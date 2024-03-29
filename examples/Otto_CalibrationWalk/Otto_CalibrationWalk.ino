@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------
 #include <Arduino.h>
 #include <Wire.h>
+#include <SoftwareSerial.h>
 #include <EEPROM.h>
 #include <Otto.h> //-- Otto Library
 Otto Otto;  //This is Otto!

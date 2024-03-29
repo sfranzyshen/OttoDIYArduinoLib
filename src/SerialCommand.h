@@ -37,7 +37,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef SerialCommand_h
 #define SerialCommand_h
 
-#ifdef ARDUINO && ARDUINO >= 100
+#if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
 #else
 #include "WProgram.h"
@@ -59,9 +59,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 
 #ifndef SERIALCOMMAND_HARDWAREONLY 
-#ifndef ARDUINO_ARCH_ESP32
 #include <SoftwareSerial.h>  
-#endif
 #endif
 
 #include <string.h>
