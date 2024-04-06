@@ -1,15 +1,15 @@
-# Otto DIY Robot Arduino Libraries
+# Otto DIY Robot Arduino Libraries - Development Branch
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![version](https://img.shields.io/badge/version-13.0-blue)
 
-This repository have all the main [Otto DIY robot](https://www.ottodiy.com/) libraries for Arduino compatible boards
+This repository has the main [Otto DIY robot](https://www.ottodiy.com/) Arduino libraries for [all Arduino compatible boards](#compatible-hardwareboards) .
 
 :star: Star us on GitHub, it helps!
 
-## Installation:
+## Installation - Development Branch:
 
-1. [Download the .zip Otto libraries here](https://github.com/OttoDIY/OttoDIYLib/archive/master.zip)
+1. [Download the .zip Otto libraries here](https://github.com/OttoDIY/OttoDIYLib/archive/refs/heads/devel.zip)
 2. Open Arduino IDE and navigate to Sketch > Include Library > Add .ZIP Library. At the top of the drop down list, select the option to "Add .ZIP Library".
 3. Navigate to the .zip file's location, that you just downloaded and open it.
 4. In the main window you will see in the bottom back area a message that it has been installed.
@@ -18,19 +18,12 @@ This repository have all the main [Otto DIY robot](https://www.ottodiy.com/) lib
 That means it is ready to use Otto example codes! you can find them in File > Examples > OttoDIYLib
 [for more details or other ways to install libraries visit this link](https://www.arduino.cc/en/Guide/Libraries)
 
-You can also find this library in the Arduino Manager as `Otto DIYLib` for quick installation, (do not use other non compatible libraries).
+## Supported Hardware
 
-## Compatible Hardware
-
-- Arduino Nano
-- Arduino Uno
-- Arduino Micro
-- Arduino Mega
-- Arduino Mini
-- Arduino Leonardo
-- Arduino Nano Every
-- ESP8266
-- ESP32
+- Arduino Nano, Uno, Micro, Mega, Mini, Leonardo, Nano Every (ATMega*)
+- Arduino Nano Connect, Raspberry Pi Pico (RP2040)
+- Arduino Nano Esp32, ESP32 (ESP32*)
+- ESP8266 (ESP8266)
 
 ## Structure
 
