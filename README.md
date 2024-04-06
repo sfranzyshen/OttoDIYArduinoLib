@@ -1,4 +1,4 @@
-# Otto DIY Robot Arduino Libraries - Develpoment Branch
+# Otto DIY Robot Arduino Libraries - Development Branch
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![version](https://img.shields.io/badge/version-13.0-blue)
