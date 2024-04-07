@@ -1,9 +1,11 @@
 # Otto DIY Robot Arduino Libraries - Development Branch
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-![version](https://img.shields.io/badge/version-13.0-blue)
+![version](https://img.shields.io/badge/version-0.1.0-blue)
 
-This repository has the main [Otto DIY robot](https://www.ottodiy.com/) Arduino libraries for [all Arduino compatible boards](#compatible-hardwareboards) .
+This branch of the repository has the development [Otto DIY robot](https://www.ottodiy.com/) Arduino libraries for [all Arduinos and compatible boards](#compatible-hardwareboards) .
+
+This project is begining a new life as of 3/31/2024 - this branch 'devel' could be currently broken ... do not use it!
 
 :star: Star us on GitHub, it helps!
 
