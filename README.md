@@ -1,9 +1,9 @@
-# Otto DIY Robot Arduino Libraries - Development Branch
+# Otto DIY Robot Arduino Library - Development Branch
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![version](https://img.shields.io/badge/version-0.1.0-blue)
 
-This branch of the repository has the development [Otto DIY robot](https://www.ottodiy.com/) Arduino libraries for [all Arduinos and compatible boards](#compatible-hardwareboards) .
+This branch of the repository has the development [Otto DIY robot](https://www.ottodiy.com/) Arduino library for [all Arduinos and compatible boards](#compatible-hardwareboards) .
 
 This project is begining a new life as of 3/31/2024 - this branch 'devel' could be currently broken ... do not use it!
 
@@ -18,24 +18,40 @@ This project is begining a new life as of 3/31/2024 - this branch 'devel' could 
 5. To verify they are properly installed, go to Sketch > Include Library menu. You should now see the library at the bottom of the drop-down menu.
 
 That means it is ready to use Otto example codes! you can find them in File > Examples > OttoDIYLib
+
 [for more details or other ways to install libraries visit this link](https://www.arduino.cc/en/Guide/Libraries)
 
-## Supported Hardware
-
+## Supported Models
+- Biped (Classic Otto)
+- Wheels & Wheels w/ Arms
+- Ninja & Ninja w/ Arms
+- Humanoid (Biped w/ Arms)
+  
+## Supported Platforms
 - Arduino Nano, Uno, Micro, Mega, Mini, Leonardo, Nano Every (ATMega*)
 - Arduino Nano Connect, Raspberry Pi Pico (RP2040)
 - Arduino Nano Esp32, ESP32 (ESP32*)
 - ESP8266 (ESP8266)
 
+## Supported Hardware (mouths, faces, sounds, and eyes)
+- Ultrasonic sensor 3, 4 and 5pin with (eyes) ws281x
+- led matrix 8x8 (mouths) spi, i2c and ws281x
+- led matrix 8x16 (eyes) spi, i2c and ws281x
+- led matrix 6x20 (eyes) ws281x
+- led matrix 6x10 (mouths) ws281x
+- led matrix 10x16 (eyes) ws281x
+- oled display 128x64 (eyes, faces) spi & i2c
+- oled display 128x32 (eyes, mouths) spi & 12c
+  
 ## Structure
-
-Base set of libraries for any biped robot that uses 4 motors in the legs as Otto.
 
 * `Otto.h` and `Otto.cpp` contains all the main functions
 * `Otto_gestures.h` contains all the gestures functions
 * `Otto_mouths.h` contains all the mouth functions
+* `Otto_eyes.h` contains all the mouth functions
 * `Otto_sounds.h` contains all the sound functions
-* `Otto_matrix.h` contains all the matrix functions
+* `Display.h` contains all the oled and led matrix functions
+* `Distance.h` contains all the distance messurement functions
 * `Oscillator.h` is the main algorithm for the servos "smooth" movement
 * `SerialCommand.c` is for Bluetooth communication vis Software serial
 
