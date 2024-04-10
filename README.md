@@ -34,16 +34,17 @@ That means it is ready to use Otto example codes! you can find them in File > Ex
 - ESP8266 (ESP8266)
 
 ## Supported Hardware (mouths, faces, sounds, and eyes)
-- Ultrasonic sensor 3, 4 and 5pin with (eyes) ws281x
+- Ultrasonic sensor 3, 4 and 5pin with rgb leds (eyes) ws281x
 - led matrix 8x8 (mouths) spi, i2c and ws281x
 - led matrix 8x16 (eyes) spi, i2c and ws281x
 - led matrix 6x20 (eyes) ws281x
 - led matrix 6x10 (mouths) ws281x
 - led matrix 10x16 (eyes) ws281x
 - oled display 128x64 (eyes, faces) spi & i2c
-- oled display 128x32 (eyes, mouths) spi & 12c
+- oled display 128x32 (eyes, mouths) spi & i2c
   
 ## Structure
+### During the development phase files will be broken out further into more files then in the release file set
 
 * `Otto.h` and `Otto.cpp` contains all the main functions
 * `Otto_gestures.h` contains all the gestures functions
