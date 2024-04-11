@@ -2,5 +2,7 @@
 
 #ifndef Otto_config_h
 #define Otto_config_h
-  #include "Otto_models.h"
+
+#include "Otto_models.h"
+
 #endif
