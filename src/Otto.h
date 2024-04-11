@@ -3,7 +3,7 @@
 #ifndef Otto_h
 #define Otto_h
 
-#include "Otto_models.h"
+#include "Otto_config.h"
 
 #ifndef Otto_model
 #define Otto_model BIPED  // default to classic biped for compatibility
