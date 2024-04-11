@@ -3,11 +3,18 @@
 #ifndef Otto_h
 #define Otto_h
 
+#include "Otto_models.h"
+
+#ifndef Otto_model
+#define Otto_model BIPED  // default to classic biped for compatibility
+#endif
+
 #ifdef ARDUINO_ARCH_ESP32
 #include <ESP32Servo.h>
 #else
 #include <Servo.h>
 #endif
+
 #include <EEPROM.h>
 #include "Oscillator.h"
 #include "Otto_sounds.h"
