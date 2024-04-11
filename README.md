@@ -1,49 +1,75 @@
-# Otto DIY Robot Arduino Library - Development Branch
+# OttoDIY Core Code Improvement Project (Development Branch)
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![version](https://img.shields.io/badge/version-0.1.0-blue)
-
-This branch of the repository has the development [Otto DIY robot](https://www.ottodiy.com/) Arduino library for [all Arduinos and compatible boards](#compatible-hardwareboards) .
-
-This project is begining a new life as of 3/31/2024 - this branch 'devel' could be currently broken ... do not use it!
-
 :star: Star us on GitHub, it helps!
 
-## Installation - Development Branch:
+This branch of the repository has the [OttoDIY robot](https://www.ottodiy.com/) "development" Arduino library for all the [OttoDIY Models](https://github.com/OttoDIY/OttoDIYLib/tree/devel#supported-models) and [compatible boards](https://github.com/OttoDIY/OttoDIYLib/tree/devel?tab=readme-ov-file#supported-platforms)
+If you are looking for the production software please refer to the [main branch](https://github.com/OttoDIY/OttoDIYLib).
 
-1. [Download the .zip Otto libraries here](https://github.com/OttoDIY/OttoDIYLib/archive/refs/heads/devel.zip)
-2. Open Arduino IDE and navigate to Sketch > Include Library > Add .ZIP Library. At the top of the drop down list, select the option to "Add .ZIP Library".
-3. Navigate to the .zip file's location, that you just downloaded and open it.
-4. In the main window you will see in the bottom back area a message that it has been installed.
-5. To verify they are properly installed, go to Sketch > Include Library menu. You should now see the library at the bottom of the drop-down menu.
+### Versioning for the project will follow a three-numeral format separated by decimal points, for example, 0.1.0
 
-That means it is ready to use Otto example codes! you can find them in File > Examples > OttoDIYLib
+The first numeral represents the major software version number. Versions with the same major number should maintain full compatibility with each other.
+The second numeral indicates the stability number. Odd numbers denote development releases, while even numbers signify stable releases.
+The last numeral is the minor release number, incrementally increased to distinguish it from the previous minor release." We are currently at ![version](https://img.shields.io/badge/version-0.1.0-blue) to 
+indicate that there is no version or release yet ... but we are in development. Our first development release will be ![version](https://img.shields.io/badge/version-1.1.1-blue)
 
-[for more details or other ways to install libraries visit this link](https://www.arduino.cc/en/Guide/Libraries)
+## Project Objective:
+To enhance the core code running OttoDIY in order to address its current limitations and make it more competitive in the educational tech arena.
+
+## Project Scope:
+* #### Code Refactoring:
+  Evaluate the existing codebase to identify areas for refactoring.
+  Refactor the code to improve its structure, readability, and maintainability.
+* #### Functionality Enhancement:
+  Identify key functionalities that need improvement or addition.
+  Enhance existing functionalities to make them more robust and responsive.
+  Implement new features to address current limitations and meet user needs.
+* #### Reliability Improvement:
+  Address any known issues or bugs that affect the reliability of the code.
+  Improve error handling and error reporting mechanisms to enhance the stability of the system.
+* #### Documentation Update:
+  Review and update existing documentation to reflect changes made to the codebase.
+  Ensure comprehensive documentation covering installation, usage, and troubleshooting.
+* #### Testing and Quality Assurance:
+  Develop and execute test cases to ensure the reliability and functionality of the updated code.
+  Implement automated testing where feasible to streamline the testing process.
+  Conduct thorough quality assurance to identify and address any issues before deployment.
+* #### Deployment Plan:
+  Develop a plan for deploying the updated code to users.
+  Consider methods for migrating existing users to the new version smoothly.
+  Provide support and assistance to users during the transition period.
+
+### Constraints and Assumptions:
+* #### Limited resources (e.g., developers, testers, time).
+* #### Compatibility with existing hardware and software configurations.
+* #### User acceptance of the updated code.
+* #### Adherence to project timeline and budget constraints.
 
 ## Supported Models
-- Biped & Biped w/ Arms
-- Wheels & Wheels w/ Arms
-- Ninja & Ninja w/ Arms
-  
-## Supported Platforms
-- Arduino Nano, Uno, Micro, Mega, Mini, Leonardo, Nano Every (ATMega*)
-- Arduino Nano Connect, Raspberry Pi Pico (RP2040)
-- Arduino Nano Esp32, ESP32 (ESP32*)
-- ESP8266 (ESP8266)
+  - Biped (Classic) & Biped w/ Arms
+  - Wheels & Wheels w/ Arms
+  - Ninja & Ninja w/ Arms
 
-## Supported Hardware (mouths, faces, sounds, and eyes)
-- Ultrasonic sensor 3, 4 and 5pin with rgb leds (eyes) ws281x
-- led matrix 8x8 (mouths) spi, i2c and ws281x
-- led matrix 8x16 (eyes) spi, i2c and ws281x
-- led matrix 6x20 (eyes) ws281x
-- led matrix 6x10 (mouths) ws281x
-- led matrix 10x16 (eyes) ws281x
-- oled display 128x64 (eyes, faces) spi & i2c
-- oled display 128x32 (eyes, mouths) spi & i2c
+## Supported Platforms
+  - Arduino Nano, Uno, Micro, Mega, Mini, Leonardo, Nano Every (ATMega*)
+  - Arduino Nano Connect, Raspberry Pi Pico (RP2040)
+  - Arduino Nano Esp32, ESP32 (ESP32*)
+  - ESP8266 (ESP8266)
+
+## Supported Hardware
+  ### (mouths, faces, sounds, and eyes)  
+  - Ultrasonic sensor 3, 4 and 5pin with rgb leds (eyes) ws281x
+  - Led matrix 8x8 (mouths) spi, i2c and ws281x
+  - Led matrix 8x16 (eyes) spi, i2c and ws281x
+  - Led matrix 6x20 (eyes) ws281x
+  - Led matrix 6x10 (mouths) ws281x
+  - Led matrix 10x16 (eyes) ws281x
+  - Oled display 128x64 (eyes, faces) spi & i2c
+  - Oled display 128x32 (eyes, mouths) spi & i2c
   
 ## Structure
-### During the development phase files will be broken out further into more files then in the release file set
+#### In the development phase, files will be further divided into more files compared to the release file set
 
 * `Otto.h` and `Otto.cpp` contains all the main functions
 * `Otto_gestures.h` contains all the gestures functions
