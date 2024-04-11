@@ -1,63 +1,35 @@
-#if defined(ARDUINO) && ARDUINO >= 100                                                //FIXME: outdated
-  #include "Arduino.h"
-#else
-  #include "WProgram.h"
-  #include <pins_arduino.h>
-#endif
+#include <Arduino.h>
 #include "Otto.h"
-#include <Oscillator.h>
+#include "Oscillator.h"
 
-void Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer) { //FIXME: outdated
+void Otto::init() { 
 
-  servo_pins[0] = YL;
-  servo_pins[1] = YR;
-  servo_pins[2] = RL;
-  servo_pins[3] = RR;
-
-  attachServos();
-  isOttoResting=false;
-
-  if (load_calibration) {
-    for (int i = 0; i < 4; i++) {
-      int servo_trim = EEPROM.read(i);
-      if (servo_trim > 128) servo_trim -= 256;
-      servo[i].SetTrim(servo_trim);
-    }
-  }
-
-  //Buzzer pin:
-  pinBuzzer = Buzzer;
-  pinMode(Buzzer,OUTPUT);
- 
-}
-///////////////////////////////////////////////////////
-void Otto::initMATRIX(int DIN, int CS, int CLK, int rotate){                    //FIXME: move
-ledmatrix.init( DIN, CS, CLK, 1, rotate);   // set up Matrix display
-}
-void Otto::matrixIntensity(int intensity){                                      //FIXME: move
-ledmatrix.setIntensity(intensity);
 }
 
-///////////////////////////////////////////////////////////////////
-//-- ATTACH & DETACH FUNCTIONS ----------------------------------//
-///////////////////////////////////////////////////////////////////
-void Otto::attachServos(){                                                      //FIXME: move
-    servo[0].attach(servo_pins[0]);
-    servo[1].attach(servo_pins[1]);
-    servo[2].attach(servo_pins[2]);
-    servo[3].attach(servo_pins[3]);
+void Otto::initMATRIX(int DIN, int CS, int CLK, int rotate) {                    //FIXME: move
+  ledmatrix.init(DIN, CS, CLK, 1, rotate);  // set up Matrix display
 }
 
-void Otto::detachServos(){                                                      //FIXME: move
-    servo[0].detach();
-    servo[1].detach();
-    servo[2].detach();
-    servo[3].detach();
+void Otto::matrixIntensity(int intensity) {                                      //FIXME: move
+  ledmatrix.setIntensity(intensity);
 }
 
-///////////////////////////////////////////////////////////////////
-//-- OSCILLATORS TRIMS ------------------------------------------//
-///////////////////////////////////////////////////////////////////
+// ATTACH & DETACH FUNCTIONS
+void Otto::attachServos() {                                                      //FIXME: move
+  servo[0].attach(servo_pins[0]);
+  servo[1].attach(servo_pins[1]);
+  servo[2].attach(servo_pins[2]);
+  servo[3].attach(servo_pins[3]);
+}
+
+void Otto::detachServos() {                                                      //FIXME: move
+  servo[0].detach();
+  servo[1].detach();
+  servo[2].detach();
+  servo[3].detach();
+}
+
+// OSCILLATORS TRIMS
 void Otto::setTrims(int YL, int YR, int RL, int RR) {                          //FIXME: move
   servo[0].SetTrim(YL);
   servo[1].SetTrim(YR);
@@ -66,137 +38,129 @@ void Otto::setTrims(int YL, int YR, int RL, int RR) {                          /
 }
 
 void Otto::saveTrimsOnEEPROM() {                                               //FIXME: move
-
-  for (int i = 0; i < 4; i++){
-      EEPROM.write(i, servo[i].getTrim());
+  for(int i = 0; i < 4; i++) {
+    EEPROM.write(i, servo[i].getTrim());
   }
 }
 
-///////////////////////////////////////////////////////////////////
-//-- BASIC MOTION FUNCTIONS -------------------------------------//
-///////////////////////////////////////////////////////////////////
+// BASIC MOTION FUNCTIONS
 void Otto::_moveServos(int time, int  servo_target[]) {                        //FIXME: move
-
   attachServos();
-  if(getRestState()==true){
-        setRestState(false);
+  if(getRestState()==true) {
+    setRestState(false);
   }
-
   final_time =  millis() + time;
-  if(time>10){
-    for (int i = 0; i < 4; i++) increment[i] = (servo_target[i] - servo[i].getPosition()) / (time / 10.0);
-
-    for (int iteration = 1; millis() < final_time; iteration++) {
-      partial_time = millis() + 10;
-      for (int i = 0; i < 4; i++) servo[i].SetPosition(servo[i].getPosition() + increment[i]);
-      while (millis() < partial_time); //pause
+  if(time > 10) {
+    for(int i = 0; i < 4; i++) {
+      increment[i] = (servo_target[i] - servo[i].getPosition()) / (time / 10.0);
     }
+    for(int iteration = 1; millis() < final_time; iteration++) {
+      partial_time = millis() + 10;
+      for(int i = 0; i < 4; i++) {
+        servo[i].SetPosition(servo[i].getPosition() + increment[i]);
+      }
+      while(millis() < partial_time); //pause FIXME: eliminate delays
+    }
+  } else {
+    for(int i = 0; i < 4; i++) {
+      servo[i].SetPosition(servo_target[i]);
+    }
+    while (millis() < final_time); //pause FIXME: eliminate delays
   }
-  else{
-    for (int i = 0; i < 4; i++) servo[i].SetPosition(servo_target[i]);
-    while (millis() < final_time); //pause
-  }
-
-  // final adjustment to the target. if servo speed limiter is turned on, reaching to the goal may take longer than 
-  // requested time.
+  // final adjustment to the target. if servo speed limiter is turned on, reaching to the goal may take longer than requested time.
   bool f = true;
   while(f) {
     f = false;
-    for (int i = 0; i < 4; i++) {
-      if (servo_target[i] != servo[i].getPosition()) {
+    for(int i = 0; i < 4; i++) {
+      if(servo_target[i] != servo[i].getPosition()) {
         f = true;
         break;
       }
     }
-    if (f) {
-      for (int i = 0; i < 4; i++) {
+    if(f) {
+      for(int i = 0; i < 4; i++) {
         servo[i].SetPosition(servo_target[i]);
       }
       partial_time = millis() + 10;
-      while (millis() < partial_time); //pause
+      while(millis() < partial_time); //pause FIXME: eliminate delays
     }
-  };
+  }
 }
 
 void Otto::_moveSingle(int position, int servo_number) {                            //FIXME: move
-if (position > 180) position = 90;
-if (position < 0) position = 90;
-  attachServos();
-  if(getRestState()==true){
-        setRestState(false);
+  int servoNumber = servo_number;
+  if(position > 180) {
+    position = 90;
   }
-int servoNumber = servo_number;
-if (servoNumber == 0){
-  servo[0].SetPosition(position);
-}
-if (servoNumber == 1){
-  servo[1].SetPosition(position);
-}
-if (servoNumber == 2){
-  servo[2].SetPosition(position);
-}
-if (servoNumber == 3){
-  servo[3].SetPosition(position);
-}
+  if(position < 0) {
+    position = 90;
+  }
+  attachServos();
+  if(getRestState() == true) {
+    setRestState(false);
+  }
+  if(servoNumber == 0) {
+    servo[0].SetPosition(position);
+  }
+  if(servoNumber == 1) {
+    servo[1].SetPosition(position);
+  }
+  if(servoNumber == 2) {
+    servo[2].SetPosition(position);
+  }
+  if(servoNumber == 3) {
+    servo[3].SetPosition(position);
+  }
 }
 
-void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle=1){    //FIXME: move
-
-  for (int i=0; i<4; i++) {
+void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle = 1) {    //FIXME: move
+  for(int i=0; i<4; i++) {
     servo[i].SetO(O[i]);
     servo[i].SetA(A[i]);
     servo[i].SetT(T);
     servo[i].SetPh(phase_diff[i]);
   }
-  double ref=millis();
-   for (double x=ref; x<=T*cycle+ref; x=millis()){
-     for (int i=0; i<4; i++){
-        servo[i].refresh();
-     }
+  double ref = millis();
+  for(double x = ref; x <= T * cycle + ref; x = millis()) {
+    for(int i = 0; i < 4; i++) {
+      servo[i].refresh();
+    }
   }
 }
 
-void Otto::_execute(int A[4], int O[4], int T, double phase_diff[4], float steps = 1.0){    //FIXME: move
-
+void Otto::_execute(int A[4], int O[4], int T, double phase_diff[4], float steps = 1.0) {    //FIXME: move
   attachServos();
-  if(getRestState()==true){
-        setRestState(false);
+  if(getRestState() == true) {
+    setRestState(false);
   }
+  int cycles = (int)steps;
 
-
-  int cycles=(int)steps;
-
-  //-- Execute complete cycles
-  if (cycles >= 1)
-    for(int i = 0; i < cycles; i++)
-      oscillateServos(A,O, T, phase_diff);
-
-  //-- Execute the final not complete cycle
-  oscillateServos(A,O, T, phase_diff,(float)steps-cycles);
+  // Execute complete cycles
+  if(cycles >= 1) {
+    for(int i = 0; i < cycles; i++) {
+      oscillateServos(A, O, T, phase_diff);
+    }
+  }
+  // Execute the final not complete cycle
+  oscillateServos(A, O, T, phase_diff, (float)steps-cycles);
 }
 
-///////////////////////////////////////////////////////////////////
-//-- HOME = Otto at rest position -------------------------------//
-///////////////////////////////////////////////////////////////////
-void Otto::home(){                                                                            //FIXME: move
-
-  if(isOttoResting==false){ //Go to rest position only if necessary
-
-    int homes[4]={90, 90, 90, 90}; //All the servos at rest position
-    _moveServos(500,homes);   //Move the servos in half a second
-
+// HOME - Otto at rest position
+void Otto::home() {                                                    //FIXME: move
+  if(isOttoResting == false) {       //Go to rest position only if necessary
+    int homes[4] = {90, 90, 90, 90}; //All the servos at rest position
+    _moveServos(500, homes);         //Move the servos in half a second
     detachServos();
-    isOttoResting=true;
+    isOttoResting = true;
   }
 }
 
-bool Otto::getRestState(){
-    return isOttoResting;
+bool Otto::getRestState() {
+  return isOttoResting;
 }
 
-void Otto::setRestState(bool state){
-
-    isOttoResting = state;
+void Otto::setRestState(bool state) {
+  isOttoResting = state;
 }
 
 ///////////////////////////////////////////////////////////////////
