@@ -4,7 +4,8 @@
 // GPL license
 // https://github.com/Obijuan/ArduSnake/tree/master/ArduSnake
 // http://www.iearobotics.com/wiki/index.php?title=ArduSnake:_Arduino_Modular_Snake_Robots_Library
-// Used by OttoDIY project 2024
+// Used by OttoDIY Arduino Library project 2024
+
 
 #include "Arduino.h"
 #include "Oscillator.h"
