@@ -1,7 +1,6 @@
-// Oscillator.cpp
+// Oscillator.cpp ~ GPL license
 // Generate sinusoidal oscillations in the servos
 // (c) Juan Gonzalez-Gomez (Obijuan), Dec 2011
-// GPL license
 // https://github.com/Obijuan/ArduSnake/tree/master/ArduSnake
 // http://www.iearobotics.com/wiki/index.php?title=ArduSnake:_Arduino_Modular_Snake_Robots_Library
 // Used by OttoDIY Arduino Library project 2024
