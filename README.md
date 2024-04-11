@@ -22,10 +22,9 @@ That means it is ready to use Otto example codes! you can find them in File > Ex
 [for more details or other ways to install libraries visit this link](https://www.arduino.cc/en/Guide/Libraries)
 
 ## Supported Models
-- Biped (Classic Otto)
+- Biped & Biped w/ Arms
 - Wheels & Wheels w/ Arms
 - Ninja & Ninja w/ Arms
-- Humanoid (Biped w/ Arms)
   
 ## Supported Platforms
 - Arduino Nano, Uno, Micro, Mega, Mini, Leonardo, Nano Every (ATMega*)
