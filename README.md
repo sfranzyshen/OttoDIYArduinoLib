@@ -1,6 +1,8 @@
 # OttoDIY Core Code Improvement Project [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) ![version](https://img.shields.io/badge/version-0.1.0-blue) 
 ### Development Branch :star: Star us on GitHub, it helps!
 
+<a href="https://discord.com/channels/691410809586450483/1228242677963685918"><img src="https://images.squarespace-cdn.com/content/v1/5cd3e3917046805e4d6700e3/1560193788834-KYURUXVSZAIE4XX1ZB2F/ke17ZwdGBToddI8pDm48kK6MRMHcYvpidTm-7i2qDf_lfiSMXz2YNBs8ylwAJx2qLijIv1YpVq4N1RMuCCrb3iJz4vYg48fcPCuGX417dnbl3kVMtgxDPVlhqW83Mmu6GipAUbdvsXjVksOX7D692AoyyEsAbPHhHcQMU6bWQFI/join_discord_button_small.png" width="25%"></a>
+
 This branch of the repository has the [OttoDIY robot](https://www.ottodiy.com/) "development" Arduino library for all the [OttoDIY Models](https://github.com/OttoDIY/OttoDIYLib/tree/devel#supported-models) and [compatible boards](https://github.com/OttoDIY/OttoDIYLib/tree/devel?tab=readme-ov-file#supported-platforms)
 If you are looking for the production software please refer to the [main branch](https://github.com/OttoDIY/OttoDIYLib).
 
@@ -9,7 +11,8 @@ If you are looking for the production software please refer to the [main branch]
 The first numeral represents the major software version number. Versions with the same major number should maintain full compatibility with each other.
 The second numeral indicates the stability number. Odd numbers denote development releases, while even numbers signify stable releases.
 The last numeral is the minor release number, incrementally increased to distinguish it from the previous minor release." We are currently at 0.1.0 to 
-indicate that there is no version or release yet ... but we are in development. Our initial development release, version 1.1.1, will aim to maintain complete backward compatibility with the existing OttoDIY Arduino library.
+indicate that there is no version or release yet ... but we are in development. 
+#### Our initial development release, version 1.1.1, will aim to maintain complete backwards compatibility with the existing OttoDIY Arduino library.
 
 ## Project Objective:
 To enhance the core code running OttoDIY in order to address its current limitations and make it more competitive in the educational tech arena.
