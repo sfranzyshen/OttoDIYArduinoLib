@@ -1,8 +1,5 @@
-# OttoDIY Core Code Improvement Project (Development Branch)
-
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-![version](https://img.shields.io/badge/version-0.1.0-blue)
-:star: Star us on GitHub, it helps!
+# OttoDIY Core Code Improvement Project [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) ![version](https://img.shields.io/badge/version-0.1.0-blue) 
+### Development Branch :star: Star us on GitHub, it helps!
 
 This branch of the repository has the [OttoDIY robot](https://www.ottodiy.com/) "development" Arduino library for all the [OttoDIY Models](https://github.com/OttoDIY/OttoDIYLib/tree/devel#supported-models) and [compatible boards](https://github.com/OttoDIY/OttoDIYLib/tree/devel?tab=readme-ov-file#supported-platforms)
 If you are looking for the production software please refer to the [main branch](https://github.com/OttoDIY/OttoDIYLib).
@@ -11,8 +8,8 @@ If you are looking for the production software please refer to the [main branch]
 
 The first numeral represents the major software version number. Versions with the same major number should maintain full compatibility with each other.
 The second numeral indicates the stability number. Odd numbers denote development releases, while even numbers signify stable releases.
-The last numeral is the minor release number, incrementally increased to distinguish it from the previous minor release." We are currently at ![version](https://img.shields.io/badge/version-0.1.0-blue) to 
-indicate that there is no version or release yet ... but we are in development. Our first development release will be ![version](https://img.shields.io/badge/version-1.1.1-blue)
+The last numeral is the minor release number, incrementally increased to distinguish it from the previous minor release." We are currently at 0.1.0 to 
+indicate that there is no version or release yet ... but we are in development. Our initial development release, version 1.1.1, will aim to maintain complete backward compatibility with the existing OttoDIY Arduino library.
 
 ## Project Objective:
 To enhance the core code running OttoDIY in order to address its current limitations and make it more competitive in the educational tech arena.
@@ -44,7 +41,7 @@ To enhance the core code running OttoDIY in order to address its current limitat
 * #### Limited resources (e.g., developers, testers, time).
 * #### Compatibility with existing hardware and software configurations.
 * #### User acceptance of the updated code.
-* #### Adherence to project timeline and budget constraints.
+* #### Adherence to project timeline.
 
 ## Supported Models
   - Biped (Classic) & Biped w/ Arms
@@ -58,28 +55,35 @@ To enhance the core code running OttoDIY in order to address its current limitat
   - ESP8266 (ESP8266)
 
 ## Supported Hardware
-  ### (mouths, faces, sounds, and eyes)  
-  - Ultrasonic sensor 3, 4 and 5pin with rgb leds (eyes) ws281x
-  - Led matrix 8x8 (mouths) spi, i2c and ws281x
-  - Led matrix 8x16 (eyes) spi, i2c and ws281x
-  - Led matrix 6x20 (eyes) ws281x
-  - Led matrix 6x10 (mouths) ws281x
-  - Led matrix 10x16 (eyes) ws281x
-  - Oled display 128x64 (eyes, faces) spi & i2c
-  - Oled display 128x32 (eyes, mouths) spi & i2c
-  
+  ### Outputs (Mouths, Faces, Sounds, and Eyes)  
+  - Ultrasonic sensor 3, 4 and 5pin with rgb leds (eyes) ws281x (rgb)
+  - Led matrix 8x8 (mouths) spi, i2c (mono) and ws281x (rgb)
+  - Led matrix 8x16 (eyes) spi, i2c (mono) and ws281x (rgb)
+  - Led matrix 6x20 (eyes) ws281x (rgb)
+  - Led matrix 6x10 (mouths) ws281x (rgb)
+  - Led matrix 10x16 (eyes) ws281x (rgb)
+  - Oled display 128x64 (eyes, faces) spi & i2c (mono)
+  - Oled display 128x32 (eyes, mouths) spi & i2c (mono)
+  ### Inputs (Distance, Line-follower, Noise, Button, and Touch)
+  - Ultrasonic sensor 3, 4 and 5pin (gpio, i2c)
+  - IR Line-follower Sensor 3 and 4 pin (gpio, analog)
+  - microphone 3, 4 and 5 pin (gpio, analog)
+  - IR distance sensor 3 pin (analog)
+    
 ## Structure
-#### In the development phase, files will be further divided into more files compared to the release file set
+#### In the development phase, files will be further divided into more files compared to the release file set.
 
-* `Otto.h` and `Otto.cpp` contains all the main functions
-* `Otto_gestures.h` contains all the gestures functions
+* `Otto.h` and `Otto.cpp` contains all the main otto functions
+* `Otto_gestures.h` contains all the otto gestures functions
 * `Otto_mouths.h` contains all the mouth functions
-* `Otto_eyes.h` contains all the mouth functions
-* `Otto_sounds.h` contains all the sound functions
-* `Display.h` contains all the oled and led matrix functions
-* `Distance.h` contains all the distance messurement functions
-* `Oscillator.h` is the main algorithm for the servos "smooth" movement
-* `SerialCommand.c` is for Bluetooth communication vis Software serial
+* `Otto_moves.h` contains all the otto movement functions
+* `Otto_eyes.h` contains all the otto eye functions
+* `Otto_sounds.h` contains all the otto sound functions
+* `Display.h` and `Display.cpp` contains all the oled and led matrix functions
+* `Distance.h` and `Distance.cpp` contains all the distance messurement functions
+* `Oscillator.h` and `Oscillator.cpp` is the main algorithm for the servos "smooth" movement
+* `Sound.h` and `Sound.cpp` contains all the code for making sounds
+* `SerialCommand.h` and `SerialCommand.cpp` is for Bluetooth communication vis Software serial or native Bluetooth
 
 ### Adding library
 
