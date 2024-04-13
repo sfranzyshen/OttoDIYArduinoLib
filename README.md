@@ -87,123 +87,61 @@ To enhance the core code running OttoDIY in order to address its current limitat
 * `Sound.h` and `Sound.cpp` contains all the code for making sounds
 * `SerialCommand.h` and `SerialCommand.cpp` is for Bluetooth communication vis Software serial or native Bluetooth
 
-### Current Otto API: 
-#### (Typical Biped with buzzer and mouth matrix)
-```cpp
-  #include <Otto.h>
-  Otto Otto;
-
-  #define YL      2	// left leg pin
-  #define YR      3	// right leg pin
-  #define RL      4	// left foot pin
-  #define RR      5	// right foot pin
-  #define Buzzer  13 	// buzzer pin
-
-  #define CLK     A1    // Clock pin
-  #define CS      A2    // Chip Select pin
-  #define DIN     A3    // Data In pin
-  #define Rotate  0     // 8x8 LED Matrix orientation  Top  = 1, Bottom = 2, Left = 3, Right = 4
-	
-  void Otto.init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer);
-  void Otto.initMATRIX(int DIN, int CS, int CLK, int rotate);
-  void Otto.matrixIntensity(int intensity);
-  void Otto.setLed(byte X, byte Y, byte value);
-  void Otto.writeText (const char * s, byte scrollspeed);	
-	
-  void Otto.setTrims(int TYL, int TYR, int TRL, int TRR);
-  void Otto.saveTrimsOnEEPROM();
-	
-  void Otto._moveServos(int time, int  servo_target[]);
-  void Otto._moveSingle(int position,int  servo_number);
-  void Otto.oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle);
-  bool Otto.getRestState();
-  void Otto.setRestState(bool state);
-  void Otto.attachServos();
-  void Otto.detachServos();
-  void Otto.enableServoLimit(int speed_limit_degree_per_sec = SERVO_LIMIT_DEFAULT);
-  void Otto.disableServoLimit();
-	
-  void Otto.home();
-  void Otto.jump(float steps=1, int T = 2000);
-  void Otto.walk(float steps=4, int T=1000, int dir = FORWARD);
-  void Otto.turn(float steps=4, int T=2000, int dir = LEFT);
-  void Otto.bend (int steps=1, int T=1400, int dir=LEFT);
-  void Otto.shakeLeg (int steps=1, int T = 2000, int dir=RIGHT);
-  void Otto.updown(float steps=1, int T=1000, int h = 20);
-  void Otto.swing(float steps=1, int T=1000, int h=20);
-  void Otto.tiptoeSwing(float steps=1, int T=900, int h=20);
-  void Otto.jitter(float steps=1, int T=500, int h=20);
-  void Otto.ascendingTurn(float steps=1, int T=900, int h=20);
-  void Otto.moonwalker(float steps=1, int T=900, int h=20, int dir=LEFT);
-  void Otto.crusaito(float steps=1, int T=900, int h=20, int dir=FORWARD);
-  void Otto.flapping(float steps=1, int T=1000, int h=20, int dir=FORWARD);
-	
-  void Otto.putMouth(unsigned long int mouth, bool predefined = true);
-  void Otto.putAnimationMouth(unsigned long int anim, int index);
-  void Otto.clearMouth();
-    
-  void Otto._tone(float noteFrequency, long noteDuration, int silentDuration);
-  void Otto.bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration);
-  void Otto.sing(int songName);
-    
-  void Otto.playGesture(int gesture);
-```
-
 ### Proposed Otto API: 
 #### (Biped with arms model, RGB ultrasonic eyes, buzzer sound, and a mono spi matrix mouth)
 ```cpp
-  #include "Otto_config.h"		// first, include preprocessor configuration directives
+  #include "Otto_config.h"	// first, include preprocessor configuration directives
 
-  // Otto Config			// next define Otto's configuration (can be blockly generated)
+  // Otto Config		// next define Otto's configuration (can be blockly generated)
   #define Otto_code	  BLOCKING
 ```
 The Otto_code directive sets the overall sketch coding style, which can be overridden at the function call level, and defaults to BLOCKING. When set to NON_BLOCKING, all functions will default to non-blocking behavior."
 ```cpp
-  #define Otto_model	  BIPED_ARMS	// 6x 180° Servos
-  #define Otto_sound	  BUZZER
-  #define Otto_mouth	  LED_MATRIX_8X8_MONO_SPI
-  #define Otto_eyes	  LED_USONIC_RGB_NEO
+  #define Otto_model	  	BIPED_ARMS	// 6x 180° Servos
+  #define Otto_sound	  	BUZZER
+  #define Otto_mouth	  	LED_MATRIX_8X8_MONO_SPI
+  #define Otto_eyes	  	LED_USONIC_RGB_NEO
 
   // Otto Servos		define Otto's servos (can be blockly generated)
-  #define Otto_SERVOS	  6	// total number of servos
-  #define Otto_LL	  2	// left leg pin
-  #define Otto_LR	  3	// right leg pin
-  #define Otto_FL	  4	// left foot pin
-  #define Otto_FR	  5	// right foot pin
-  #define Otto_AL	  6	// left arm pin
-  #define Otto_AR	  7	// right arm pin
+  #define Otto_SERVOS	  	6	// total number of servos
+  #define Otto_LL	  	2	// left leg pin
+  #define Otto_LR	  	3	// right leg pin
+  #define Otto_FL	  	4	// left foot pin
+  #define Otto_FR	 	5	// right foot pin
+  #define Otto_AL	 	6	// left arm pin
+  #define Otto_AR	  	7	// right arm pin
 
   // Otto Sound			define Otto's sound (can be blockly generated)
-  #define Otto_Buzzer     13   // buzzer pin
+  #define Otto_Buzzer     	13   // buzzer pin
 
   // Otto Eyes		    	define Otto's eyes (can be blockly generated)
-  #define Otto_EYES_PIN	  12   // ultrasonic eyes neopixel pin
-  #define Otto_EYES_START 0    // ultrasonic eyes neopixel start pixel
-  #define Otto_EYES_END	  5    // ultrasonic eyes neopixel end pixel
+  #define Otto_EYES_PIN	  	12   // ultrasonic eyes neopixel pin
+  #define Otto_EYES_START 	0    // ultrasonic eyes neopixel start pixel
+  #define Otto_EYES_END	  	5    // ultrasonic eyes neopixel end pixel
 
   // Otto Mouth			define Otto's mouth (can be blockly generated)
   #define Otto_MOUTH_CLK       	A1   // Clock pin
   #define Otto_MOUTH_CS        	A2   // Chip Select pin
   #define Otto_MOUTH_DIN       	A3   // Data In pin
-  #define Otto_MOUTH_Rotate    	0    // 8x8 LED Matrix orientation  Top  = 1, Bottom = 2, Left = 3, Right = 4
+  #define Otto_MOUTH_Rotate    	0    // 8x8 Matrix orientation Top = 1, Bottom = 2, Left = 3, Right = 4
 ```
-If none of the above directives are included in the sketch, the API defaults to the "current" Otto API configuration, which is set to a standard biped for compatibility. After declaring the configuration, include the Otto.h API that will use the compiler preprocessor to selectively add or exclude code segments.
+After declaring the configuration, include the Otto.h API that will use the compiler preprocessor to selectively add or exclude code segments. If none of the above directives are included in the sketch, the API defaults to the "current" Otto API configuration, which is set to a standard biped for compatibility. 
 ```cpp
   #include <Otto.h>
   Otto Otto;
 ```
 All functions now return an (int) value, which can be tested for error handling or for compatibility it can be ignored.
 ```cpp
-  int Otto.init(const char * name);						// every Otto should have a unique name. Can be used for Wifi, etc.
-  int Otto.Servos_init(LL, LR, FL, FR, AL, AR);					// initialize the servos (called by Otto.init() not directly)
-  int Otto.Mouth_init(int DIN, int CS, int CLK, int rotate);			// initialize the mouth display (called by Otto.init() not directly)
-  int Otto.Sound_init(int Buzzer);						// initialize the sound output device (called by Otto.init() not directly)
-  int Otto.Eyes_init(int EYES_NEO_PIN, int EYES_NEO_START, int EYES_NEO_END);	// initialize the eyes output device (called by Otto.init() not directly)
+  int Otto.init(const char * name);		// every Otto should have a unique name. Can be used for Wifi, etc.
+  int Otto.Servos_init(LL, LR, FL, FR, AL, AR);			
+  int Otto.Mouth_init(int DIN, int CS, int CLK, int rotate);	
+  int Otto.Sound_init(int Buzzer);				
+  int Otto.Eyes_init(int EYES_NEO_PIN, int EYES_NEO_START, int EYES_NEO_END);
 ```
 Many functions in the Otto API now include an optional (int) noblock parameter, which defaults to BLOCKING for compatibility.
 However, the underlying code has been modified to be non-blocking. This modification allows for greater flexibility and can be
 extended to user-level code. For younger beginner students, understanding blocking, sequentially executed commands is straightforward.
-However, for older, more experienced students, blocking code can be seen as a limitation and may exclude the current Otto from being used.
+However, for older, more experienced students, blocking code can be seen as a limitation and may exclude the current Otto from being used in the classroom.
 ```cpp
   int Otto.home(int noblock = BLOCKING);
   int Otto.jump(float steps = 1, int T = 2000, int noblock = BLOCKING);
