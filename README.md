@@ -6,7 +6,7 @@
 This branch of the repository has the [OttoDIY robot](https://www.ottodiy.com/) "development" Arduino library for all the [OttoDIY Models](https://github.com/OttoDIY/OttoDIYLib/tree/devel#supported-models) and [compatible boards](https://github.com/OttoDIY/OttoDIYLib/tree/devel?tab=readme-ov-file#supported-platforms)
 If you are looking for the production software please refer to the [main branch](https://github.com/OttoDIY/OttoDIYLib).
 
-### Versioning for the project will follow a three-numeral format separated by decimal points, for example, 0.1.0
+#### Versioning for the project will follow a three-numeral format separated by decimal points, for example, 0.1.0
 
 The first numeral represents the major software version number. Versions with the same major number should maintain full compatibility with each other.
 The second numeral indicates the stability number. Odd numbers denote development releases, while even numbers signify stable releases.
@@ -14,10 +14,10 @@ The last numeral is the minor release number, incrementally increased to disting
 indicate that there is no version or release yet ... but we are in development. 
 #### Our initial development release, version 1.1.1, will aim to maintain complete backwards compatibility with the existing OttoDIY Arduino library.
 
-## Project Objective:
+### Project Objective:
 To enhance the core code running OttoDIY in order to address its current limitations and make it more competitive in the educational tech arena.
 
-## Project Scope:
+### Project Scope:
 * #### Code Refactoring:
   Evaluate the existing codebase to identify areas for refactoring.
   Refactor the code to improve its structure, readability, and maintainability.
@@ -51,14 +51,14 @@ To enhance the core code running OttoDIY in order to address its current limitat
   - Wheels & Wheels w/ Arms
   - Ninja & Ninja w/ Arms
 
-## Supported Platforms
+### Supported Platforms
   - Arduino Nano, Uno, Micro, Mega, Mini, Leonardo, Nano Every (ATMega*)
   - Arduino Nano Connect, Raspberry Pi Pico (RP2040)
   - Arduino Nano Esp32, ESP32 (ESP32*)
   - ESP8266 (ESP8266)
 
-## Supported Hardware
-  ### Outputs (Mouths, Faces, Sounds, and Eyes)  
+### Supported Hardware
+  #### Outputs (Mouths, Faces, Sounds, and Eyes)  
   - Ultrasonic sensor 3, 4 and 5pin with rgb leds (eyes) ws281x (rgb)
   - Led matrix 8x8 (mouths) spi, i2c (mono) and ws281x (rgb)
   - Led matrix 8x16 (eyes) spi, i2c (mono) and ws281x (rgb)
@@ -67,13 +67,13 @@ To enhance the core code running OttoDIY in order to address its current limitat
   - Led matrix 10x16 (eyes) ws281x (rgb)
   - Oled display 128x64 (eyes, faces) spi & i2c (mono)
   - Oled display 128x32 (eyes, mouths) spi & i2c (mono)
-  ### Inputs (Distance, Line-follower, Noise, Button, Touch, ...)
+  #### Inputs (Distance, Line-follower, Noise, Button, Touch, ...)
   - Ultrasonic sensor 3, 4 and 5pin (gpio, i2c)
   - IR Line-follower Sensor 3 and 4 pin (gpio, analog)
   - microphone 3, 4 and 5 pin (gpio, analog)
   - IR distance sensor 3 pin (analog)
     
-## Source File Structure
+### Source File Structure
 #### In the development phase, files will be further divided into more files compared to the release file set.
 
 * `Otto.h` and `Otto.cpp` contains all the main otto functions
