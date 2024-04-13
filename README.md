@@ -180,11 +180,11 @@ However, for older, more experienced students, blocking code can be seen as a li
 
   int Otto.Servos_moveServos(int time, int servo_target[], int noblock = BLOCKING);
   int Otto.Servos_moveSingle(int position, int servo_number, int noblock = BLOCKING);
-  int Otto.Servos_oscillateServos(int A[Otto_SERVOS], int O[Otto_SERVOS], int T, double phase_diff[Otto_SERVOS], float cycle, int noblock = BLOCKING);
+  int Otto.Servos_oscillateServos(int A[6], int O[6], int T, double phase_diff[6], float cycle, int noblock = BLOCKING);
   bool Otto.Servos_getRestState();
   int Otto.Servos_setRestState(bool state);
-  int Otto.Servos_attachServos(int noblock = BLOCKING);
-  int Otto.Servos_detachServos(int noblock = BLOCKING);
+  int Otto.Servos_attachServos();
+  int Otto.Servos_detachServos();
   int Otto.Servos_enableServoLimit(int speed_limit_degree_per_sec = SERVO_LIMIT_DEFAULT);
   int Otto.Servos_disableServoLimit();
   int Otto.Servos_setTrims(int TLL, int TLR, int TFL, int TFR, int TAL, int TAR);
