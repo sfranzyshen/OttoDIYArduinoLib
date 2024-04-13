@@ -67,13 +67,13 @@ To enhance the core code running OttoDIY in order to address its current limitat
   - Led matrix 10x16 (eyes) ws281x (rgb)
   - Oled display 128x64 (eyes, faces) spi & i2c (mono)
   - Oled display 128x32 (eyes, mouths) spi & i2c (mono)
-  ### Inputs (Distance, Line-follower, Noise, Button, and Touch)
+  ### Inputs (Distance, Line-follower, Noise, Button, Touch, ...)
   - Ultrasonic sensor 3, 4 and 5pin (gpio, i2c)
   - IR Line-follower Sensor 3 and 4 pin (gpio, analog)
   - microphone 3, 4 and 5 pin (gpio, analog)
   - IR distance sensor 3 pin (analog)
     
-## Structure
+## Source File Structure
 #### In the development phase, files will be further divided into more files compared to the release file set.
 
 * `Otto.h` and `Otto.cpp` contains all the main otto functions
@@ -84,206 +84,147 @@ To enhance the core code running OttoDIY in order to address its current limitat
 * `Otto_sounds.h` contains all the otto sound functions
 * `Display.h` and `Display.cpp` contains all the oled and led matrix functions
 * `Distance.h` and `Distance.cpp` contains all the distance messurement functions
+* `Servo.h` and `Servo.cpp` contains all the servo functions
 * `Oscillator.h` and `Oscillator.cpp` is the main algorithm for the servos "smooth" movement
 * `Sound.h` and `Sound.cpp` contains all the code for making sounds
 * `SerialCommand.h` and `SerialCommand.cpp` is for Bluetooth communication vis Software serial or native Bluetooth
 
-### Adding library
-
+### Current Otto API: 
+#### (Typical Biped with buzzer and mouth matrix)
 ```cpp
-#include <Otto.h>
-Otto Otto;
-```
+  #include <Otto.h>
+  Otto Otto;
 
-### Pins declaration
+  #define YL      2	// left leg pin
+  #define YR      3	// right leg pin
+  #define RL      4	// left foot pin
+  #define RR      5	// right foot pin
+  #define Buzzer  13 	// buzzer pin
 
-These are the default signal connections for the servos and buzzer for AVR Arduino boards in the examples, you can alternatively connect them in different pins if you also change the pin number.
-
+  #define CLK     A1    // Clock pin
+  #define CS      A2    // Chip Select pin
+  #define DIN     A3    // Data In pin
+  #define Rotate  0     // 8x8 LED Matrix orientation  Top  = 1, Bottom = 2, Left = 3, Right = 4
+	
+  void Otto.init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer);
+  void Otto.initMATRIX(int DIN, int CS, int CLK, int rotate);
+  void Otto.matrixIntensity(int intensity);
+  void Otto.setLed(byte X, byte Y, byte value);
+  void Otto.writeText (const char * s, byte scrollspeed);	
+	
+  void Otto.setTrims(int TYL, int TYR, int TRL, int TRR);
+  void Otto.saveTrimsOnEEPROM();
+	
+  void Otto._moveServos(int time, int  servo_target[]);
+  void Otto._moveSingle(int position,int  servo_number);
+  void Otto.oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle);
+  bool Otto.getRestState();
+  void Otto.setRestState(bool state);
+  void Otto.attachServos();
+  void Otto.detachServos();
+  void Otto.enableServoLimit(int speed_limit_degree_per_sec = SERVO_LIMIT_DEFAULT);
+  void Otto.disableServoLimit();
+	
+  void Otto.home();
+  void Otto.jump(float steps=1, int T = 2000);
+  void Otto.walk(float steps=4, int T=1000, int dir = FORWARD);
+  void Otto.turn(float steps=4, int T=2000, int dir = LEFT);
+  void Otto.bend (int steps=1, int T=1400, int dir=LEFT);
+  void Otto.shakeLeg (int steps=1, int T = 2000, int dir=RIGHT);
+  void Otto.updown(float steps=1, int T=1000, int h = 20);
+  void Otto.swing(float steps=1, int T=1000, int h=20);
+  void Otto.tiptoeSwing(float steps=1, int T=900, int h=20);
+  void Otto.jitter(float steps=1, int T=500, int h=20);
+  void Otto.ascendingTurn(float steps=1, int T=900, int h=20);
+  void Otto.moonwalker(float steps=1, int T=900, int h=20, int dir=LEFT);
+  void Otto.crusaito(float steps=1, int T=900, int h=20, int dir=FORWARD);
+  void Otto.flapping(float steps=1, int T=1000, int h=20, int dir=FORWARD);
+	
+  void Otto.putMouth(unsigned long int mouth, bool predefined = true);
+  void Otto.putAnimationMouth(unsigned long int anim, int index);
+  void Otto.clearMouth();
+    
+  void Otto._tone(float noteFrequency, long noteDuration, int silentDuration);
+  void Otto.bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration);
+  void Otto.sing(int songName);
+    
+  void Otto.playGesture(int gesture);
+```	
+### Proposed Otto API: 
+#### (Biped with arms model, RGB ultrasonic eyes, buzzer sound, and a mono spi matrix mouth)
 ```cpp
-#define LeftLeg 2 // left leg pin
-#define RightLeg 3 // right leg pin
-#define LeftFoot 4 // left foot pin
-#define RightFoot 5 // right foot pin
-#define Buzzer 13 //buzzer pin
+  #include "Otto_config.h"
+
+  #define Otto_model  BIPED_ARMS
+  #define Otto_sound  BUZZER
+  #define Otto_mouth  LED_MATRIX_8X8_MONO_SPI
+  #define Otto_eyes   LED_USONIC_RGB_NEO
+
+  #include <Otto.h>
+  Otto Otto;
+
+  #define LL        2  // left leg pin
+  #define LR        3  // right leg pin
+  #define FL        4  // left foot pin
+  #define FR        5  // right foot pin
+  #define AL        6  // left arm pin
+  #define AR        7  // right arm pin
+  #define Buzzer    13 // buzzer pin
+
+  #define EYES_NEO_PIN		12  // ultrasonic eyes neopixel pin
+  #define EYES_NEO_START	0   // ultrasonic eyes neopixel start pixel
+  #define EYES_NEO_END		5   // ultrasonic eyes neopixel end pixel
+
+  #define CLK       A1 // Clock pin
+  #define CS        A2 // Chip Select pin
+  #define DIN       A3 // Data In pin
+  #define Rotate    0  // 8x8 LED Matrix orientation  Top  = 1, Bottom = 2, Left = 3, Right = 4
+	
+  int Otto.init(const char * name); // every Otto should have a unique name. Can be used for Wifi, led matrix, etc.
+  int Otto.Servo_init(LL, LR, FL, FR, AL, AR); // initialize the servos
+  int Otto.Mouth_init(int DIN, int CS, int CLK, int rotate); // initialize the mouth display
+  int Otto.Sound_init(int Buzzer); // initialize the sound output device
+  int Otto.Eyes_init(int EYES_NEO_PIN, int EYES_NEO_START, int EYES_NEO_END); // initialize the eyes out device
+	
+  int Otto.Servo_setTrims(int TLL, int TLR, int TFL, int TFR, int TAL, int TAR);
+  int Otto.Servo_saveTrims();
+
+  int Otto.home(int noblock = 0);
+  int Otto.jump(float steps = 1, int T = 2000, int noblock = FALSE);
+  int Otto.walk(float steps = 4, int T = 1000, int dir = FORWARD, int noblock = FALSE);
+  int Otto.turn(float steps = 4, int T = 2000, int dir = LEFT, int noblock = FALSE);
+  int Otto.bend (int steps = 1, int T = 1400, int dir = LEFT, int noblock = FALSE);
+  int Otto.shakeLeg (int steps = 1, int T = 2000, int dir = RIGHT, int noblock = FALSE);
+  int Otto.updown(float steps = 1, int T = 1000, int h = , int noblock = FALSE);
+  int Otto.swing(float steps = 1, int T = 1000, int h = 20, int noblock = FALSE);
+  int Otto.tiptoeSwing(float steps = 1, int T = 900, int h = 20, int noblock = FALSE);
+  int Otto.jitter(float steps = 1, int T = 500, int h = 20, int noblock = FALSE);
+  int Otto.ascendingTurn(float steps = 1, int T = 900, int h = 20, int noblock = FALSE);
+  int Otto.moonwalker(float steps = 1, int T = 900, int h = 20, int dir = LEFT, int noblock = FALSE);
+  int Otto.crusaito(float steps = 1, int T = 900, int h = 20, int dir = FORWARD, int noblock = FALSE);
+  int Otto.flapping(float steps = 1, int T = 1000, int h = 20, int dir = FORWARD, int noblock = FALSE);
+
+  int Otto.Sound_tone(float noteFreq, long noteDur, int silentDur, int noblock = FALSE);
+  int Otto.Sound_bendTones(float initFreq, float finalFreq, float prop, long noteDur, int silentDur, int noblock = FALSE);
+  int Otto.Sound_sing(int songName, int noblock = FALSE);
+
+  int Otto.Gesture(int gesture, int noblock = FALSE);
+
+  int Otto.Mouth_intensity(int intensity);
+  int Otto.Mouth_setled(byte X, byte Y, byte value);
+  int Otto.Mouth_write(const char * s, byte scrollspeed, int noblock = FALSE);
+  int Otto.Mouth(unsigned long int mouth, bool predefined = true);
+  int Otto.Mouth_animation(unsigned long int anim, int noblock = FALSE);
+  int Otto.Mouth_clear();
+
+  int Otto.Eyes_intensity(int intensity);
+  int Otto.Eyes_setled(byte X, byte Y, byte value);
+  int Otto.Eyes_write(const char * s, byte scrollspeed, int noblock = FALSE);
+  int Otto.Eyes(unsigned long int eyes, bool predefined = true);
+  int Otto.Eyes_animation(unsigned long int anim, int noblock = FALSE);
+  int Otto.Eyes_clear();
 ```
 
-### Initialization
-
-When starting the program, the 'init' function must be called with the use of servo motor calibration as a parameter. <br/>
-It is best to place the servo motors in their home position after initialization with 'home' function.
-
-```cpp
-void setup() {
-   Otto.init(LeftLeg, RightLeg, LeftFoot, RightFoot, true, Buzzer);
-   Otto.home();
-}
-```
-The `home()` function makes the servos move to the center position, Otto standing in the neutral position.
-
-## Predetermined Functions:
-Many preconfigured movements are available in the library:
-
-### Movements:
-These are actions that involve the use of the 4 servo motors with the oscillation library combined in synergy and with smooth movements. You can change the values inside the pratensis `()` to alter the speed, direction, and size of the movements.
-
-#### Walk function
-
-```cpp
-Otto.walk(steps, time, dir);
-```
-- `steps` are just how many times you want to repeat that movement without the need of further coding or adding additional rows.
-- `time` (noted as `T` below) translated in milliseconds is the duration of the movement. For a higher time value is slower the movement, try values between 500 to 3000.
-- `dir` is the direction: `1` for forward or `-1` backward
-
-Example:
-```cpp
-Otto.walk(2, 1000, 1);
-```
-In this example `2` is the number of steps, `1000` is "TIME" in milliseconds and it will walk forward.
-
-For example changing T value: Slow=2000 Normal=1000 Fast= 500
-
-```cpp
-Otto.turn(steps, T, dir);
-```
-(# of steps, T, to the left or -1 to the right)
-
-```cpp
-Otto.bend (steps, T, dir);
-```
-
-(# of steps, T, 1 bends to the left or -1 to the right)
-
-```cpp
-Otto.shakeLeg (steps, T, dir);
-```
-(# of steps, T, 1 bends to the left or -1 to the right)
-
-```cpp
-Otto.jump(steps, T);
-```
-(# of steps up, T) this one does not have a dir parameter
-Otto doesn't really jump ;P
-
-### Dances:
-
-Similar to movements but more fun! you can adjust a new parameter `h` "height or size of the movements" to make the dance more interesting.
-
-```cpp
-Otto.moonwalker(steps, T, h, dir);
-```
-(# of steps, T, h, 1 to the left or -1 to the right)
-
-`h`: you can try change between 15 and 40
-
-
-Example:
-```cpp
-Otto.moonwalker(3, 1000, 25,1);
-```
-
-```cpp
-Otto.crusaito(steps, T, h, dir);
-```
-(# of steps, T, h, 1 to the left or -1 to the right)
-
-`h`: you can try change between 20 to 50
-
-```cpp
-Otto.flapping(steps, T, h, dir);
-```
-(# of steps, T, h, 1 to the front or -1 to the back)
-
-`h`: you can try change between 10 to 30
-
-```cpp
-Otto.swing(steps, T, h);
-```
-`h`: you can try change between 0 to 50
-
-```cpp
-Otto.tiptoeSwing(steps, T, h);
-```
-`h`: you can try change between 0 to 50
-
-```cpp
-Otto.jitter(steps, T, h);
-```
-`h`: you can try change between 5 to 25
-
-```cpp
-Otto.updown(steps, T, h);  
-```
-`h`: you can try change between 0 to 90
-
-```cpp
-Otto.ascendingTurn(steps, T, h);
-```
-`h`: you can try change between 5 to 15
-
-### Sounds:
-
-```
-Otto.sing(songName);
-```
-By just changing what is inside the () we can change the sounds easily to 19 different ones.
-Simple as copying and pasting in a new row to make the sounds as many times as you like.
-
-- S_connection
-- S_disconnection
-- S_buttonPushed
-- S_mode1
-- S_mode2
-- S_mode3
-- S_surprise
-- S_OhOoh
-- S_OhOoh2
-- S_cuddly
-- S_sleeping
-- S_happy
-- S_superHappy
-- S_happy_short
-- S_sad
-- S_confused
-- S_fart1
-- S_fart2
-- S_fart3
-
-Otto can emit several sounds with the 'sing' function:
-```cpp
-Otto._tone(10, 3, 1);
-```
-
-(noteFrequency, noteDuration, silentDuration)
-
-```cpp
-Otto.bendTones (100, 200, 1.04, 10, 10);
-```
-(initFrequency, finalFrequency, prop, noteDuration, silentDuration)
-
-
-### Gestures:
-Finally, our favorite, This is a combination of the 2 previous functions we learnt sing + walk
-Their goal is to express emotions by combining sounds with movements at the same time and if you have the LED matrix you can show them in the robot mouth!
-
-```cpp
-Otto.playGesture(gesture);
-```
-- `Otto.playGesture(OttoHappy);`
-- `Otto.playGesture(OttoSuperHappy);`
-- `Otto.playGesture(OttoSad);`
-- `Otto.playGesture(OttoVictory);`
-- `Otto.playGesture(OttoAngry);`
-- `Otto.playGesture(OttoSleeping);`
-- `Otto.playGesture(OttoFretful);`
-- `Otto.playGesture(OttoLove);`
-- `Otto.playGesture(OttoConfused);`
-- `Otto.playGesture(OttoFart);`
-- `Otto.playGesture(OttoWave);`
-- `Otto.playGesture(OttoMagic);`
-- `Otto.playGesture(OttoFail);`
-
-As you see it’s very simple, but what it does is quite advanced.
 
 ## License
 
