@@ -89,7 +89,8 @@ To enhance the core code running OttoDIY in order to address its current limitat
 * `Sound.h` and `Sound.cpp` contains all the code for making sounds
 * `SerialCommand.h` and `SerialCommand.cpp` is for Bluetooth communication vis Software serial or native Bluetooth
 
-### Current Otto API: (Typical Biped with buzzer and mouth matrix)
+### Current Otto API: 
+#### (Typical Biped with buzzer and mouth matrix)
 ```cpp
   #include <Otto.h>
   Otto Otto;
@@ -149,7 +150,8 @@ To enhance the core code running OttoDIY in order to address its current limitat
     
   void Otto.playGesture(int gesture);
 ```	
-### Proposed Otto API: (Biped with arms model, RGB ultrasonic eyes, buzzer sound, and a mono spi matrix mouth)
+### Proposed Otto API: 
+#### (Biped with arms model, RGB ultrasonic eyes, buzzer sound, and a mono spi matrix mouth)
 ```cpp
   #include "Otto_config.h"
 
@@ -169,7 +171,9 @@ To enhance the core code running OttoDIY in order to address its current limitat
   #define AR        7  // right arm pin
   #define Buzzer    13 // buzzer pin
 
-  #define EYES_NEO  12 // ultrasonic eyes neopixel pin
+  #define EYES_NEO_PIN		12  // ultrasonic eyes neopixel pin
+  #define EYES_NEO_START	0   // ultrasonic eyes neopixel start pixel
+  #define EYES_NEO_END		5   // ultrasonic eyes neopixel end pixel
 
   #define CLK       A1 // Clock pin
   #define CS        A2 // Chip Select pin
@@ -179,8 +183,8 @@ To enhance the core code running OttoDIY in order to address its current limitat
   int Otto.init(const char * name); // every Otto should have a unique name. Can be used for Wifi, led matrix, etc.
   int Otto.Servo_init(LL, LR, FL, FR, AL, AR); // initialize the servos
   int Otto.Mouth_init(int DIN, int CS, int CLK, int rotate); // initialize the mouth display
-  int Otto.Sound_init(Buzzer); // initialize the sound output device
-  int Otto.Eyes_init(EYES_NEO); // initialize the eyes out device
+  int Otto.Sound_init(int Buzzer); // initialize the sound output device
+  int Otto.Eyes_init(int EYES_NEO_PIN, int EYES_NEO_START, int EYES_NEO_END); // initialize the eyes out device
 	
   int Otto.Servo_setTrims(int TLL, int TLR, int TFL, int TFR, int TAL, int TAR);
   int Otto.Servo_saveTrims();
