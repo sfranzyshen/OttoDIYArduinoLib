@@ -200,8 +200,8 @@ To enhance the core code running OttoDIY in order to address its current limitat
   int Otto.crusaito(float steps = 1, int T = 900, int h = 20, int dir = FORWARD, int noblock = FALSE);
   int Otto.flapping(float steps = 1, int T = 1000, int h = 20, int dir = FORWARD, int noblock = FALSE);
 
-  int Otto.Sound_tone(float noteFrequency, long noteDuration, int silentDuration, int noblock = FALSE);
-  int Otto.Sound_bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration, int noblock = FALSE);
+  int Otto.Sound_tone(float noteFreq, long noteDur, int silentDur, int noblock = FALSE);
+  int Otto.Sound_bendTones(float initFreq, float finalFreq, float prop, long noteDur, int silentDur, int noblock = FALSE);
   int Otto.Sound_sing(int songName, int noblock = FALSE);
 
   int Otto.Gesture(int gesture, int noblock = FALSE);
@@ -216,7 +216,7 @@ To enhance the core code running OttoDIY in order to address its current limitat
   int Otto.Eyes_intensity(int intensity);
   int Otto.Eyes_setled(byte X, byte Y, byte value);
   int Otto.Eyes_write(const char * s, byte scrollspeed, int noblock = FALSE);
-  int Otto.Eyes(unsigned long int mouth, bool predefined = true);
+  int Otto.Eyes(unsigned long int eyes, bool predefined = true);
   int Otto.Eyes_animation(unsigned long int anim, int noblock = FALSE);
   int Otto.Eyes_clear();
 ```
