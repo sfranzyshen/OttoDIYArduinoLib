@@ -87,7 +87,7 @@ To enhance the core code running OttoDIY in order to address its current limitat
 * `Sound.h` and `Sound.cpp` contains all the code for making sounds
 * `SerialCommand.h` and `SerialCommand.cpp` is for Bluetooth communication vis Software serial or native Bluetooth
 
-### Proposed Otto API: 
+### New Otto API: 
 #### (Biped with arms model, RGB ultrasonic eyes, buzzer sound, and a mono spi matrix mouth)
 ```cpp
   #include "Otto_config.h"	// first, include preprocessor configuration directives
