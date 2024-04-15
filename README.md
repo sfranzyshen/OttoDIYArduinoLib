@@ -93,7 +93,7 @@ To enhance the core code running OttoDIY in order to address its current limitat
   #include "Otto_config.h"	// first, include preprocessor config directives
 
   // Otto Config		// next define Otto's config (can be blockly generated)
-  #define Otto_code	      BLOCKING
+  #define Otto_code	        BLOCKING
 ```
 The Otto_code directive sets the overall sketch coding style, which can be overridden at the function call level, and defaults to BLOCKING. When set to NON_BLOCKING, all functions will default to non-blocking behavior."
 ```cpp
@@ -123,7 +123,7 @@ The Otto_code directive sets the overall sketch coding style, which can be overr
   #define Otto_MOUTH_CLK       	A1   // Clock pin
   #define Otto_MOUTH_CS        	A2   // Chip Select pin
   #define Otto_MOUTH_DIN       	A3   // Data In pin
-  #define Otto_MOUTH_Rotate    	0    // 8x8 orientation Top = 1, Bottom = 2, Left = 3, Right = 4
+  #define Otto_MOUTH_Rotate    	0    // Rotate Top = 1, Bottom = 2, Left = 3, Right = 4
 ```
 After declaring the configuration, include the Otto.h API that will use the compiler preprocessor to selectively add or exclude code segments. If none of the above directives are included in the sketch, the API defaults to the "current" Otto API configuration, which is set to a standard biped for compatibility. 
 ```cpp
@@ -132,9 +132,9 @@ After declaring the configuration, include the Otto.h API that will use the comp
 ```
 All functions now return an (int) value, which can be tested for error handling or for compatibility it can be ignored.
 ```cpp
-  int Otto.init(const char * name);		// every Otto should have a unique name.
+  int Otto.init(const char * name);   // every Otto should have a unique name.
                                       // Can be used for Wifi, etc.
-  int Otto.Servos_init(LL, LR, FL, FR, AL, AR);			
+  int Otto.Servos_init(LL, LR, FL, FR, AL, AR);   // other hardware inits are called by Otto.init()
   int Otto.Mouth_init(int DIN, int CS, int CLK, int rotate);	
   int Otto.Sound_init(int Buzzer);				
   int Otto.Eyes_init(int EYES_NEO_PIN, int EYES_NEO_START, int EYES_NEO_END);
@@ -191,7 +191,7 @@ However, for older, more experienced students, blocking code can be seen as a li
   int Otto.Servos_setTrims(int TLL, int TLR, int TFL, int TFR, int TAL, int TAR);
   int Otto.Servos_saveTrims();
 ```
-The following functions are provided for compatibility with the "current" Otto library. These functions serve as aliases or wrappers to the new API. We will maintain support for the original Otto library with all 1.x.x versions, but support may be dropped with version 2.x.x.
+The following functions are provided for compatibility with the "current" Otto library. These functions serve as aliases or wrappers to the new API. We will maintain support for the original Otto library with all 1.x.x versions, but support will be dropped with version 2.x.x.
 ```cpp
   void Otto.init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer); 
   void Otto.setTrims(int TLL, int TLR, int TFL, int TFR);			
