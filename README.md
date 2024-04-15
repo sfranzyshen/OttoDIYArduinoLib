@@ -90,10 +90,10 @@ To enhance the core code running OttoDIY in order to address its current limitat
 ### New Otto API: 
 #### (Biped with arms model, RGB ultrasonic eyes, buzzer sound, and a mono spi matrix mouth)
 ```cpp
-  #include "Otto_config.h"	// first, include preprocessor configuration directives
+  #include "Otto_config.h"	// first, include preprocessor config directives
 
-  // Otto Config		// next define Otto's configuration (can be blockly generated)
-  #define Otto_code	  BLOCKING
+  // Otto Config		// next define Otto's config (can be blockly generated)
+  #define Otto_code	      BLOCKING
 ```
 The Otto_code directive sets the overall sketch coding style, which can be overridden at the function call level, and defaults to BLOCKING. When set to NON_BLOCKING, all functions will default to non-blocking behavior."
 ```cpp
@@ -123,7 +123,7 @@ The Otto_code directive sets the overall sketch coding style, which can be overr
   #define Otto_MOUTH_CLK       	A1   // Clock pin
   #define Otto_MOUTH_CS        	A2   // Chip Select pin
   #define Otto_MOUTH_DIN       	A3   // Data In pin
-  #define Otto_MOUTH_Rotate    	0    // 8x8 Matrix orientation Top = 1, Bottom = 2, Left = 3, Right = 4
+  #define Otto_MOUTH_Rotate    	0    // 8x8 orientation Top = 1, Bottom = 2, Left = 3, Right = 4
 ```
 After declaring the configuration, include the Otto.h API that will use the compiler preprocessor to selectively add or exclude code segments. If none of the above directives are included in the sketch, the API defaults to the "current" Otto API configuration, which is set to a standard biped for compatibility. 
 ```cpp
@@ -132,7 +132,8 @@ After declaring the configuration, include the Otto.h API that will use the comp
 ```
 All functions now return an (int) value, which can be tested for error handling or for compatibility it can be ignored.
 ```cpp
-  int Otto.init(const char * name);		// every Otto should have a unique name. Can be used for Wifi, etc.
+  int Otto.init(const char * name);		// every Otto should have a unique name.
+                                      // Can be used for Wifi, etc.
   int Otto.Servos_init(LL, LR, FL, FR, AL, AR);			
   int Otto.Mouth_init(int DIN, int CS, int CLK, int rotate);	
   int Otto.Sound_init(int Buzzer);				
