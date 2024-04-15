@@ -3,12 +3,10 @@
 
 <a href="https://discord.com/channels/691410809586450483/1228242677963685918"><img src="https://images.squarespace-cdn.com/content/v1/5cd3e3917046805e4d6700e3/1560193788834-KYURUXVSZAIE4XX1ZB2F/ke17ZwdGBToddI8pDm48kK6MRMHcYvpidTm-7i2qDf_lfiSMXz2YNBs8ylwAJx2qLijIv1YpVq4N1RMuCCrb3iJz4vYg48fcPCuGX417dnbl3kVMtgxDPVlhqW83Mmu6GipAUbdvsXjVksOX7D692AoyyEsAbPHhHcQMU6bWQFI/join_discord_button_small.png" width="25%"></a>
 
-This branch of the repository contains the "development" Arduino library for the [OttoDIY robot](https://www.ottodiy.com/), support for all [OttoDIY models](https://github.com/OttoDIY/OttoDIYLib/tree/devel#supported-models) and [compatible boards](https://github.com/OttoDIY/OttoDIYLib/tree/devel?tab=readme-ov-file#supported-platforms). This branch is currently not functional. If you are looking for the production software please refer to the [main branch](https://github.com/OttoDIY/OttoDIYLib).
+This branch of the repository contains the "development" Arduino library for the [OttoDIY robot](https://www.ottodiy.com/), with support for all [OttoDIY models](https://github.com/OttoDIY/OttoDIYLib/tree/devel#supported-models) and [compatible boards](https://github.com/OttoDIY/OttoDIYLib/tree/devel?tab=readme-ov-file#supported-platforms). This branch is currently not functional. If you are looking for the production software please refer to the [main branch](https://github.com/OttoDIY/OttoDIYLib).
 
 #### Versioning for the project will follow a three-numeral format separated by decimal points, for example, 0.1.0
-The first numeral represents the major software version number. Versions with the same major number should maintain full compatibility with each other.
-The second numeral indicates the stability number. Odd numbers denote development releases, while even numbers signify stable releases.
-The last numeral is the minor release number, incrementally increased to distinguish it from the previous minor release. We are currently at 0.1.0 to indicate that there is no version or release yet ... but we are in development. 
+The first numeral represents the major software version number. Versions with the same major number should maintain full compatibility with each other. The second numeral indicates the stability number. Odd numbers denote development releases, while even numbers signify stable releases. The last numeral is the minor release number, incrementally increased to distinguish it from the previous minor release. We are currently at 0.1.0 to indicate that there is no version or release yet ... but that we are in development. 
 
 #### Our initial development release, version 1.1.1, will strive to maintain full backward compatibility with the existing OttoDIY Arduino library, and this commitment will continue with all subsequent 1.x.x releases.
 
@@ -17,32 +15,23 @@ To enhance the core code running OttoDIY in order to address its current limitat
 
 ### Project Scope:
 * #### Code Refactoring:
-  Evaluate the existing codebase to identify areas for refactoring.
-  Refactor the code to improve its structure, readability, and maintainability.
+  Evaluate the existing codebase to identify areas for refactoring. Refactor the code to improve its structure, readability, and maintainability.
 * #### Functionality Enhancement:
-  Identify key functionalities that need improvement or addition.
-  Enhance existing functionalities to make them more robust and responsive.
-  Implement new features to address current limitations and meet user needs.
+  Identify key functionalities that need improvement or addition. Enhance existing functionalities to make them more robust and responsive. Implement new features to address current limitations and meet user needs.
 * #### Reliability Improvement:
-  Address any known issues or bugs that affect the reliability of the code.
-  Improve error handling and error reporting mechanisms to enhance the stability of the system.
+  Address any known issues or bugs that affect the reliability of the code. Improve error handling and error reporting mechanisms to enhance the stability of the system.
 * #### Documentation Update:
-  Review and update existing documentation to reflect changes made to the codebase.
-  Ensure comprehensive documentation covering installation, usage, and troubleshooting.
+  Review and update existing documentation to reflect changes made to the codebase. Ensure comprehensive documentation covering installation, usage, and troubleshooting.
 * #### Testing and Quality Assurance:
-  Develop and execute test cases to ensure the reliability and functionality of the updated code.
-  Implement automated testing where feasible to streamline the testing process.
-  Conduct thorough quality assurance to identify and address any issues before deployment.
+  Develop and execute test cases to ensure the reliability and functionality of the updated code. Implement automated testing where feasible to streamline the testing process. Conduct thorough quality assurance to identify and address any issues before deployment.
 * #### Deployment Plan:
-  Develop a plan for deploying the updated code to users.
-  Consider methods for migrating existing users to the new version smoothly.
-  Provide support and assistance to users during the transition period.
+  Develop a plan for deploying the updated code to users. Consider methods for migrating existing users to the new version smoothly. Provide support and assistance to users during the transition period.
 
 ### Constraints and Assumptions:
-* #### Limited resources (e.g., developers, testers, time).
-* #### Compatibility with existing hardware and software configurations.
-* #### User acceptance of the updated code.
-* #### Adherence to project timeline.
+* Limited resources (e.g., developers, testers, time).
+* Compatibility with existing hardware and software configurations.
+* User acceptance of the updated code.
+* Adherence to project timeline.
 
 ### Supported Models
   - Biped (Classic) & Biped w/ Arms
@@ -56,15 +45,16 @@ To enhance the core code running OttoDIY in order to address its current limitat
   - ESP8266 (ESP8266)
 
 ### Supported Hardware
-  #### Outputs (Mouths, Faces, Sounds, and Eyes)  
+  #### Outputs (Mouth, Eyes, and Sound)  
   - Ultrasonic sensor 3, 4 and 5pin with rgb leds (eyes) ws281x (rgb)
-  - Led matrix 8x8 (mouths) spi, i2c (mono) and ws281x (rgb)
+  - Led matrix 8x8 (mouth) spi, i2c (mono) and ws281x (rgb)
   - Led matrix 8x16 (eyes) spi, i2c (mono) and ws281x (rgb)
   - Led matrix 6x20 (eyes) ws281x (rgb)
-  - Led matrix 6x10 (mouths) ws281x (rgb)
+  - Led matrix 6x10 (mouth) ws281x (rgb)
   - Led matrix 10x16 (eyes) ws281x (rgb)
-  - Oled display 128x64 (eyes, faces) spi & i2c (mono)
-  - Oled display 128x32 (eyes, mouths) spi & i2c (mono)
+  - Oled display 128x64 (eyes, mouth) spi & i2c (mono)
+  - Oled display 128x32 (eyes, mouth) spi & i2c (mono)
+
   #### Inputs (Distance, Line-follower, Noise, Button, Touch, ...)
   - Ultrasonic sensor 3, 4 and 5pin (gpio, i2c)
   - IR Line-follower Sensor 3 and 4 pin (gpio, analog)
@@ -72,7 +62,7 @@ To enhance the core code running OttoDIY in order to address its current limitat
   - IR distance sensor 3 pin (analog)
     
 ### Source File Structure
-#### In the development phase, files will be further divided into more files compared to the release file set.
+#### During the development phase, files will be further divided into several smaller files compared to the release file set.
 
 * `Otto.h` and `Otto.cpp` contains all the main otto functions
 * `Otto_gestures.h` contains all the otto gestures functions
@@ -95,7 +85,7 @@ To enhance the core code running OttoDIY in order to address its current limitat
   // Otto Config		// next define Otto's config (can be blockly generated)
   #define Otto_code	        BLOCKING
 ```
-The "Otto_code" directive establishes the overall coding style for a sketch. This setting can be overridden at the function call level. By default, it operates in BLOCKING mode. However, when switched to NON_BLOCKING, all functions default to non-blocking behavior.
+The "Otto_code" directive establishes the overall coding style for a sketch. This setting can be overridden at the function call level. By default, it operates in BLOCKING mode. However, when set to NON_BLOCKING, all functions will default to non-blocking behavior.
 ```cpp
   #define Otto_model	  	BIPED_ARMS	// 6x 180° Servos
   #define Otto_sound	  	BUZZER
@@ -103,29 +93,29 @@ The "Otto_code" directive establishes the overall coding style for a sketch. Thi
   #define Otto_eyes	  	LED_USONIC_RGB_NEO
 
   // Otto Servos		define Otto's servos (can be blockly generated)
-  #define Otto_SERVOS	  	6	// total number of servos
-  #define Otto_LL	  	2	// left leg pin
-  #define Otto_LR	  	3	// right leg pin
-  #define Otto_FL	  	4	// left foot pin
-  #define Otto_FR	 	5	// right foot pin
-  #define Otto_AL	 	6	// left arm pin
-  #define Otto_AR	  	7	// right arm pin
+  #define Otto_SERVOS	  	6  // total number of servos
+  #define Otto_LL	  	2  // left leg pin
+  #define Otto_LR	  	3  // right leg pin
+  #define Otto_FL	  	4  // left foot pin
+  #define Otto_FR	 	5  // right foot pin
+  #define Otto_AL	 	6  // left arm pin
+  #define Otto_AR	  	7  // right arm pin
 
   // Otto Sound			define Otto's sound (can be blockly generated)
-  #define Otto_Buzzer     	13   // buzzer pin
+  #define Otto_Buzzer     	13 // buzzer pin
 
   // Otto Eyes		    	define Otto's eyes (can be blockly generated)
-  #define Otto_EYES_PIN	  	12   // ultrasonic eyes neopixel pin
-  #define Otto_EYES_START 	0    // ultrasonic eyes neopixel start pixel
-  #define Otto_EYES_END	  	5    // ultrasonic eyes neopixel end pixel
+  #define Otto_EYES_PIN	  	12 // ultrasonic eyes neopixel pin
+  #define Otto_EYES_START 	0  // ultrasonic eyes neopixel start pixel
+  #define Otto_EYES_END	  	5  // ultrasonic eyes neopixel end pixel
 
   // Otto Mouth			define Otto's mouth (can be blockly generated)
-  #define Otto_MOUTH_CLK       	A1   // Clock pin
-  #define Otto_MOUTH_CS        	A2   // Chip Select pin
-  #define Otto_MOUTH_DIN       	A3   // Data In pin
-  #define Otto_MOUTH_Rotate    	0    // Rotate Top = 1, Bottom = 2, Left = 3, Right = 4
+  #define Otto_MOUTH_CLK       	A1 // Clock pin
+  #define Otto_MOUTH_CS        	A2 // Chip Select pin
+  #define Otto_MOUTH_DIN       	A3 // Data In pin
+  #define Otto_MOUTH_Rotate    	0  // Rotate Top = 1, Bottom = 2, Left = 3, Right = 4
 ```
-Following the configuration declaration, include the Otto.h API. This API utilizes the compiler preprocessor to selectively include or exclude code segments. If none of the above directives are present in the sketch, the API defaults to the "current" Otto API configuration, which is configured for a standard biped for compatibility.
+Following the configuration declaration, include the Otto.h API. This API utilizes the compiler preprocessor to selectively include or exclude code segments. If none of the above directives are present in the sketch, the API defaults to the "current" Otto API configuration, which is set to a standard biped for compatibility.
 ```cpp
   #include <Otto.h>
   Otto Otto;
@@ -139,10 +129,7 @@ Following the configuration declaration, include the Otto.h API. This API utiliz
   int Otto.Sound_init(int Buzzer);				
   int Otto.Eyes_init(int EYES_NEO_PIN, int EYES_NEO_START, int EYES_NEO_END);
 ```
-Many functions in the Otto API now include an optional (int) noblock parameter, which defaults to BLOCKING for compatibility.
-However, the underlying code has been modified to be non-blocking. This modification allows for greater flexibility and can be
-extended to user-level code. For younger beginner students, understanding blocking, sequentially executed commands is straightforward.
-However, for older, more experienced students, blocking code can be seen as a limitation. This limitation may exclude the current Otto from being used in the classroom.
+Many functions in the Otto API now include an optional (int) noblock parameter, which defaults to BLOCKING for compatibility. However, the underlying code has been modified to be non-blocking. This modification allows for greater flexibility and can be extended to user-level code. For younger beginner students, understanding blocking, sequentially executed commands is straightforward. However, for older, more experienced students, blocking code can be seen as a limitation. This limitation may exclude the current Otto from being used in the classroom.
 ```cpp
   int Otto.home(int noblock = BLOCKING);
   int Otto.jump(float steps = 1, int T = 2000, int noblock = BLOCKING);
@@ -191,7 +178,7 @@ However, for older, more experienced students, blocking code can be seen as a li
   int Otto.Servos_setTrims(int TLL, int TLR, int TFL, int TFR, int TAL, int TAR);
   int Otto.Servos_saveTrims();
 ```
-The following functions are provided for compatibility with the "current" Otto library. These functions serve as aliases or wrappers to the new API. We will maintain support for the original Otto library with all 1.x.x versions, but support will be dropped with version 2.x.x.
+The following functions are provided for compatibility with the "current" Otto library. These functions serve as aliases or wrappers to the new API. We will maintain support for the original Otto library with all 1.x.x versions, but support will be dropped with version 2.x.x and above.
 ```cpp
   void Otto.init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer); 
   void Otto.setTrims(int TLL, int TLR, int TFL, int TFR);			
