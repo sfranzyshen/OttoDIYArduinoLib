@@ -1,8 +1,10 @@
+// OttoDIY Arduino Library project 2024
+
+// http://www.phy.mtu.edu/~suits/notefreqs.html
+
 #ifndef Otto_sounds_h
 #define Otto_sounds_h
 
-// Reference:  This list was adapted from the table located here:
-//    http://www.phy.mtu.edu/~suits/notefreqs.html
 #define  note_C0  16.35  //C0
 #define  note_Db0 17.32  //C#0/Db0
 #define  note_D0  18.35  //D0
