@@ -1,12 +1,9 @@
 // OttoDIY Arduino Library project 2024
 
+// (c) Juan Gonzalez-Gomez (Obijuan), Dec 2011 GPL license
+
 #ifndef Oscillator_h
 #define Oscillator_h
-
-// Oscillator.pde
-// Generate sinusoidal oscillations in the servos
-// (c) Juan Gonzalez-Gomez (Obijuan), Dec 2011
-// GPL license
 
 #ifdef ARDUINO_ARCH_ESP32
 #include <ESP32Servo.h>
