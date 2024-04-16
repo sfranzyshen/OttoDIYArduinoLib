@@ -1,9 +1,6 @@
-/*
- * MaxMatrix
- * Version 1.0 Feb 2013
- * Copyright 2013 Oscar Kin-Chung Au
- * Adapted for OTTO version 9 use
- */
+// OttoDIY Arduino Library project 2024
+
+// MaxMatrix - Copyright 2013 Oscar Kin-Chung Au
 
 #ifndef _Otto_matrix_H_
 #define _Otto_matrix_H_
