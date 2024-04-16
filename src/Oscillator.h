@@ -1,7 +1,7 @@
+// OttoDIY Arduino Library project 2024
+
 #ifndef Oscillator_h
 #define Oscillator_h
-
-// OttoDIY Arduino Library project 2024
 
 // Oscillator.pde
 // Generate sinusoidal oscillations in the servos
