@@ -1,13 +1,5 @@
-// OttoDIY Arduino Library project 2024
-
 #ifndef Otto_h
 #define Otto_h
-
-#include "Otto_config.h"
-
-#ifndef Otto_model
-#define Otto_model BIPED  // default to classic biped for compatibility
-#endif
 
 #ifdef ARDUINO_ARCH_ESP32
 #include <ESP32Servo.h>
@@ -15,19 +7,19 @@
 #include <Servo.h>
 #endif
 
+#include <Oscillator.h>
 #include <EEPROM.h>
-#include "Oscillator.h"
 #include "Otto_sounds.h"
 #include "Otto_gestures.h"
 #include "Otto_mouths.h"
 #include "Otto_matrix.h"
 
 // Constants
-#define FORWARD      1
+#define FORWARD     1
 #define BACKWARD    -1
-#define LEFT         1
+#define LEFT        1
 #define RIGHT       -1
-#define SMALL        5
+#define SMALL       5
 #define MEDIUM      15
 #define BIG         30
 
@@ -35,25 +27,34 @@
 #define SERVO_LIMIT_DEFAULT 240
 
 class Otto {
-  public:
-    void init();                                    // Otto initialization
-    void attachServos();                            // Attach & detach functions
+public:
+    // Otto initialization
+    void init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer);
+
+    // Attach & detach functions
+    void attachServos();
     void detachServos();
-    void setTrims(int YL, int YR, int RL, int RR);  // Oscillator Trims
+
+    // Oscillator Trims
+    void setTrims(int YL, int YR, int RL, int RR);
     void saveTrimsOnEEPROM();
 
     // Predetermined Motion Functions
     void _moveServos(int time, int servo_target[]);
-    void _moveSingle(int position,int servo_number);
+    void _moveSingle(int position, int servo_number);
     void oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle);
-    void home();  // HOME - Otto at rest position
+
+    // HOME = Otto at rest position
+    void home();
     bool getRestState();
     void setRestState(bool state);
+
+    // Predetermined Motion Functions
     void jump(float steps = 1, int T = 2000);
     void walk(float steps = 4, int T = 1000, int dir = FORWARD);
     void turn(float steps = 4, int T = 2000, int dir = LEFT);
-    void bend (int steps = 1, int T = 1400, int dir=LEFT);
-    void shakeLeg (int steps = 1, int T = 2000, int dir=RIGHT);
+    void bend(int steps = 1, int T = 1400, int dir = LEFT);
+    void shakeLeg(int steps = 1, int T = 2000, int dir = RIGHT);
     void updown(float steps = 1, int T = 1000, int h = 20);
     void swing(float steps = 1, int T = 1000, int h = 20);
     void tiptoeSwing(float steps = 1, int T = 900, int h = 20);
@@ -69,8 +70,8 @@ class Otto {
     void clearMouth();
 
     // Sounds
-    void _tone (float noteFrequency, long noteDuration, int silentDuration);
-    void bendTones (float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration);
+    void _tone(float noteFrequency, long noteDuration, int silentDuration);
+    void bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration);
     void sing(int songName);
 
     // Gestures
@@ -78,13 +79,13 @@ class Otto {
     void initMATRIX(int DIN, int CS, int CLK, int rotate);
     void matrixIntensity(int intensity);
     void setLed(byte X, byte Y, byte value);
-    void writeText (const char * s, byte scrollspeed);
+    void writeText(const char* s, byte scrollspeed);
 
-    // -- Servo limiter
+    // Servo limiter
     void enableServoLimit(int speed_limit_degree_per_sec = SERVO_LIMIT_DEFAULT);
     void disableServoLimit();
 
-  private:
+private:
     Oscillator servo[4];
     Otto_Matrix ledmatrix;
     int servo_pins[4];
@@ -94,9 +95,10 @@ class Otto {
     unsigned long partial_time;
     float increment[4];
     bool isOttoResting;
+
     unsigned long int getMouthShape(int number);
     unsigned long int getAnimShape(int anim, int index);
     void _execute(int A[4], int O[4], int T, double phase_diff[4], float steps);
-}
+};
 
 #endif
