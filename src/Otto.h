@@ -7,7 +7,7 @@
 #include <Servo.h>
 #endif
 
-#include <Oscillator.h>
+#include "Oscillator.h"
 #include <EEPROM.h>
 #include "Otto_sounds.h"
 #include "Otto_gestures.h"
