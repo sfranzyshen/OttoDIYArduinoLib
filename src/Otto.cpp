@@ -8,14 +8,6 @@ void Otto::init() {
 
 }
 
-void Otto::initMATRIX(int DIN, int CS, int CLK, int rotate) {                    //FIXME: move
-  ledmatrix.init(DIN, CS, CLK, 1, rotate);  // set up Matrix display
-}
-
-void Otto::matrixIntensity(int intensity) {                                      //FIXME: move
-  ledmatrix.setIntensity(intensity);
-}
-
 // ATTACH & DETACH FUNCTIONS
 void Otto::attachServos() {                                                      //FIXME: move
   servo[0].attach(servo_pins[0]);
@@ -45,7 +37,6 @@ void Otto::saveTrimsOnEEPROM() {                                               /
   }
 }
 
-// BASIC MOTION FUNCTIONS
 void Otto::_moveServos(int time, int servo_target[]) {
     // Attach servos if not already attached
     attachServos();
