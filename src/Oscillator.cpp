@@ -1,3 +1,5 @@
+// OttoDIY Arduino Library project 2024
+
 // Oscillator.pde
 // Generate sinusoidal oscillations in the servos
 // (c) Juan Gonzalez-Gomez (Obijuan), Dec 2011
