@@ -1,9 +1,9 @@
+// OttoDIY Arduino Library project 2024
+
+// Zowi (c) BQ. Released under a GPL licencse 04 December 2015
+
 #ifndef Otto_gestures_h
 #define Otto_gestures_h
-
-//***********************************************************************************
-//*********************************GESTURE DEFINES***********************************
-//***********************************************************************************           
 
 #define OttoHappy 		0
 #define OttoSuperHappy 	1
@@ -25,7 +25,6 @@
 #define adivinawi		2
 #define wave 			3
 
-
  //*** MOUTH ANIMATIONS***
 #define littleUuh   0
 #define dreamMouth    1   
@@ -40,7 +39,19 @@ typedef struct
 }
 LED_Matrix_Font_6x8_TypeDef;
 
-//Terminal
+template <typename T> void PROGMEM_readAnything (const T * sce, T& dest)
+{
+  memcpy_P (&dest, sce, sizeof (T));
+}
+
+template <typename T> T PROGMEM_getAnything (const T * sce)
+{
+  static T temp;
+  memcpy_P (&temp, sce, sizeof (T));
+  return temp;
+}
+
+// Terminal Font
 const LED_Matrix_Font_6x8_TypeDef Character_font_6x8[] PROGMEM =
 {
 
@@ -59,7 +70,7 @@ const LED_Matrix_Font_6x8_TypeDef Character_font_6x8[] PROGMEM =
     '<',  0x00,0x10,0x28,0x44,0x82,0x00, 
     '=',  0x00,0x28,0x28,0x28,0x28,0x00,
     '>',  0x00,0x82,0x44,0x28,0x10,0x00,
-    '?',  0x00,0x20,0x4a,0x30,0x00,0x00, //
+    '?',  0x00,0x20,0x4a,0x30,0x00,0x00,
     '@',  0x00,0x00,0x00,0x00,0x00,0x00,
     'A',  0x00,0x7E,0x88,0x88,0x7E,0x00,
     'B',  0x00,0xFE,0x92,0x92,0x6C,0x00,
@@ -89,9 +100,7 @@ const LED_Matrix_Font_6x8_TypeDef Character_font_6x8[] PROGMEM =
     'Z',  0x00,0x86,0x9A,0xB2,0xC2,0x00,
     '!',  0x00,0x00,0x7a,0x00,0x00,0x00,
     ' ',  0x00,0x00,0x00,0x00,0x00,0x00,
-    
 };
- 
 
 const unsigned long int Gesturetable[4][10] PROGMEM = {
   {
@@ -134,21 +143,5 @@ const unsigned long int Gesturetable[4][10] PROGMEM = {
     0b00011000100100000010000001000000  // wave_code10
   } 
 };
-
-//"PROGMEM_readAnything.h"   FROM http://www.gammon.com.au/progmem
-// modified for OTTO use by Paul Van De Veen along with all PROGMEM mouths and gestures
-#include <Arduino.h>  // for type definitions
-
-template <typename T> void PROGMEM_readAnything (const T * sce, T& dest)
-  {
-  memcpy_P (&dest, sce, sizeof (T));
-  }
-
-template <typename T> T PROGMEM_getAnything (const T * sce)
-  {
-  static T temp;
-  memcpy_P (&temp, sce, sizeof (T));
-  return temp;
-  }
 
 #endif
