@@ -5,22 +5,7 @@
 #ifndef SerialCommand_h
 #define SerialCommand_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
-// If you want to use SerialCommand with the hardware serial port only, and want to disable
-// SoftwareSerial support, and thus don't have to use "#include <SoftwareSerial.h>" in your
-// sketches, then uncomment this define for SERIALCOMMAND_HARDWAREONLY, and comment out the 
-// corresponding #undef line.  
-//
-// You don't have to use SoftwareSerial features if this is not defined, you can still only use 
-// the Hardware serial port, just that this way lets you get out of having to include 
-// the SoftwareSerial.h header. 
-//#define SERIALCOMMAND_HARDWAREONLY 1
-#undef SERIALCOMMAND_HARDWAREONLY
 
 #ifdef SERIALCOMMAND_HARDWAREONLY
 #warning "Warning: Building SerialCommand without SoftwareSerial Support"
