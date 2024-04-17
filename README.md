@@ -8,7 +8,7 @@ This branch of the repository contains the "development" Arduino library for the
 #### Versioning for the project will follow a three-numeral format separated by decimal points, for example, 0.1.0
 The first numeral represents the major software version number. Versions with the same major number maintain full compatibility with each other. The second numeral indicates the stability number. Odd numbers denote development releases, while even numbers signify stable releases. The last numeral is the minor release number, incrementally increased to distinguish it from the previous minor release. We are currently at 0.1.0 to indicate that there is no version or release yet ... but that we are in development. 
 
-#### Our initial development release, version 1.1.1, will strive to maintain full backward compatibility with the existing OttoDIY Arduino library, and this commitment will continue with all subsequent 1.x.x releases.
+#### Our initial development release, version 1.1.1, will maintain full backward compatibility with the existing OttoDIY Arduino library, and this commitment will continue with all subsequent 1.x.x releases.
 
 ### Project Objective:
 To enhance the core code running OttoDIY in order to address its current limitations and make it more competitive in the educational tech arena.
