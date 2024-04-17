@@ -5,5 +5,6 @@
 
 #include "Otto_models.h"
 #include "Otto_sound.h"
+#include "Otto_version.h"
 
 #endif
