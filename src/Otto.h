@@ -1,3 +1,7 @@
+// OttoDIY Arduino Library project 2024
+
+// Zowi (c) BQ. Released under a GPL licencse 04 December 2015
+
 #ifndef Otto_h
 #define Otto_h
 
@@ -7,7 +11,7 @@
 #include <Servo.h>
 #endif
 
-#include <Oscillator.h>
+#include "Oscillator.h"
 #include <EEPROM.h>
 #include "Otto_sounds.h"
 #include "Otto_gestures.h"

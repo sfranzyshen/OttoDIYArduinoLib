@@ -1,12 +1,9 @@
-/*
- * MaxMatrix
- * Version 1.0 Feb 2013
- * Copyright 2013 Oscar Kin-Chung Au
- * Adapted for OTTO version 9 use
- */
+// OttoDIY Arduino Library project 2024
 
-#ifndef _Otto_matrix_H_
-#define _Otto_matrix_H_
+// MaxMatrix - Copyright 2013 Oscar Kin-Chung Au
+
+#ifndef Otto_matrix_h
+#define Otto_matrix_h
 
 #include "Arduino.h"
 #include "Otto_gestures.h"
@@ -54,7 +51,7 @@ class Otto_Matrix
     void setColumnAll(byte col, byte value);
     void setDot(byte col, byte row, byte value);
     void writeFull(unsigned long value);
-    void sendChar ( const byte data, byte pos, byte number, byte scrollspeed);
+    void sendChar(const byte data, byte pos, byte number, byte scrollspeed);
 };
 
 #endif

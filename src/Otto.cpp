@@ -1,5 +1,7 @@
 // OttoDIY Arduino Library project 2024
 
+// Zowi (c) BQ. Released under a GPL licencse 04 December 2015
+
 #include <Arduino.h>
 #include "Otto.h"
 #include "Oscillator.h"
