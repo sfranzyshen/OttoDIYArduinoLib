@@ -1,14 +1,14 @@
 # OttoDIY Core Code Improvement Project 
-<a href="https://creativecommons.org/licenses/by-sa/4.0/"><img src="https://certification.oshwa.org/images/by-sa.png" height="23px"></a>[![OSHW Certification Mark](https://raw.githubusercontent.com/OttoDIY/OttoDIYLib/devel/certification-mark-CZ000001.png)](https://certification.oshwa.org/cz000001.html)[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Version](https://img.shields.io/badge/Version-0.1.0-blue)](https://github.com/OttoDIY/OttoDIYLib/tree/devel) [![Built with: Arduino](https://img.shields.io/badge/Built_with-Arduino-blue)](https://www.arduino.cc/reference/en/) [![Built with: FreeRTOS](https://img.shields.io/badge/Built_with-FreeRTOS-green)](https://www.freertos.org/index.html)
+<a href="https://creativecommons.org/licenses/by-sa/4.0/"><img src="https://certification.oshwa.org/images/by-sa.png" height="23px"></a>[![OSHW Certification Mark](https://raw.githubusercontent.com/OttoDIY/OttoDIYLib/devel/certification-mark-CZ000001.png)](https://certification.oshwa.org/cz000001.html)[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Version](https://img.shields.io/badge/Version-13.1.0-blue)](https://github.com/OttoDIY/OttoDIYLib/tree/devel) [![Built with: Arduino](https://img.shields.io/badge/Built_with-Arduino-blue)](https://www.arduino.cc/reference/en/) [![Built with: FreeRTOS](https://img.shields.io/badge/Built_with-FreeRTOS-green)](https://www.freertos.org/index.html)
 ### Development Branch :star: Star us on GitHub, it helps!
 First join the server <a href="https://discord.gg/CZZytnw"><img src="https://images.squarespace-cdn.com/content/v1/5cd3e3917046805e4d6700e3/1560193788834-KYURUXVSZAIE4XX1ZB2F/ke17ZwdGBToddI8pDm48kK6MRMHcYvpidTm-7i2qDf_lfiSMXz2YNBs8ylwAJx2qLijIv1YpVq4N1RMuCCrb3iJz4vYg48fcPCuGX417dnbl3kVMtgxDPVlhqW83Mmu6GipAUbdvsXjVksOX7D692AoyyEsAbPHhHcQMU6bWQFI/join_discord_button_small.png" width="15%"></a> Then join the discussion <a href="https://discord.com/channels/691410809586450483/1228242677963685918"><img src="https://images.squarespace-cdn.com/content/v1/5cd3e3917046805e4d6700e3/1560193788834-KYURUXVSZAIE4XX1ZB2F/ke17ZwdGBToddI8pDm48kK6MRMHcYvpidTm-7i2qDf_lfiSMXz2YNBs8ylwAJx2qLijIv1YpVq4N1RMuCCrb3iJz4vYg48fcPCuGX417dnbl3kVMtgxDPVlhqW83Mmu6GipAUbdvsXjVksOX7D692AoyyEsAbPHhHcQMU6bWQFI/join_discord_button_small.png" width="15%"></a>
 
 This branch of the repository contains the "development" Arduino library for the [OttoDIY robot](https://www.ottodiy.com/), with support for all [OttoDIY models](https://github.com/OttoDIY/OttoDIYLib/tree/devel#supported-models) and [compatible boards](https://github.com/OttoDIY/OttoDIYLib/tree/devel?tab=readme-ov-file#supported-platforms). This branch is currently not functional. If you are looking for the production software please refer to the [main branch](https://github.com/OttoDIY/OttoDIYLib).
 
-#### Versioning for the project will follow a three-numeral format separated by decimal points, for example, 0.1.0
-The first numeral represents the major software version number. Versions with the same major number maintain full compatibility with each other. The second numeral indicates the stability number. Odd numbers denote development releases, while even numbers signify stable releases. The last numeral is the minor release number, incrementally increased to distinguish it from the previous minor release. We are currently at 0.1.0 to indicate that there is no version or release yet ... but that we are in development. 
+#### Versioning for the project will follow a three-numeral format separated by decimal points, for example, 13.1.0
+The first numeral represents the major software version number. Versions with the same major number maintain full compatibility with each other. The second numeral indicates the stability number. Odd numbers denote development releases, while even numbers signify stable releases. The last numeral is the minor release number, incrementally increased to distinguish it from the previous minor release. We are currently at 13.1.0 to indicate that there is no release yet ... but that we are in development. 
 
-#### Our initial development release, version 1.1.1, will maintain full backward compatibility with the existing OttoDIY Arduino library, and this commitment will continue with all subsequent 1.x.x releases.
+#### Our initial development release, version 13.1.1, will maintain full backward compatibility with the existing OttoDIY Arduino library 13.0.1, and this commitment will continue with all subsequent 13.x.x releases.
 
 ### Project Objective:
 To enhance the core code running OttoDIY robot in order to address its current limitations and make it more competitive in the educational tech arena.
@@ -75,7 +75,6 @@ To enhance the core code running OttoDIY robot in order to address its current l
 * `Servo.h` and `Servo.cpp` contains all the servo functions
 * `Oscillator.h` and `Oscillator.cpp` is the main algorithm for the servos "smooth" movement
 * `Sound.h` and `Sound.cpp` contains all the code for making sounds
-* `SerialCommand.h` and `SerialCommand.cpp` is for Bluetooth communication vis Software serial or native Bluetooth
 
 ### New Otto API: 
 #### (Biped with arms model, RGB ultrasonic eyes, buzzer sound, and a mono spi matrix mouth)
@@ -178,7 +177,7 @@ Many functions in the Otto API now include an optional (int) noblock parameter, 
   int Otto.Servos_setTrims(int TLL, int TLR, int TFL, int TFR, int TAL, int TAR);
   int Otto.Servos_saveTrims();
 ```
-The following functions are provided for compatibility with the "current" Otto library. These functions serve as aliases or wrappers to the new API. We will maintain support for the original Otto library with all 1.x.x versions, but support will be dropped with version 2.x.x and above.
+The following functions are provided for compatibility with the "current" Otto library. These functions serve as aliases or wrappers to the new API. We will maintain support for the original Otto library with all 13.x.x versions, but support will be dropped with version 14.x.x and above.
 ```cpp
   void Otto.init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer); 
   void Otto.setTrims(int TLL, int TLR, int TFL, int TFR);			
