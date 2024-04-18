@@ -209,8 +209,8 @@ The following functions are provided for compatibility with the "current" Otto l
 #### Built with FreeRTOS (coming soon)
 
 ### Development Tool-Chain:
-#### Models [Tinkercad](https://www.tinkercad.com/users/9Wbn1uShxa2)
-#### Code [Github](https://github.com/OttoDIY/OttoDIYLib/tree/devel)
+#### 3D Models [Tinkercad](https://www.tinkercad.com/users/9Wbn1uShxa2)
+#### Source Code [Github](https://github.com/OttoDIY/OttoDIYLib/tree/devel)
 #### Simulation [Wokwi](https://wokwi.com/dashboard/projects)
 #### Disscusion [Discord](https://discord.com/channels/691410809586450483/1228242677963685918)
 
