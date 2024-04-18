@@ -11,7 +11,7 @@ The first numeral represents the major software version number. Versions with th
 #### Our initial development release, version 1.1.1, will maintain full backward compatibility with the existing OttoDIY Arduino library, and this commitment will continue with all subsequent 1.x.x releases.
 
 ### Project Objective:
-To enhance the core code running OttoDIY in order to address its current limitations and make it more competitive in the educational tech arena.
+To enhance the core code running OttoDIY robot in order to address its current limitations and make it more competitive in the educational tech arena.
 
 ### Project Scope:
 * #### Code Refactoring:
