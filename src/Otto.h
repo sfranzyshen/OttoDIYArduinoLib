@@ -5,6 +5,8 @@
 #ifndef Otto_h
 #define Otto_h
 
+#define #define OTTO_VER    13.1.1
+
 #ifdef ARDUINO_ARCH_ESP32
 #include <ESP32Servo.h>
 #else
