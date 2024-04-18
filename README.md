@@ -1,7 +1,7 @@
 # Otto DIY Robot Arduino Libraries
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-![version](https://img.shields.io/badge/version-14.0-blue)
+![version](https://img.shields.io/badge/version-13.0-blue)
 
 This repository have all the main [Otto DIY robot](https://www.ottodiy.com/) libraries for Arduino compatible boards
 
