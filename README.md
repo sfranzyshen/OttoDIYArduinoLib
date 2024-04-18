@@ -207,6 +207,7 @@ The following functions are provided for compatibility with the "current" Otto l
 ```
 ### New Otto Background API: 
 #### Built with FreeRTOS (coming soon)
+<img src="https://predictabledesigns.com/wp-content/uploads/2020/06/word-image-19.jpeg)" width="10%">
 
 ### Development Tool-Chain:
 #### 3D Models [Tinkercad](https://www.tinkercad.com/users/9Wbn1uShxa2)
