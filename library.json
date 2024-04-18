@@ -16,5 +16,12 @@
   ],
   "license": "GPL-3.0-or-later",
   "frameworks": "arduino",
-  "platforms": "atmelavr"
+  "platforms": [
+    {
+      "atmelavr", 
+      "rp2040", 
+      "espressif32", 
+      "espressif8266"
+    }
+  ]
 }
