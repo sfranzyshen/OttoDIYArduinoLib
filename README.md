@@ -37,7 +37,6 @@ Base set of libraries for any biped robot that uses 4 motors in the legs as Otto
 - `Otto_sounds.h` contains all the sound functions
 - `Otto_matrix.h` and `Otto_matrix.cpp` contain all the matrix functions
 - `Oscillator.h` and `Oscillator.cpp` contain the main algorithm for the servos "smooth" movement
-- `SerialCommand.h` and `SerialCommand.cpp` contain the Bluetooth communication functions
 
 ### Adding library
 
