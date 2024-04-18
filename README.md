@@ -211,7 +211,7 @@ The following functions are provided for compatibility with the "current" Otto l
 <img src="https://predictabledesigns.com/wp-content/uploads/2020/06/word-image-19.jpeg)" width="10%">
 
 ### Development Tool-Chain:
-#### 3D Models [Tinkercad](https://www.tinkercad.com/users/9Wbn1uShxa2)
+#### 3D Models [Tinkercad](https://www.tinkercad.com/users/9Wbn1uShxa2?size=small)
 #### Source Code [Github](https://github.com/OttoDIY/OttoDIYLib/tree/devel)
 #### Simulation [Wokwi](https://wokwi.com/dashboard/projects)
 #### Disscusion [Discord](https://discord.com/channels/691410809586450483/1228242677963685918)
