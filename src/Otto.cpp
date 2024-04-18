@@ -6,8 +6,34 @@
 #include "Otto.h"
 #include "Oscillator.h"
 
-void Otto::init() { 
+void Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer) {
+  servo_pins[0] = YL;
+  servo_pins[1] = YR;
+  servo_pins[2] = RL;
+  servo_pins[3] = RR;
 
+  attachServos();
+  isOttoResting = false;
+
+  if (load_calibration) {
+    for (int i = 0; i < 4; i++) {
+      int servo_trim = EEPROM.read(i);
+      if (servo_trim > 128) servo_trim -= 256;
+      servo[i].SetTrim(servo_trim);
+    }
+  }
+
+  // Buzzer pin:
+  pinBuzzer = Buzzer;
+  pinMode(Buzzer, OUTPUT);
+}
+
+void Otto::initMATRIX(int DIN, int CS, int CLK, int rotate) {
+  ledmatrix.init(DIN, CS, CLK, 1, rotate); // Set up Matrix display
+}
+
+void Otto::matrixIntensity(int intensity) {
+  ledmatrix.setIntensity(intensity);
 }
 
 // ATTACH & DETACH FUNCTIONS
