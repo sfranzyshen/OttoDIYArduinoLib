@@ -1,4 +1,5 @@
-# OttoDIY Core Code Improvement Project [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) ![version](https://img.shields.io/badge/version-0.1.0-blue) 
+# OttoDIY Core Code Improvement Project 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Version](https://img.shields.io/badge/Version-0.1.0-blue)](https://github.com/OttoDIY/OttoDIYLib/tree/devel) [![Built with: Arduino](https://img.shields.io/badge/Built_with-Arduino-blue)](https://www.arduino.cc/reference/en/) [![Built with: FreeRTOS](https://img.shields.io/badge/Built_with-FreeRTOS-green)](https://www.freertos.org/index.html)
 ### Development Branch :star: Star us on GitHub, it helps!
 
 <a href="https://discord.com/channels/691410809586450483/1228242677963685918"><img src="https://images.squarespace-cdn.com/content/v1/5cd3e3917046805e4d6700e3/1560193788834-KYURUXVSZAIE4XX1ZB2F/ke17ZwdGBToddI8pDm48kK6MRMHcYvpidTm-7i2qDf_lfiSMXz2YNBs8ylwAJx2qLijIv1YpVq4N1RMuCCrb3iJz4vYg48fcPCuGX417dnbl3kVMtgxDPVlhqW83Mmu6GipAUbdvsXjVksOX7D692AoyyEsAbPHhHcQMU6bWQFI/join_discord_button_small.png" width="25%"></a>
@@ -207,10 +208,11 @@ The following functions are provided for compatibility with the "current" Otto l
 ```
 ### New Otto Background API: 
 #### Built with FreeRTOS (coming soon)
+<img src="https://predictabledesigns.com/wp-content/uploads/2020/06/word-image-19.jpeg)" width="10%">
 
 ### Development Tool-Chain:
-#### Models [Tinkercad](https://www.tinkercad.com/users/9Wbn1uShxa2)
-#### Code [Github](https://github.com/OttoDIY/OttoDIYLib/tree/devel)
+#### 3D Models [Tinkercad](https://www.tinkercad.com/users/9Wbn1uShxa2?size=small)
+#### Source Code [Github](https://github.com/OttoDIY/OttoDIYLib/tree/devel)
 #### Simulation [Wokwi](https://wokwi.com/dashboard/projects)
 #### Disscusion [Discord](https://discord.com/channels/691410809586450483/1228242677963685918)
 
