@@ -14,17 +14,17 @@ The first numeral represents the major software version number. Versions with th
 To enhance the core code running OttoDIY robot in order to address its current limitations and make it more competitive in the educational tech arena.
 
 ### Project Scope:
-* #### Code Refactoring:
-  Evaluate the existing codebase to identify areas for refactoring. Refactor the code to improve its structure, readability, and maintainability.
-* #### Functionality Enhancement:
+- [ ] **Code Refactoring:**
+  Evaluate the existing codebase to identify areas for refactoring. Refactor the code to improve its structure, readability, and maintainability. (release as version 13.0.1)
+- [ ] **Functionality Enhancement:**
   Identify key functionalities that need improvement or addition. Enhance existing functionalities to make them more robust and responsive. Implement new features to address current limitations and meet user needs.
-* #### Reliability Improvement:
+- [ ] **Reliability Improvement:**
   Address any known issues or bugs that affect the reliability of the code. Improve error handling and error reporting mechanisms to enhance the stability of the system.
-* #### Documentation Update:
+- [ ] **Documentation Update:**
   Review and update existing documentation to reflect changes made to the codebase. Ensure comprehensive documentation covering installation, usage, and troubleshooting.
-* #### Testing and Quality Assurance:
+- [ ] **Testing and Quality Assurance:**
   Develop and execute test cases to ensure the reliability and functionality of the updated code. Implement automated testing where feasible to streamline the testing process. Conduct thorough quality assurance to identify and address any issues before deployment.
-* #### Deployment Plan:
+- [ ] **Deployment Plan:**
   Develop a plan for deploying the updated code to users. Consider methods for migrating existing users to the new version smoothly. Provide support and assistance to users during the transition period.
 
 ### Constraints and Assumptions:
@@ -39,10 +39,10 @@ To enhance the core code running OttoDIY robot in order to address its current l
   - Ninja & Ninja w/ Arms
 
 ### Supported Platforms
-  - Arduino Nano, Uno, Micro, Mega, Mini, Leonardo, Nano Every (ATMega*)
-  - Arduino Nano Connect, Raspberry Pi Pico (RP2040)
-  - Arduino Nano Esp32, ESP32 (ESP32*)
-  - ESP8266 (ESP8266)
+  - Arduino Nano, Uno, Micro, Mega, Mini, Leonardo, Nano Every [(AVR*)](https://github.com/arduino/ArduinoCore-avr)
+  - Arduino Nano Connect, Raspberry Pi Pico [(RP2040)](https://github.com/earlephilhower/arduino-pico)
+  - Arduino Nano Esp32, ESP32 [(ESP32*)](https://github.com/espressif/arduino-esp32)
+  - ESP8266 [(ESP8266)](https://github.com/esp8266/Arduino)
 
 ### Supported Hardware
   #### Outputs (Mouth, Eyes, and Sound)  
