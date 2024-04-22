@@ -23,7 +23,7 @@ You can also find this library in the Arduino Manager as `Otto DIYLib` for quick
 ## Compatible Hardware
 
 - Arduino Nano, Uno, Micro, Mega, Mini, Leonardo, Nano Every [(AVR*)](https://github.com/arduino/ArduinoCore-avr)
-- Arduino Nano Connect, Raspberry Pi Pico [(RP2040)](https://github.com/earlephilhower/arduino-pico)
+- Arduino Nano Connect, Raspberry Pi Pico [(RP2040)](https://github.com/earlephilhower/arduino-pico) *using earlephilhower's arduino-pico core
 - Arduino Nano Esp32, ESP32 [(ESP32*)](https://github.com/espressif/arduino-esp32)
 - ESP8266 [(ESP8266)](https://github.com/esp8266/Arduino)
 
