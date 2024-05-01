@@ -40,7 +40,7 @@ To enhance the core code running OttoDIY robot in order to address its current l
 
 ### Supported Platforms
   - Arduino Nano, Uno, Micro, Mega, Mini, Leonardo, Nano Every [(AVR*)](https://github.com/arduino/ArduinoCore-avr)
-  - Arduino Nano Connect, Raspberry Pi Pico [(RP2040)](https://github.com/earlephilhower/arduino-pico)
+  - Arduino Nano Connect, Raspberry Pi Pico [(RP2040)](https://github.com/earlephilhower/arduino-pico) *using earlephilhower's arduino-pico core
   - Arduino Nano Esp32, ESP32 [(ESP32*)](https://github.com/espressif/arduino-esp32)
   - ESP8266 [(ESP8266)](https://github.com/esp8266/Arduino)
 
