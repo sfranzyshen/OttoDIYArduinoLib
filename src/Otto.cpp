@@ -21,7 +21,7 @@
 //---------------------------------------------------------
 void Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer) {
     // Create the tone task
-    xTaskCreate(toneTask, "Tone Task", 100, NULL, 1, &toneTaskHandle);
+    xTaskCreate(toneTaskWrapper, "Tone Task", 100, NULL, 1, &toneTaskHandle);
 
     // Check if the task creation was successful
     if (toneTaskHandle == NULL) {
@@ -1291,14 +1291,20 @@ void Otto::disableServoLimit() {
     }
 }
 
+// Define c++ wrapper function for c toneTask
+void Otto::toneTaskWrapper(void *pvParameters) {
+  Otto* ottoInstance = static_cast<Otto*>(pvParameters);
+  ottoInstance->toneTask(pvParameters);
+}
+
 // Task to play the tone
-void toneTask(void *pvParameters) {
+void Otto::toneTask(void *pvParameters) {
   ToneParameters toneParams;
 
   while (true) {
     if (xQueueReceive(toneQueue, &toneParams, portMAX_DELAY) == pdTRUE) {
       // Play the tone
-      tone(Otto::pinBuzzer, toneParams.frequency, toneParams.noteDuration);
+      tone(pinBuzzer, toneParams.frequency, toneParams.noteDuration);
       vTaskDelay(pdMS_TO_TICKS(toneParams.silentDuration));
     }
   }
