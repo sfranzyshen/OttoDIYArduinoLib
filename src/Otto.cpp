@@ -292,7 +292,7 @@ void Otto::_execute(int A[4], int O[4], int T, double phase_diff[4], float steps
 
     // Execute complete cycles
     for (int i = 0; i < completeCycles; i++)
-        oscillateServos(A, O, T, phase_diff);
+        oscillateServos(A, O, T, phase_diff, steps);
 
     // Execute the final incomplete cycle if necessary
     float remainingSteps = steps - completeCycles;
