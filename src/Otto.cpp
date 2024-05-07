@@ -2,9 +2,7 @@
 
 // Zowi (c) BQ. Released under a GPL licencse 04 December 2015
 
-#include <Arduino.h>
 #include "Otto.h"
-#include "Oscillator.h"
 
 //---------------------------------------------------------
 //-- Otto Init: Initialize
@@ -22,6 +20,14 @@
 //    Buzzer: Pin for the buzzer
 //---------------------------------------------------------
 void Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer) {
+    // Create the tone task
+    xTaskCreate(toneTask, "Tone Task", 100, NULL, 1, &toneTaskHandle);
+
+    // Check if the task creation was successful
+    if (toneTaskHandle == NULL) {
+        Serial.println("Failed to create tone task!");
+    }
+    
     // Set servo pins
     servo_pins[0] = YL;
     servo_pins[1] = YR;
@@ -757,24 +763,80 @@ void Otto::writeText(const char *s, byte scrollspeed) {
 }
 
 //---------------------------------------------------------
-//-- Otto Sound: Play Tone
+//-- Otto Sound: return the number of entries in the tone queue
+//---------------------------------------------------------
+// Returns:
+//    Integer value representing the number of entries in the tone queue.
+//-------------------------------------------------------
+int Otto::getToneQueueSize() {
+  if (toneQueue != NULL) {
+    return uxQueueMessagesWaiting(toneQueue);
+  } else {
+      return -2; // Queue doesn't exist
+  }
+}
+
+//---------------------------------------------------------
+//-- Otto Sound: check if the tone queue is empty
+//---------------------------------------------------------
+// Returns:
+//    Boolen value representing if the tone queue is empty.
+//-------------------------------------------------------
+bool Otto::isEmptyToneQueue() {
+  return (getToneQueueSize() == 0);
+}
+
+//---------------------------------------------------------
+//-- Otto Sound: clear all tones currently in the tone queue.
+//---------------------------------------------------------
+// Returns:
+//    Integer value representing the number of entries in the tone queue.
+//-------------------------------------------------------
+// Function to clear all tones currently in the queue
+int Otto::clearToneQueue() {
+  if (toneQueue != NULL) {
+    if (xQueueReset(toneQueue) == pdPASS) {
+      return 0; // Successfully cleared the queue
+    } else {
+      return -1; // Failed to clear the queue
+    }
+  }
+  return -2; // Queue doesn't exist
+}
+
+//---------------------------------------------------------
+//-- Otto Sound: Play Tone and return the number of entries in the tone queue
 //---------------------------------------------------------
 // Parameters:
 //   * noteFrequency: Frequency of the tone to play
 //   * noteDuration: Duration of the tone
 //   * silentDuration: Duration of silence after the tone
-//---------------------------------------------------------
-void Otto::_tone(float noteFrequency, long noteDuration, int silentDuration) {
-    // Ensure silent duration is at least 1 millisecond
-    if (silentDuration == 0) {
-        silentDuration = 1;
+//   * waitUntilFinished: Block until finished
+// Returns:
+//    Integer value representing the number of entries in the tone queue.
+//-------------------------------------------------------
+int Otto::_tone(float frequency, long noteDuration, int silentDuration, bool waitUntilFinished = true) {
+  // Create the tone queue if it doesn't exist
+  if (toneQueue == NULL) {
+    toneQueue = xQueueCreate(10, sizeof(ToneParameters));
+    if (toneQueue == NULL) {
+      return -1; // Failed to create queue
     }
+  }
 
-    // Play the tone for the specified duration
-    tone(Otto::pinBuzzer, noteFrequency, noteDuration);
-    delay(noteDuration);
-    // Add a delay for the specified silent duration
-    delay(silentDuration);
+  // Create a ToneParameters structure
+  ToneParameters toneParams = {frequency, noteDuration, silentDuration};
+
+  // Queue up the tone parameters
+  if (xQueueSendToBack(toneQueue, &toneParams, portMAX_DELAY) != pdTRUE) {
+    return -2; // Failed to send to queue
+  }
+
+  // If specified to wait until finished, 
+  // fixme here add test for empty queue
+
+  // Return the number of entries in the queue
+  return uxQueueMessagesWaiting(toneQueue);
 }
 
 //---------------------------------------------------------
@@ -1228,3 +1290,18 @@ void Otto::disableServoLimit() {
         servo[i].DisableLimiter();
     }
 }
+
+// Task to play the tone
+void toneTask(void *pvParameters) {
+  ToneParameters toneParams;
+
+  while (true) {
+    if (xQueueReceive(toneQueue, &toneParams, portMAX_DELAY) == pdTRUE) {
+      // Play the tone
+      tone(Otto::pinBuzzer, toneParams.frequency, toneParams.noteDuration);
+      vTaskDelay(pdMS_TO_TICKS(toneParams.silentDuration));
+    }
+  }
+}
+
+
