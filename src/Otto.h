@@ -5,13 +5,21 @@
 #ifndef Otto_h
 #define Otto_h
 
-#define #define OTTO_VER    13.0.1
+#define OTTO_VER    13.0.1
 
-#ifdef ARDUINO_ARCH_ESP32
-#include <ESP32Servo.h>
-#else
-#include <Servo.h>
-#endif
+#include <Arduino.h>
+
+#if defined(ARDUINO_ARCH_AVR)
+    #include <Arduino_FreeRTOS.h>    // add the FreeRTOS functions
+    #include <Servo.h>               // Servo Library
+#elif defined(ARDUINO_ARCH_ESP8266)  // https://github.com/alexCajas/esp8266RTOSArduCore/
+    #include <ESP32Servo.h>          // Esp-idf Servo Library *untested
+#elif defined(ARDUINO_ARCH_ESP32)
+    #include <ESP32Servo.h>          // Esp-idf Servo Library
+#elif defined(ARDUINO_ARCH_RP2040)   // https://github.com/earlephilhower/arduino-pico
+    #include <FreeRTOS.h>            // add the FreeRTOS functions
+    #include <Servo.h>               // Servo Library
+#endif // ARDUINO_ARCH
 
 #include "Oscillator.h"
 #include <EEPROM.h>
@@ -28,6 +36,13 @@
 #define SMALL       5
 #define MEDIUM      15
 #define BIG         30
+
+// Structure to hold tone parameters
+struct ToneParameters {
+  float frequency;
+  long noteDuration;
+  int silentDuration;
+};
 
 // Servo delta limit default. degree / sec
 #define SERVO_LIMIT_DEFAULT 240
@@ -76,9 +91,12 @@ public:
     void clearMouth();
 
     // Sounds
-    void _tone(float noteFrequency, long noteDuration, int silentDuration);
+    int _tone(float frequency, long noteDuration, int silentDuration, bool waitUntilFinished = true);
     void bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration);
     void sing(int songName);
+    int getToneQueueSize();
+    bool isEmptyToneQueue();
+    int clearToneQueue();
 
     // Gestures
     void playGesture(int gesture);
@@ -92,6 +110,8 @@ public:
     void disableServoLimit();
 
 private:
+    TaskHandle_t toneTaskHandle = NULL;    // Define the task handler for playing tones
+    QueueHandle_t toneQueue;               // Define the queue handler
     Oscillator servo[4];
     Otto_Matrix ledmatrix;
     int servo_pins[4];
@@ -101,7 +121,7 @@ private:
     unsigned long partial_time;
     float increment[4];
     bool isOttoResting;
-
+    void toneTask(void *pvParameters);    // Function prototypes
     unsigned long int getMouthShape(int number);
     unsigned long int getAnimShape(int anim, int index);
     void _execute(int A[4], int O[4], int T, double phase_diff[4], float steps);
