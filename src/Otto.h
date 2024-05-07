@@ -11,6 +11,7 @@
 
 #if defined(ARDUINO_ARCH_AVR)
     #include <Arduino_FreeRTOS.h>    // add the FreeRTOS functions
+	#include <queue.h>
     #include <Servo.h>               // Servo Library
 #elif defined(ARDUINO_ARCH_ESP8266)  // https://github.com/alexCajas/esp8266RTOSArduCore/
     #include <ESP32Servo.h>          // Esp-idf Servo Library *untested
@@ -109,19 +110,24 @@ public:
     void enableServoLimit(int speed_limit_degree_per_sec = SERVO_LIMIT_DEFAULT);
     void disableServoLimit();
 
+	
+
+
 private:
-    TaskHandle_t toneTaskHandle = NULL;    // Define the task handler for playing tones
-    QueueHandle_t toneQueue;               // Define the queue handler
+    QueueHandle_t toneQueue;               			// Define the queue handler
+    int pinBuzzer;
+	static void toneTaskWrapper(void *pvParameters);// Static wrapper function for toneTask	
+    void toneTask(void *pvParameters);    			// Function prototypes
+    TaskHandle_t toneTaskHandle = NULL;    			// Define the task handler for playing tones
+	
     Oscillator servo[4];
     Otto_Matrix ledmatrix;
     int servo_pins[4];
     int servo_trim[4];
-    int pinBuzzer;
     unsigned long final_time;
     unsigned long partial_time;
     float increment[4];
     bool isOttoResting;
-    void toneTask(void *pvParameters);    // Function prototypes
     unsigned long int getMouthShape(int number);
     unsigned long int getAnimShape(int anim, int index);
     void _execute(int A[4], int O[4], int T, double phase_diff[4], float steps);
