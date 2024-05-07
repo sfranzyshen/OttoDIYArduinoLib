@@ -246,7 +246,7 @@ void Otto::_moveSingle(int position, int servo_number) {
 //    phase_diff: Array of phase differences for each servo
 //    cycle: Number of complete cycles to execute (default is 1)
 //---------------------------------------------------------
-void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle) {
+void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle = 1.0) {
     // Set servo parameters
     for (int i = 0; i < 4; i++) {
         servo[i].SetO(O[i]);
@@ -292,7 +292,7 @@ void Otto::_execute(int A[4], int O[4], int T, double phase_diff[4], float steps
 
     // Execute complete cycles
     for (int i = 0; i < completeCycles; i++)
-        oscillateServos(A, O, T, phase_diff, steps);
+        oscillateServos(A, O, T, phase_diff);
 
     // Execute the final incomplete cycle if necessary
     float remainingSteps = steps - completeCycles;
