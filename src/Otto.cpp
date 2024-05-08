@@ -36,8 +36,8 @@ int Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer
     toneQueue = xQueueCreate(10, sizeof(ToneParameters));
 	
     if (toneQueue == NULL) {
-      Serial.println("Failed to create tone queue!");
-      return -2; // Failed to create queue
+        Serial.println("Failed to create tone queue!");
+        return -2; // Failed to create queue
     }
 	
     // Set servo pins
@@ -56,7 +56,8 @@ int Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer
     if (load_calibration) {
         for (int i = 0; i < 4; i++) {
             int servo_trim = EEPROM.read(i);
-            if (servo_trim > 128) servo_trim -= 256;
+            if (servo_trim > 128)
+		    servo_trim -= 256;
             servo[i].SetTrim(servo_trim);
         }
     }
@@ -64,7 +65,7 @@ int Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer
     // Set buzzer pin
     pinBuzzer = Buzzer;
     pinMode(Buzzer, OUTPUT);
-	return 0;
+    return 0;
 }
 
 //---------------------------------------------------------
@@ -785,7 +786,7 @@ int Otto::getToneQueueSize() {
   if (toneQueue != NULL) {
     return uxQueueMessagesWaiting(toneQueue);
   } else {
-      return -2; // Queue doesn't exist
+    return -2; // Queue doesn't exist
   }
 }
 
@@ -797,9 +798,9 @@ int Otto::getToneQueueSize() {
 //-------------------------------------------------------
 bool Otto::isEmptyToneQueue() {
   if(getToneQueueSize() == 0) {
-	return true; // true if queue empty
+    return true; // true if queue empty
   } else {
-	  return false; // false if busy or error (Queue doesn't exist)
+    return false; // false if busy or error (Queue doesn't exist)
   }
 }
 
@@ -836,7 +837,7 @@ int Otto::_tone(float frequency, long noteDuration, int silentDuration, bool wai
 
   // Check if the tone queue exist
   if(toneQueue == NULL) {
-      return -2; // Queue doesn't exist
+    return -2; // Queue doesn't exist
   }
 
   // Check the available space in the queue
@@ -856,7 +857,7 @@ int Otto::_tone(float frequency, long noteDuration, int silentDuration, bool wai
   if(waitUntilFinished) {
     while(uxQueueMessagesWaiting(toneQueue) > 0) {
       // loop (block) until Queue is empty
-	}
+    }
   }
 
   // Return the number of entries in the queue
@@ -888,7 +889,7 @@ void Otto::bendTones(float initFrequency, float finalFrequency, float prop, long
     } else {
         // Descending frequency
         for (int i = initFrequency; i > finalFrequency; i /= prop) {
-            _tone(i, noteDuration, silentDuration);
+          _tone(i, noteDuration, silentDuration);
         }
     }
 }
@@ -902,13 +903,12 @@ void Otto::toneTaskWrapper(void *pvParameters) {
 // Task to play the tone
 void Otto::toneTask(void *pvParameters) {
   ToneParameters toneParams;
-
   while (true) {
     if (xQueueReceive(toneQueue, &toneParams, portMAX_DELAY) == pdTRUE) {
       // Play the tone
-	  if(toneParams.frequency != 0) { // ignore empty (silent) notes
-		tone(pinBuzzer, toneParams.frequency, toneParams.noteDuration);
-	  }
+      if(toneParams.frequency != 0) { // ignore empty (silent) notes
+        tone(pinBuzzer, toneParams.frequency, toneParams.noteDuration);
+      }
       vTaskDelay(pdMS_TO_TICKS(toneParams.silentDuration)); // silence delay
     }
   }
@@ -934,8 +934,7 @@ void Otto::sing(int songName) {
             break;
         case S_buttonPushed:
             bendTones(note_E6, note_G6, 1.03, 20, 2);
-            //delay(30);
-			_tone(note_0, 0, 30); // silent note 
+            _tone(note_0, 0, 30); // silent note 
             bendTones(note_E6, note_D7, 1.04, 10, 2);
             break;
         case S_mode1:
@@ -955,18 +954,16 @@ void Otto::sing(int songName) {
             break;
         case S_OhOoh:
             bendTones(880, 2000, 1.04, 8, 3);
-            //delay(200);
-			_tone(note_0, 0, 200); // silent note 
+            _tone(note_0, 0, 200); // silent note 
             for (int i = 880; i < 2000; i = i * 1.04) {
-                _tone(note_B5, 5, 10);
+              _tone(note_B5, 5, 10);
             }
             break;
         case S_OhOoh2:
             bendTones(1880, 3000, 1.03, 8, 3);
-            //delay(200);
-			_tone(note_0, 0, 200); // silent note 
+            _tone(note_0, 0, 200); // silent note 
             for (int i = 1880; i < 3000; i = i * 1.03) {
-                _tone(note_C6, 10, 10);
+              _tone(note_C6, 10, 10);
             }
             break;
         case S_cuddly:
@@ -975,8 +972,7 @@ void Otto::sing(int songName) {
             break;
         case S_sleeping:
             bendTones(100, 500, 1.04, 10, 10);
-            //delay(500);
-			_tone(note_0, 0, 500); // silent note 
+            _tone(note_0, 0, 500); // silent note 
             bendTones(400, 100, 1.04, 10, 1);
             break;
         case S_happy:
@@ -985,14 +981,12 @@ void Otto::sing(int songName) {
             break;
         case S_superHappy:
             bendTones(2000, 6000, 1.05, 8, 3);
-            //delay(50);
-			_tone(note_0, 0, 50); // silent note 
+            _tone(note_0, 0, 50); // silent note 
             bendTones(5999, 2000, 1.05, 13, 2);
             break;
         case S_happy_short:
             bendTones(1500, 2000, 1.05, 15, 8);
-            //delay(100);
-			_tone(note_0, 0, 100); // silent note 
+            _tone(note_0, 0, 100); // silent note 
             bendTones(1900, 2500, 1.05, 10, 8);
             break;
         case S_sad:
