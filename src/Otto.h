@@ -11,7 +11,7 @@
 
 #if defined(ARDUINO_ARCH_AVR)
     #include <Arduino_FreeRTOS.h>    // add the FreeRTOS functions
-    #include <queue.h>
+	#include <queue.h>
     #include <Servo.h>               // Servo Library
 #elif defined(ARDUINO_ARCH_ESP8266)  // https://github.com/alexCajas/esp8266RTOSArduCore/
     #include <ESP32Servo.h>          // Esp-idf Servo Library *untested
@@ -51,7 +51,7 @@ struct ToneParameters {
 class Otto {
 public:
     // Otto initialization
-    void init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer);
+    int init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer);
 
     // Attach & detach functions
     void attachServos();
@@ -113,7 +113,7 @@ public:
 private:
     QueueHandle_t toneQueue;               			// Define the queue handler
     int pinBuzzer;
-    static void toneTaskWrapper(void *pvParameters);		// Static wrapper function for toneTask	
+	static void toneTaskWrapper(void *pvParameters);// Static wrapper function for toneTask	
     void toneTask(void *pvParameters);    			// Function prototypes
     TaskHandle_t toneTaskHandle = NULL;    			// Define the task handler for playing tones
     Oscillator servo[4];
