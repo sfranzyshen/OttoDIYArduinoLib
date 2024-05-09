@@ -1,6 +1,6 @@
 // OttoDIY Arduino Library project 2024
 
-// Zowi (c) BQ. Released under a GPL licencse 04 December 2015
+// Zowi (c) BQ. Released under a GPL licencse 2015
 
 #include "Otto.h"
 
@@ -8,9 +8,8 @@
 //-- Otto Init: Initialize
 //---------------------------------------------------------
 // Description:
-//    This function initializes Otto by setting up servo pins,
-//    attaching servos, loading calibration data if specified,
-//    and configuring the buzzer pin.
+//    This function initializes Otto by setting up freertos task & queues, servo pins,
+//    attaching servos, loading calibration data if specified, and configuring the buzzer pin.
 // Parameters:
 //    YL: Pin for left hip servo
 //    YR: Pin for right hip servo
@@ -825,6 +824,18 @@ int Otto::clearToneQueue() {
 }
 
 //---------------------------------------------------------
+//-- Otto Sound: Play Tone compatibility wrapper
+//---------------------------------------------------------
+// Parameters:
+//   * noteFrequency: Frequency of the tone to play
+//   * noteDuration: Duration of the tone
+//   * silentDuration: Duration of silence after the tone
+//-------------------------------------------------------
+void Otto::_tone(float frequency, long noteDuration, int silentDuration) {
+	
+}
+
+//---------------------------------------------------------
 //-- Otto Sound: Play Tone and return the number of entries in the tone queue
 //---------------------------------------------------------
 // Parameters:
@@ -834,8 +845,8 @@ int Otto::clearToneQueue() {
 // Returns:
 //    Integer value representing the number of entries in the tone queue.
 //-------------------------------------------------------
-int Otto::_tone(float frequency, long noteDuration, int silentDuration) {
-	int count = 0;
+int Otto::Sound_tone(float frequency, long noteDuration, int silentDuration, int noblock = BLOCKING) {
+  int count = 0;
 
   // Check if the tone queue exist
   if(toneQueueHandle == NULL) {
