@@ -7,4 +7,7 @@
 #include "Otto_sound.h"
 #include "Otto_version.h"
 
+#define  BLOCKING  false
+#define  NON_BLOCKING  true
+
 #endif
