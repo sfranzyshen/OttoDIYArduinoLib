@@ -11,8 +11,9 @@
 
 #if defined(ARDUINO_ARCH_AVR)
     #include <Arduino_FreeRTOS.h>    // add the FreeRTOS functions
-    #include <queue.h>
+	#include <queue.h>
     #include <Servo.h>               // Servo Library
+	#undef delay
 #elif defined(ARDUINO_ARCH_ESP8266)  // https://github.com/alexCajas/esp8266RTOSArduCore/
     #include <ESP32Servo.h>          // Esp-idf Servo Library *untested
 #elif defined(ARDUINO_ARCH_ESP32)
@@ -92,7 +93,7 @@ public:
     void clearMouth();
 
     // Sounds
-    int _tone(float frequency, long noteDuration, int silentDuration, bool waitUntilFinished = true);
+    int _tone(float frequency, long noteDuration, int silentDuration);
     void bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration);
     void sing(int songName);
     int getToneQueueSize();
@@ -111,11 +112,11 @@ public:
     void disableServoLimit();
 
 private:
-    QueueHandle_t toneQueue;               			// Define the queue handler
     int pinBuzzer;
-    static void toneTaskWrapper(void *pvParameters);// Static wrapper function for toneTask	
+	static void toneTaskWrapper(void *pvParameters);// Static wrapper function for toneTask	
     void toneTask(void *pvParameters);    			// Function prototypes
     TaskHandle_t toneTaskHandle = NULL;    			// Define the task handler for playing tones
+    QueueHandle_t toneQueueHandle = NULL;           // Define the queue handler
     Oscillator servo[4];
     Otto_Matrix ledmatrix;
     int servo_pins[4];
