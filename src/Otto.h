@@ -13,13 +13,13 @@
 	#define  Otto_model		BIPED 	 // 4x 180° Servos
 	#define  Otto_sound		SOUND_BUZZER
 	#define  Otto_mouth		LED_MATRIX_8X8_MONO_SPI
-	#define  Otto_SERVOS	4
+	#define  Otto_SERVOS		4
 #endif
 
 #if defined(ARDUINO_ARCH_AVR)
     #include <Arduino_FreeRTOS.h>    // add the FreeRTOS functions
-	#undef delay					 // undefine freertos's delay() wrapper 
-	#include <queue.h>
+    #undef delay		     // undefine freertos's delay() wrapper 
+    #include <queue.h>
     #include <Servo.h>               // Servo Library
 #elif defined(ARDUINO_ARCH_ESP8266)  // https://github.com/alexCajas/esp8266RTOSArduCore/
     #include <ESP32Servo.h>          // Esp-idf Servo Library *untested
