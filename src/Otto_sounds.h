@@ -5,7 +5,7 @@
 #ifndef Otto_sounds_h
 #define Otto_sounds_h
 
-#define  note_0       0    // Silent note
+#define  note_0       0    // Rests note
 #define  note_C0  16.35    // C0
 #define  note_Db0 17.32    // C#0/Db0
 #define  note_D0  18.35    // D0
