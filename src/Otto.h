@@ -5,15 +5,22 @@
 #ifndef Otto_h
 #define Otto_h
 
-#define OTTO_VER    13.0.1
-
 #include <Arduino.h>
+
+#ifndef Otto_config_h				 // no pre-config ... default to starter kit biped
+	#include "Otto_config.h"
+	#define  Otto_code		BLOCKING
+	#define  Otto_model		BIPED 	 // 4x 180° Servos
+	#define  Otto_sound		SOUND_BUZZER
+	#define  Otto_mouth		LED_MATRIX_8X8_MONO_SPI
+	#define  Otto_SERVOS	4
+#endif
 
 #if defined(ARDUINO_ARCH_AVR)
     #include <Arduino_FreeRTOS.h>    // add the FreeRTOS functions
+	#undef delay					 // undefine freertos's delay() wrapper 
 	#include <queue.h>
     #include <Servo.h>               // Servo Library
-	#undef delay
 #elif defined(ARDUINO_ARCH_ESP8266)  // https://github.com/alexCajas/esp8266RTOSArduCore/
     #include <ESP32Servo.h>          // Esp-idf Servo Library *untested
 #elif defined(ARDUINO_ARCH_ESP32)
@@ -31,13 +38,14 @@
 #include "Otto_matrix.h"
 
 // Constants
-#define FORWARD     1
-#define BACKWARD    -1
-#define LEFT        1
-#define RIGHT       -1
-#define SMALL       5
-#define MEDIUM      15
-#define BIG         30
+#define FORWARD     	1
+#define BACKWARD    	-1
+#define LEFT        	1
+#define RIGHT       	-1
+#define SMALL       	5
+#define MEDIUM      	15
+#define BIG         	30
+
 
 // Structure to hold tone parameters
 struct ToneParameters {
@@ -93,7 +101,8 @@ public:
     void clearMouth();
 
     // Sounds
-    int _tone(float frequency, long noteDuration, int silentDuration);
+    void _tone(float frequency, long noteDuration, int silentDuration);
+    int Sound_tone(float frequency, long noteDuration, int silentDuration, bool noblock);
     void bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration);
     void sing(int songName);
     int getToneQueueSize();
@@ -113,7 +122,7 @@ public:
 
 private:
     int pinBuzzer;
-	static void toneTaskWrapper(void *pvParameters);// Static wrapper function for toneTask	
+    static void toneTaskWrapper(void *pvParameters);// Static wrapper function for toneTask	
     void toneTask(void *pvParameters);    			// Function prototypes
     TaskHandle_t toneTaskHandle = NULL;    			// Define the task handler for playing tones
     QueueHandle_t toneQueueHandle = NULL;           // Define the queue handler
