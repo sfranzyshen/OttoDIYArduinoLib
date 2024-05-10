@@ -87,7 +87,7 @@ To enhance the core code running OttoDIY robot in order to address its current l
 The "Otto_code" directive establishes the overall coding style for a sketch. This setting can be overridden at the function call level. By default, it operates in BLOCKING mode. However, when set to NON_BLOCKING, all functions will default to non-blocking behavior.
 ```cpp
   #define Otto_model	  	BIPED_ARMS	// 6x 180° Servos
-  #define Otto_sound	  	BUZZER
+  #define Otto_sound	  	SOUND_BUZZER
   #define Otto_mouth	  	LED_MATRIX_8X8_MONO_SPI
   #define Otto_eyes	  	LED_USONIC_RGB_NEO
 
