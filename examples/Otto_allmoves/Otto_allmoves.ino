@@ -5,7 +5,6 @@
 //-- Make sure to have installed all libraries: https://github.com/OttoDIY/OttoDIYLib
 //-----------------------------------------------------------------
 #include <Otto.h>
-#undef delay
 
 Otto Otto;  //This is Otto!
 
