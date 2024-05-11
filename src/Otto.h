@@ -7,14 +7,16 @@
 
 #include <Arduino.h>
 
-#ifndef Otto_config_h				 // no pre-config ... default to starter kit biped
+#ifndef Otto_config_h				  // no pre-config ... default to starter kit biped
 	#include "Otto_config.h"
-	#define  Otto_code		BLOCKING
-	#define  Otto_model		BIPED 	 // 4x 180° Servos
-	#define  Otto_sound		SOUND_BUZZER
-	#define  Otto_mouth		LED_MATRIX_8X8_MONO_SPI
-	#define  Otto_SERVOS	4
-#endif
+	//#define  Otto_code			NON_BLOCKING
+	#define  Otto_code			BLOCKING
+	#define  Otto_model			BIPED // 4x 180° Servos
+	#define  Otto_SERVOS		4
+	#define  Otto_sound			SOUND_BUZZER
+	//#define  Otto_sound			SOUND_NONE	
+	#define  Otto_mouth			LED_MATRIX_8X8_MONO_SPI
+#endif // Otto_config
 
 #if defined(ARDUINO_ARCH_AVR)
     #include <Arduino_FreeRTOS.h>    // add the FreeRTOS functions
@@ -33,6 +35,16 @@
 #include "Oscillator.h"
 #include <EEPROM.h>
 #include "Otto_sounds.h"
+
+#if Otto_sound == SOUND_BUZZER
+	// Structure to hold tone parameters
+	struct ToneParameters {
+		float frequency;
+		long noteDuration;
+		int silentDuration;
+	};
+#endif // SOUND_BUZZER
+
 #include "Otto_gestures.h"
 #include "Otto_mouths.h"
 #include "Otto_matrix.h"
@@ -45,14 +57,6 @@
 #define SMALL       	5
 #define MEDIUM      	15
 #define BIG         	30
-
-
-// Structure to hold tone parameters
-struct ToneParameters {
-  float frequency;
-  long noteDuration;
-  int silentDuration;
-};
 
 // Servo delta limit default. degree / sec
 #define SERVO_LIMIT_DEFAULT 240
@@ -101,7 +105,8 @@ public:
     void putAnimationMouth(unsigned long int anim, int index);
     void clearMouth();
 
-    // Sounds
+#if Otto_sound == SOUND_BUZZER
+    // Sound functions for SOUND_BUZZER
     void _tone(float frequency, long noteDuration, int silentDuration); // compatibility wrapper
     int Sound_tone(float frequency, long noteDuration, int silentDuration, bool noblock = Otto_code);
     void bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration); // compatibility wrapper
@@ -111,6 +116,11 @@ public:
     int getToneQueueSize();
     bool isEmptyToneQueue();
     int clearToneQueue();
+#else // dummy compatibility wrappers
+    void _tone(float frequency, long noteDuration, int silentDuration); // dummy compatibility wrapper
+    void bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration); // dummy compatibility wrapper
+    void sing(int songName); // dummy compatibility wrapper
+#endif // SOUND_BUZZER
 
     // Gestures
     void playGesture(int gesture);
@@ -124,11 +134,16 @@ public:
     void disableServoLimit();
 
 private:
-    int pinBuzzer;
+#if Otto_sound == SOUND_BUZZER
 	static void toneTaskWrapper(void *pvParameters);// Static wrapper function for toneTask	
     void toneTask(void *pvParameters);    			// Function prototypes
     TaskHandle_t toneTaskHandle = NULL;    			// Define the task handler for playing tones
     QueueHandle_t toneQueueHandle = NULL;           // Define the queue handler
+    int pinBuzzer;
+#else // compatibility wrappers
+    int pinBuzzer;
+#endif // SOUND_BUZZER
+
     Oscillator servo[4];
     Otto_Matrix ledmatrix;
     int servo_pins[4];
@@ -142,4 +157,4 @@ private:
     void _execute(int A[4], int O[4], int T, double phase_diff[4], float steps = 1.0);
 };
 
-#endif
+#endif // Otto_h
