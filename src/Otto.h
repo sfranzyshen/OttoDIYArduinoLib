@@ -164,10 +164,10 @@ public:
 
 private:
 #if Otto_sound == SOUND_BUZZER
-	static void toneTaskWrapper(void *pvParameters);// Static wrapper function for toneTask	
-    void toneTask(void *pvParameters);    			// Function prototypes
-    TaskHandle_t toneTaskHandle = NULL;    			// Define the task handler for playing tones
-    QueueHandle_t toneQueueHandle = NULL;           // Define the queue handler
+    static void toneTaskWrapper(void *pvParameters);	// Static wrapper function for toneTask	
+    void toneTask(void *pvParameters);    		// Function prototypes
+    TaskHandle_t toneTaskHandle = NULL;    		// Define the task handler for playing tones
+    QueueHandle_t toneQueueHandle = NULL;           	// Define the queue handler
     int pinBuzzer;
 #else // compatibility wrappers
     int pinBuzzer;
