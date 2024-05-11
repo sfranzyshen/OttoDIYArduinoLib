@@ -882,14 +882,14 @@ int Otto::Sound_tone(float frequency, long noteDuration, int silentDuration, boo
 	while(uxQueueSpacesAvailable(toneQueueHandle) == 0) {
 		delay(1); // delay 1ms
 		count++;
-		Serial.print(F("."));
+		//Serial.print(F("."));
 		if(count > 200) { // max delay 200ms
-			Serial.println();
+			//Serial.println();
 			Serial.println(F("Error: No space available in the tone queue."));
 			return -3; // No space available in the tone queue			
 		}
 	}
-	Serial.println();
+	//Serial.println();
   }
 
   // Create a ToneParameters structure
@@ -902,11 +902,11 @@ int Otto::Sound_tone(float frequency, long noteDuration, int silentDuration, boo
   }
 
   if(noblock) { // non-blocking code flow
-    int count = uxQueueMessagesWaiting(toneQueueHandle);
-    Serial.print("Tone queue size: ");
-    Serial.println(count);
-    return count; // Return the number of entries in the tone queue
-    //return uxQueueMessagesWaiting(toneQueueHandle); // Return the number of entries in the tone queue
+    //int count = uxQueueMessagesWaiting(toneQueueHandle);
+    //Serial.print("Tone queue size: ");
+    //Serial.println(count);
+    //return count; // Return the number of entries in the tone queue
+    return uxQueueMessagesWaiting(toneQueueHandle); // Return the number of entries in the tone queue
   } else {  // blocking code flow
     while(uxQueueMessagesWaiting(toneQueueHandle) != 0) { 
       // wait for queue to empty
@@ -1006,7 +1006,7 @@ void Otto::sing(int songName) {
 //    Integer value representing success (0) or error #.
 //---------------------------------------------------------
 int Otto::Sound_sing(int songName, bool noblock) {
-	int result;
+    int result = 0;
     switch (songName) {
         case S_connection:
             result = Sound_tone(note_E5, 50, 30, noblock);
