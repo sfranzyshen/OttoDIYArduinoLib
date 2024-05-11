@@ -16,8 +16,8 @@
 //    Integer value representing Otto's init status. 0 = successful -# = error
 //---------------------------------------------------------
 int Otto::init(const char * name) {
-	// fixme
-	return -1;
+  // fixme
+  return -1;
 }
 
 //---------------------------------------------------------
@@ -44,7 +44,7 @@ void Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzze
     if (toneQueueHandle == NULL) {
       Serial.println(F("Error: Failed to create tone queue!"));
       //return -2; // Failed to create queue
-	  return;
+      return;
     }
     // Create the tone task
     xTaskCreate(toneTaskWrapper, "Tone Task", 128, this, 1, &toneTaskHandle);
@@ -53,7 +53,7 @@ void Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzze
     if (toneTaskHandle == NULL) {
         Serial.println(F("Error: Failed to create tone task!"));
         //return -1; // Failed to create queue
-		return;
+	return;
     }
 	
     // Set buzzer pin
@@ -818,9 +818,9 @@ int Otto::getToneQueueSize() {
 //-------------------------------------------------------
 bool Otto::isEmptyToneQueue() {
   if(getToneQueueSize() == 0) {
-	return true; // true if queue empty
+    return true; // true if queue empty
   } else {
-	  return false; // false if busy or error (Queue doesn't exist)
+    return false; // false if busy or error (Queue doesn't exist)
   }
 }
 
@@ -853,7 +853,7 @@ int Otto::clearToneQueue() {
 //   * silentDuration: Duration of silence after the tone
 //-------------------------------------------------------
 void Otto::_tone(float frequency, long noteDuration, int silentDuration) {
-	Sound_tone(frequency, noteDuration, silentDuration, Otto_code);
+  Sound_tone(frequency, noteDuration, silentDuration, Otto_code);
 }
 
 //---------------------------------------------------------
@@ -878,7 +878,7 @@ int Otto::Sound_tone(float frequency, long noteDuration, int silentDuration, boo
 
   // Check the available space in the tone queue
   if(uxQueueSpacesAvailable(toneQueueHandle) == 0) {
-	Serial.println(F("Stall: waiting for available space in the tone queue."));
+	//Serial.println(F("Stall: waiting for available space in the tone queue."));
 	while(uxQueueSpacesAvailable(toneQueueHandle) == 0) {
 		delay(1); // delay 1ms
 		count++;
@@ -897,21 +897,21 @@ int Otto::Sound_tone(float frequency, long noteDuration, int silentDuration, boo
 
   // Queue up the tone parameters
   if(xQueueSendToBack(toneQueueHandle, &toneParams, portMAX_DELAY) != pdTRUE) {
-	Serial.println(F("Error: Failed to send to tone queue."));
+    Serial.println(F("Error: Failed to send to tone queue."));
     return -1; // Failed to send to tone queue
   }
 
   if(noblock) { // non-blocking code flow
-	  int count = uxQueueMessagesWaiting(toneQueueHandle);
-      Serial.print("Tone queue size: ");
-      Serial.println(count);
-	  return count; // Return the number of entries in the tone queue
-	  //return uxQueueMessagesWaiting(toneQueueHandle); // Return the number of entries in the tone queue
+    int count = uxQueueMessagesWaiting(toneQueueHandle);
+    Serial.print("Tone queue size: ");
+    Serial.println(count);
+    return count; // Return the number of entries in the tone queue
+    //return uxQueueMessagesWaiting(toneQueueHandle); // Return the number of entries in the tone queue
   } else {  // blocking code flow
-	while(uxQueueMessagesWaiting(toneQueueHandle) != 0) { 
-	  // wait for queue to empty
-	}
-	delay(noteDuration + silentDuration); // delay (block) for note duration + silence
+    while(uxQueueMessagesWaiting(toneQueueHandle) != 0) { 
+      // wait for queue to empty
+    }
+    delay(noteDuration + silentDuration); // delay (block) for note duration + silence
     return 0;
   }
 }
@@ -953,16 +953,16 @@ int Otto::Sound_bendTones(float initFrequency, float finalFrequency, float prop,
         // Ascending frequency
         for (int i = initFrequency; i < finalFrequency; i *= prop) {
             result = Sound_tone(i, noteDuration, silentDuration, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
         }
     } else {
         // Descending frequency
         for (int i = initFrequency; i > finalFrequency; i /= prop) {
             result = Sound_tone(i, noteDuration, silentDuration, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
         }
     }
-	return 0; // sucess
+    return 0; // sucess
 }
 
 // Define c++ wrapper function for c toneTask
@@ -978,11 +978,10 @@ void Otto::toneTask(void *pvParameters) {
   while (true) {
     if (xQueueReceive(toneQueueHandle, &toneParams, portMAX_DELAY) == pdTRUE) {
 	  if(toneParams.frequency != 0) { // ignore empty (rests ) notes
-		tone(Otto::pinBuzzer, toneParams.frequency, toneParams.noteDuration);
+	    tone(Otto::pinBuzzer, toneParams.frequency, toneParams.noteDuration);
 	    vTaskDelay(max (1U, (toneParams.noteDuration / portTICK_PERIOD_MS) ));
 	  }
 	  vTaskDelay(max (1U, (toneParams.silentDuration / portTICK_PERIOD_MS) ));
-
     }
   }
 }
@@ -1011,146 +1010,146 @@ int Otto::Sound_sing(int songName, bool noblock) {
     switch (songName) {
         case S_connection:
             result = Sound_tone(note_E5, 50, 30, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_tone(note_E6, 55, 25, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = result = Sound_tone(note_A6, 60, 10, noblock);
- 			if(result < 0) return result;
+ 	    if(result < 0) return result;
             break;
         case S_disconnection:
             result = Sound_tone(note_E5, 50, 30, noblock);
- 			if(result < 0) return result;
+ 	    if(result < 0) return result;
             result = Sound_tone(note_A6, 55, 25, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_tone(note_E6, 50, 10, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             break;
         case S_buttonPushed:
             result = Sound_bendTones(note_E6, note_G6, 1.03, 20, 2, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_tone(note_0, 0, 30); // rests  note 
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_bendTones(note_E6, note_D7, 1.04, 10, 2, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             break;
         case S_mode1:
             result = Sound_bendTones(note_E6, note_A6, 1.02, 30, 10, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             break;
         case S_mode2:
             result = Sound_bendTones(note_G6, note_D7, 1.03, 30, 10, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             break;
         case S_mode3:
             result = Sound_tone(note_E6, 50, 100, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_tone(note_G6, 50, 80, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_tone(note_D7, 300, 0, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             break;
         case S_surprise:
             result = Sound_bendTones(800, 2150, 1.02, 10, 1, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_bendTones(2149, 800, 1.03, 7, 1, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             break;
         case S_OhOoh:
             result = Sound_bendTones(880, 2000, 1.04, 8, 3, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
- 			if(result < 0) return result;
+ 	    if(result < 0) return result;
             for (int i = 880; i < 2000; i = i * 1.04) {
               result = Sound_tone(note_B5, 5, 10, noblock);
-			  if(result < 0) return result;
+	      if(result < 0) return result;
             }
             break;
         case S_OhOoh2:
             result = Sound_bendTones(1880, 3000, 1.03, 8, 3, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
-			if(result < 0) return result;
+	    if(result < 0) return result;
             for (int i = 1880; i < 3000; i = i * 1.03) {
               result = Sound_tone(note_C6, 10, 10, noblock);
-			  if(result < 0) return result;
+	       if(result < 0) return result;
             }
             break;
         case S_cuddly:
             result = Sound_bendTones(700, 900, 1.03, 16, 4, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_bendTones(899, 650, 1.01, 18, 7, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             break;
         case S_sleeping:
             result = Sound_bendTones(100, 500, 1.04, 10, 10, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_bendTones(400, 100, 1.04, 10, 1, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             break;
         case S_happy:
             result = Sound_bendTones(1500, 2500, 1.05, 20, 8, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_bendTones(2499, 1500, 1.05, 25, 8, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             break;
         case S_superHappy:
             result = Sound_bendTones(2000, 6000, 1.05, 8, 3, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_tone(note_0, 0, 50); // rests  note 
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_bendTones(5999, 2000, 1.05, 13, 2, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             break;
         case S_happy_short:
             result = Sound_bendTones(1500, 2000, 1.05, 15, 8, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_tone(note_0, 0, 100); // rests  note 
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_bendTones(1900, 2500, 1.05, 10, 8, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             break;
         case S_sad:
             result = Sound_bendTones(880, 669, 1.02, 20, 200, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             break;
         case S_confused:
             result = Sound_bendTones(1000, 1700, 1.03, 8, 2, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_bendTones(1699, 500, 1.04, 8, 3, noblock);
- 			if(result < 0) return result;
+ 	    if(result < 0) return result;
             result = Sound_bendTones(1000, 1700, 1.05, 9, 10, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             break;
         case S_fart1:
             result = Sound_bendTones(1600, 3000, 1.02, 2, 15, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             break;
         case S_fart2:
             result = Sound_bendTones(2000, 6000, 1.02, 2, 20, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             break;
         case S_fart3:
             result = Sound_bendTones(1600, 4000, 1.02, 2, 20, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             result = Sound_bendTones(4000, 3000, 1.02, 2, 20, noblock);
-			if(result < 0) return result;
+	    if(result < 0) return result;
             break;
     }
-	return 0; // return sucess
+    return 0; // return sucess
 }
 #else // SOUND_BUZZER dummy compatibility wrappers
 
