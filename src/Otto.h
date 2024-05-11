@@ -13,13 +13,13 @@
 	#define  Otto_model		BIPED 	 // 4x 180° Servos
 	#define  Otto_sound		SOUND_BUZZER
 	#define  Otto_mouth		LED_MATRIX_8X8_MONO_SPI
-	#define  Otto_SERVOS		4
+	#define  Otto_SERVOS	4
 #endif
 
 #if defined(ARDUINO_ARCH_AVR)
     #include <Arduino_FreeRTOS.h>    // add the FreeRTOS functions
-    #undef delay		     // undefine freertos's delay() wrapper 
-    #include <queue.h>
+	#undef delay					 // undefine freertos's delay() wrapper 
+	#include <queue.h>
     #include <Servo.h>               // Servo Library
 #elif defined(ARDUINO_ARCH_ESP8266)  // https://github.com/alexCajas/esp8266RTOSArduCore/
     #include <ESP32Servo.h>          // Esp-idf Servo Library *untested
@@ -60,7 +60,8 @@ struct ToneParameters {
 class Otto {
 public:
     // Otto initialization
-    int init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer);
+	int init(const char * name = "Otto");
+    void init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer); // compatibility wrapper
 
     // Attach & detach functions
     void attachServos();
@@ -73,7 +74,7 @@ public:
     // Predetermined Motion Functions
     void _moveServos(int time, int servo_target[]);
     void _moveSingle(int position, int servo_number);
-    void oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle);
+    void oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle = 1.0);
 
     // HOME = Otto at rest position
     void home();
@@ -101,10 +102,12 @@ public:
     void clearMouth();
 
     // Sounds
-    void _tone(float frequency, long noteDuration, int silentDuration);
-    int Sound_tone(float frequency, long noteDuration, int silentDuration, bool noblock);
-    void bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration);
-    void sing(int songName);
+    void _tone(float frequency, long noteDuration, int silentDuration); // compatibility wrapper
+    int Sound_tone(float frequency, long noteDuration, int silentDuration, bool noblock = Otto_code);
+    void bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration); // compatibility wrapper
+    int Sound_bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration, bool noblock = Otto_code);
+    void sing(int songName); // compatibility wrapper
+    int Sound_sing(int songName, bool noblock = Otto_code);
     int getToneQueueSize();
     bool isEmptyToneQueue();
     int clearToneQueue();
@@ -122,7 +125,7 @@ public:
 
 private:
     int pinBuzzer;
-    static void toneTaskWrapper(void *pvParameters);// Static wrapper function for toneTask	
+	static void toneTaskWrapper(void *pvParameters);// Static wrapper function for toneTask	
     void toneTask(void *pvParameters);    			// Function prototypes
     TaskHandle_t toneTaskHandle = NULL;    			// Define the task handler for playing tones
     QueueHandle_t toneQueueHandle = NULL;           // Define the queue handler
@@ -136,7 +139,7 @@ private:
     bool isOttoResting;
     unsigned long int getMouthShape(int number);
     unsigned long int getAnimShape(int anim, int index);
-    void _execute(int A[4], int O[4], int T, double phase_diff[4], float steps);
+    void _execute(int A[4], int O[4], int T, double phase_diff[4], float steps = 1.0);
 };
 
 #endif
