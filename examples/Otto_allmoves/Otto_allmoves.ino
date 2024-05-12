@@ -25,13 +25,15 @@ void setup(){
   Serial.begin(9600);
   Serial.println("Startup");
 
-  //Otto.init(LeftLeg, RightLeg, LeftFoot, RightFoot, true, Buzzer); //Set the servo pins and Buzzer pin
+  Otto.init(LeftLeg, RightLeg, LeftFoot, RightFoot, true, Buzzer); //Set the servo pins and Buzzer pin
 
-  if(Otto.init(LeftLeg, RightLeg, LeftFoot, RightFoot, true, Buzzer) != 0) { //Set the servo pins and Buzzer pin
-    Serial.println(F("Init Failed"));
+/*
+  if(Otto.init("ScOtto") != 0) { 
+    Serial.println(F("Otto Init Failed"));
   } else {
-    Serial.println(F("Init Succeed"));
+    Serial.println(F("Otto Init Succeed"));
   }
+*/
 
   
   Otto.initMATRIX( DIN, CS, CLK, Orientation);
