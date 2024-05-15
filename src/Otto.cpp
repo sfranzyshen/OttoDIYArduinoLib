@@ -1162,7 +1162,7 @@ int Otto::Sound_sing(int songName, bool noblock) {
 //   * silentDuration: Duration of silence after the tone
 //-------------------------------------------------------
 void Otto::_tone(float frequency, long noteDuration, int silentDuration) {
-	return; // do nothing
+	if(!Otto_code) delay(noteDuration + silentDuration); // block for length of note to stay compatable
 }
 
 //---------------------------------------------------------
@@ -1176,7 +1176,7 @@ void Otto::_tone(float frequency, long noteDuration, int silentDuration) {
 //   * silentDuration: Duration of silence between notes
 //---------------------------------------------------------
 void Otto::bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration) {
-	return; // do nothing
+	if(!Otto_code) delay(noteDuration + silentDuration); // block for length of note to stay compatable
 }
 
 //---------------------------------------------------------
@@ -1186,38 +1186,66 @@ void Otto::bendTones(float initFrequency, float finalFrequency, float prop, long
 //   * songName: The name of the song to sing (defined constants)
 //---------------------------------------------------------
 void Otto::sing(int songName) {
-	return; // do nothing
+	return; // fixme: change to delay lenght of song to stay compatable 
 }
 
 #endif // SOUND_BUZZER
 
 //---------------------------------------------------------
-//-- Otto Gesture: Play Gesture
+//-- Otto Gesture: Play Gesture compatibility wrapper
 //---------------------------------------------------------
 // Parameters:
 //   * gesture: The name of the gesture to play (defined constants)
 //---------------------------------------------------------
 void Otto::playGesture(int gesture) {
+	Gesture(gesture, Otto_code);
+}
+	
+//---------------------------------------------------------
+//-- Otto Gesture: Play Gesture
+//---------------------------------------------------------
+// Parameters:
+//   * gesture: The name of the gesture to play (defined constants)
+// Returns:
+//    Integer value representing success (0) or error #.
+//---------------------------------------------------------
+int Otto::Gesture(int gesture, bool noblock) {
   int gesturePOSITION[4];
+  int result = 0;
   
   switch(gesture) {
     case OttoHappy: 
-      _tone(note_E5, 50, 30);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_tone(note_E5, 50, 30, noblock);
+      //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(smile);
-      sing(S_happy_short);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_happy_short, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       swing(1, 800, 20); 
-      sing(S_happy_short);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_happy_short, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       home();
       putMouth(happyOpen);
       break;
 
     case OttoSuperHappy:
       putMouth(happyOpen);
-      sing(S_happy);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_happy, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(happyClosed);
       tiptoeSwing(1, 500, 20);
       putMouth(happyOpen);
-      sing(S_superHappy);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_superHappy, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(happyClosed);
       tiptoeSwing(1, 500, 20); 
       home();  
@@ -1231,19 +1259,34 @@ void Otto::playGesture(int gesture) {
       gesturePOSITION[2] = 20;
       gesturePOSITION[3] = 160;
       _moveServos(700, gesturePOSITION);     
-      bendTones(880, 830, 1.02, 20, 200);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_bendTones(880, 830, 1.02, 20, 200, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(sadClosed);
-      bendTones(830, 790, 1.02, 20, 200);  
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_bendTones(830, 790, 1.02, 20, 200, noblock);  
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(sadOpen);
-      bendTones(790, 740, 1.02, 20, 200);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_bendTones(790, 740, 1.02, 20, 200, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(sadClosed);
-      bendTones(740, 700, 1.02, 20, 200);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_bendTones(740, 700, 1.02, 20, 200, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(sadOpen);
-      bendTones(700, 669, 1.02, 20, 200);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_bendTones(700, 669, 1.02, 20, 200, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(sad);
-      delay(500);
+      delay(500); // fixme no delays
       home();
-      delay(300);
+      delay(300); // fixme me delays
       putMouth(happyOpen);
       break;
 
@@ -1255,20 +1298,38 @@ void Otto::playGesture(int gesture) {
       _moveServos(700, gesturePOSITION);     
       for(int i = 0; i < 4; i++) {
         putAnimationMouth(dreamMouth, 0);
-        bendTones(100, 200, 1.04, 10, 10);
+#if Otto_sound == SOUND_BUZZER
+        result = Sound_bendTones(100, 200, 1.04, 10, 10, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
         putAnimationMouth(dreamMouth, 1);
-        bendTones(200, 300, 1.04, 10, 10);  
+#if Otto_sound == SOUND_BUZZER
+        result = Sound_bendTones(200, 300, 1.04, 10, 10, noblock);  
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
         putAnimationMouth(dreamMouth, 2);
-        bendTones(300, 500, 1.04, 10, 10);   
-        delay(500);
+#if Otto_sound == SOUND_BUZZER
+        result = Sound_bendTones(300, 500, 1.04, 10, 10, noblock);   
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
+        delay(500); // fixme me delays
         putAnimationMouth(dreamMouth, 1);
-        bendTones(400, 250, 1.04, 10, 1); 
+#if Otto_sound == SOUND_BUZZER
+        result = Sound_bendTones(400, 250, 1.04, 10, 1, noblock); 
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
         putAnimationMouth(dreamMouth, 0);
-        bendTones(250, 100, 1.04, 10, 1); 
-        delay(500);
+#if Otto_sound == SOUND_BUZZER
+        result = Sound_bendTones(250, 100, 1.04, 10, 1, noblock); 
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
+        delay(500); // fixme me delays
       } 
       putMouth(lineMouth);
-      sing(S_cuddly);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_cuddly, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       home();  
       putMouth(happyOpen);
       break;
@@ -1279,33 +1340,42 @@ void Otto::playGesture(int gesture) {
       gesturePOSITION[2] = 145;
       gesturePOSITION[3] = 122;
       _moveServos(500, gesturePOSITION);
-      delay(300);     
+      delay(300); // fixme me delays
       putMouth(lineMouth);
-      sing(S_fart1);  
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_fart1, noblock);  
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(tongueOut);
-      delay(250);
+      delay(250); // fixme me delays
       gesturePOSITION[0] = 90;
       gesturePOSITION[1] = 90;
       gesturePOSITION[2] = 80;
       gesturePOSITION[3] = 122;
       _moveServos(500, gesturePOSITION);
-      delay(300);
+      delay(300); // fixme me delays
       putMouth(lineMouth);
-      sing(S_fart2); 
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_fart2, noblock); 
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(tongueOut);
-      delay(250);
+      delay(250); // fixme me delays
       gesturePOSITION[0] = 90;
       gesturePOSITION[1] = 90;
       gesturePOSITION[2] = 145;
       gesturePOSITION[3] = 80;
       _moveServos(500, gesturePOSITION);
-      delay(300);
+      delay(300); // fixme me delays
       putMouth(lineMouth);
-      sing(S_fart3);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_fart3, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(tongueOut);    
-      delay(300);
+      delay(300); // fixme me delays
       home(); 
-      delay(500); 
+      delay(500); // fixme me delays
       putMouth(happyOpen);
       break;
 
@@ -1316,18 +1386,27 @@ void Otto::playGesture(int gesture) {
       gesturePOSITION[3] = 90;
       _moveServos(300, gesturePOSITION); 
       putMouth(confused);
-      sing(S_confused);
-      delay(500);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_confused, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
+      delay(500); // fixme no delays
       home();  
       putMouth(happyOpen);
       break;
 
     case OttoLove:
       putMouth(heart);
-      sing(S_cuddly);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_cuddly, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       crusaito(2, 1500, 15, 1);
       home(); 
-      sing(S_happy_short);  
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_happy_short, noblock);  
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(happyOpen);
       break;
 
@@ -1338,34 +1417,52 @@ void Otto::playGesture(int gesture) {
       gesturePOSITION[3] = 110;
       _moveServos(300, gesturePOSITION); 
       putMouth(angry);
-      _tone(note_A5, 100, 30);
-      bendTones(note_A5, note_D6, 1.02, 7, 4);
-      bendTones(note_D6, note_G6, 1.02, 10, 1);
-      bendTones(note_G6, note_A5, 1.02, 10, 1);
-      delay(15);
-      bendTones(note_A5, note_E5, 1.02, 20, 4);
-      delay(400);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_tone(note_A5, 100, 30, noblock);
+	  //if(result < 0) return result;
+      result = Sound_bendTones(note_A5, note_D6, 1.02, 7, 4, noblock);
+ 	  //if(result < 0) return result;
+      result = Sound_bendTones(note_D6, note_G6, 1.02, 10, 1, noblock);
+	  //if(result < 0) return result;
+      result = Sound_bendTones(note_G6, note_A5, 1.02, 10, 1, noblock);
+	  //if(result < 0) return result;
+      result = Sound_tone(note_0, 0, 15, noblock); // rests note 15ms replace delay 
+	  //if(result < 0) return result;
+      result = Sound_bendTones(note_A5, note_E5, 1.02, 20, 4, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
+      delay(400); // fixme me delays
       gesturePOSITION[0] = 110;
       gesturePOSITION[1] = 110;
       gesturePOSITION[2] = 90;
       gesturePOSITION[3] = 90;
       _moveServos(200, gesturePOSITION); 
-      bendTones(note_A5, note_D6, 1.02, 20, 4);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_bendTones(note_A5, note_D6, 1.02, 20, 4, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       gesturePOSITION[0] = 70;
       gesturePOSITION[1] = 70;
       gesturePOSITION[2] = 90;
       gesturePOSITION[3] = 90;
       _moveServos(200, gesturePOSITION); 
-      bendTones(note_A5, note_E5, 1.02, 20, 4);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_bendTones(note_A5, note_E5, 1.02, 20, 4, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       home();  
       putMouth(happyOpen);
       break;
 
     case OttoFretful: 
       putMouth(angry);
-      bendTones(note_A5, note_D6, 1.02, 20, 4);
-      bendTones(note_A5, note_E5, 1.02, 20, 4);
-      delay(300);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_bendTones(note_A5, note_D6, 1.02, 20, 4, noblock);
+	  //if(result < 0) return result;
+      result = Sound_bendTones(note_A5, note_E5, 1.02, 20, 4, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
+      delay(300); // fixme me delays
       putMouth(lineMouth);
       for(int i = 0; i < 4; i++) {
         gesturePOSITION[0] = 90;
@@ -1376,57 +1473,82 @@ void Otto::playGesture(int gesture) {
         home();
       }
       putMouth(angry);
-      delay(500);
+      delay(500); // fixme me delays
       home();  
       putMouth(happyOpen);
       break;
 
     case OttoMagic:
       for(int i = 0; i < 4; i++) { 
+#if Otto_sound == SOUND_BUZZER
         int noteM = 400; 
+#endif // SOUND_BUZZER	  
         for(int index = 0; index < 6; index++) {
           putAnimationMouth(adivinawi, index);
-          bendTones(noteM, noteM + 100, 1.04, 10, 10);    // 400 -> 1000 
+#if Otto_sound == SOUND_BUZZER
+          result = Sound_bendTones(noteM, noteM + 100, 1.04, 10, 10, noblock); // 400 -> 1000
+	      //if(result < 0) return result;
           noteM += 100;
+#endif // SOUND_BUZZER	  
         }
         clearMouth();
-        bendTones(noteM - 100, noteM + 100, 1.04, 10, 10);  // 900 -> 1100
+#if Otto_sound == SOUND_BUZZER
+        result = Sound_bendTones(noteM - 100, noteM + 100, 1.04, 10, 10, noblock); // 900 -> 1100
+	    //if(result < 0) return result;
+#endif // SOUND_BUZZER	  
         for(int index = 0; index < 6; index++) {
           putAnimationMouth(adivinawi, index);
-          bendTones(noteM, noteM + 100, 1.04, 10, 10);    // 1000 -> 400 
+#if Otto_sound == SOUND_BUZZER
+          result = Sound_bendTones(noteM, noteM + 100, 1.04, 10, 10, noblock); // 1000 -> 400
+	      //if(result < 0) return result; 
           noteM -= 100;
+#endif // SOUND_BUZZER	  
         }
       } 
-      delay(300);
+      delay(300); // fixme me delays
       putMouth(happyOpen);
       break;
 
     case OttoWave:
       for(int i = 0; i < 2; i++) { 
+#if Otto_sound == SOUND_BUZZER
         int noteW = 500; 
+#endif // SOUND_BUZZER	  
         for(int index = 0; index < 10; index++) {
           putAnimationMouth(wave, index);
-          bendTones(noteW, noteW + 100, 1.02, 10, 10); 
+#if Otto_sound == SOUND_BUZZER
+          result = Sound_bendTones(noteW, noteW + 100, 1.02, 10, 10, noblock);
+	      //if(result < 0) return result;
           noteW += 101;
+#endif // SOUND_BUZZER	  
         }
         for(int index = 0; index < 10; index++) {
           putAnimationMouth(wave, index);
-          bendTones(noteW, noteW + 100, 1.02, 10, 10); 
+#if Otto_sound == SOUND_BUZZER
+          result = Sound_bendTones(noteW, noteW + 100, 1.02, 10, 10, noblock);
+	      //if(result < 0) return result;
           noteW += 101;
+#endif // SOUND_BUZZER	  
         }
         for(int index = 0; index < 10; index++) {
           putAnimationMouth(wave, index);
-          bendTones(noteW, noteW - 100, 1.02, 10, 10); 
+#if Otto_sound == SOUND_BUZZER
+          result = Sound_bendTones(noteW, noteW - 100, 1.02, 10, 10, noblock);
+	      //if(result < 0) return result; 
           noteW -= 101;
+#endif // SOUND_BUZZER	  
         }
         for(int index = 0; index < 10; index++) {
           putAnimationMouth(wave, index);
-          bendTones(noteW, noteW - 100, 1.02, 10, 10); 
+#if Otto_sound == SOUND_BUZZER
+          result = Sound_bendTones(noteW, noteW - 100, 1.02, 10, 10, noblock);
+	      //if(result < 0) return result;
           noteW -= 101;
+#endif // SOUND_BUZZER	  
         }
       }    
       clearMouth();
-      delay(100);
+      delay(100); // fixme me delays
       putMouth(happyOpen);
       break;
 
@@ -1435,13 +1557,19 @@ void Otto::playGesture(int gesture) {
       for (int i = 0; i < 60; ++i) {
         int pos[] = {90, 90, 90 + i, 90 - i};  
         _moveServos(10, pos);
-        _tone(1600 + i * 20, 15, 1);
+#if Otto_sound == SOUND_BUZZER
+        result = Sound_tone(1600 + i * 20, 15, 1, noblock);
+        //if(result < 0) return result;
+#endif // SOUND_BUZZER	  
       }
       putMouth(bigSurprise);
       for (int i = 0; i < 60; ++i) {
         int pos[] = {90, 90, 150 - i, 30 + i};  
         _moveServos(10, pos);
-        _tone(2800 + i * 20, 15, 1);
+#if Otto_sound == SOUND_BUZZER
+        result = Sound_tone(2800 + i * 20, 15, 1, noblock);
+        //if(result < 0) return result;
+#endif // SOUND_BUZZER	  
       }
       putMouth(happyOpen);
       tiptoeSwing(1, 500, 20);
@@ -1460,21 +1588,30 @@ void Otto::playGesture(int gesture) {
       gesturePOSITION[2] = 70;
       gesturePOSITION[3] = 35;
       _moveServos(300, gesturePOSITION);
-      _tone(900, 200, 1);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_tone(900, 200, 1, noblock);
+      //if(result < 0) return result;
+#endif // SOUND_BUZZER	  
       putMouth(sadClosed);
       gesturePOSITION[0] = 90;
       gesturePOSITION[1] = 90;
       gesturePOSITION[2] = 55;
       gesturePOSITION[3] = 35;
       _moveServos(300, gesturePOSITION);
-      _tone(600, 200, 1);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_tone(600, 200, 1, noblock);
+      //if(result < 0) return result;
+#endif // SOUND_BUZZER	  
       putMouth(confused);
       gesturePOSITION[0] = 90;
       gesturePOSITION[1] = 90;
       gesturePOSITION[2] = 42;
       gesturePOSITION[3] = 35;
       _moveServos(300, gesturePOSITION);
-      _tone(300, 200, 1);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_tone(300, 200, 1, noblock);
+      //if(result < 0) return result;
+#endif // SOUND_BUZZER	  
       gesturePOSITION[0] = 90;
       gesturePOSITION[1] = 90;
       gesturePOSITION[2] = 34;
@@ -1482,8 +1619,11 @@ void Otto::playGesture(int gesture) {
       _moveServos(300, gesturePOSITION);
       putMouth(xMouth);
       detachServos();
-      _tone(150, 2200, 1);
-      delay(600);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_tone(150, 2200, 1, noblock);
+      //if(result < 0) return result;
+#endif // SOUND_BUZZER	  
+      delay(600); // fixme me delays
       clearMouth();
       putMouth(happyOpen);
       home();
@@ -1516,5 +1656,3 @@ void Otto::disableServoLimit() {
         servo[i].DisableLimiter();
     }
 }
-
-

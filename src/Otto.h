@@ -63,7 +63,6 @@
 
 #include "Oscillator.h"
 #include <EEPROM.h>
-#include "Otto_sounds.h"
 
 #if Otto_sound == SOUND_BUZZER
 	// Structure to hold tone parameters
@@ -74,6 +73,7 @@
 	};
 #endif // SOUND_BUZZER
 
+#include "Otto_sounds.h"
 #include "Otto_gestures.h"
 #include "Otto_mouths.h"
 #include "Otto_matrix.h"
@@ -93,7 +93,7 @@
 class Otto {
 public:
     // Otto initialization
-	int init(const char * name = "Otto");
+    int init(const char * name = "Otto");
     void init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer); // compatibility wrapper
 
     // Attach & detach functions
@@ -153,6 +153,7 @@ public:
 
     // Gestures
     void playGesture(int gesture);
+    int  Gesture(int gesture, bool noblock = Otto_code);
     void initMATRIX(int DIN, int CS, int CLK, int rotate);
     void matrixIntensity(int intensity);
     void setLed(byte X, byte Y, byte value);

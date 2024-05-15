@@ -6,7 +6,7 @@
 #define Otto_matrix_h
 
 #include "Arduino.h"
-#include "Otto_gestures.h"
+#include "Otto_mouths.h"
 
 #if defined(ESP32)
 # include <SPI.h>
