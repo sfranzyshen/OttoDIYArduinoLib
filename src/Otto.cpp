@@ -1629,6 +1629,7 @@ int Otto::Gesture(int gesture, bool noblock) {
       home();
       break;
   }
+  return 0; // success
 }
 
 //---------------------------------------------------------
