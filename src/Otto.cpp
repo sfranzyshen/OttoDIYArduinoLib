@@ -35,6 +35,11 @@ int Otto::init(const char * name) {
 //    Buzzer: Pin for the buzzer
 //---------------------------------------------------------
 void Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer) {
+	Sound_init(Buzzer);
+    Servos_init(YL, YR, RL, RR, load_calibration);
+}
+
+int Otto::Sound_init(int Buzzer) {
 
 #if Otto_sound == SOUND_BUZZER
     // Create the tone queue
@@ -43,8 +48,7 @@ void Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzze
     // Check if the queue creation was successful
     if (toneQueueHandle == NULL) {
       Serial.println(F("Error: Failed to create tone queue!"));
-      //return -2; // Failed to create queue
-      return;
+      return -2; // Failed to create queue
     }
     // Create the tone task
     xTaskCreate(toneTaskWrapper, "Tone Task", 128, this, 1, &toneTaskHandle);
@@ -52,18 +56,19 @@ void Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzze
     // Check if the task creation was successful
     if (toneTaskHandle == NULL) {
         Serial.println(F("Error: Failed to create tone task!"));
-        //return -1; // Failed to create queue
-	return;
+        return -1; // Failed to create queue
     }
 	
     // Set buzzer pin
     pinBuzzer = Buzzer;
     pinMode(Buzzer, OUTPUT);
-    //return 0;
 #else // compatibility wrapper
     pinBuzzer = Buzzer;
 #endif // SOUND_BUZZER
+	return 0; // success
+}
 
+int Otto::Servos_init(int YL, int YR, int RL, int RR, bool load_calibration) {
     // Set servo pins
     servo_pins[0] = YL;
     servo_pins[1] = YR;
@@ -84,6 +89,7 @@ void Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzze
             servo[i].SetTrim(servo_trim);
         }
     }
+	return 0; // success
 }
 
 //---------------------------------------------------------

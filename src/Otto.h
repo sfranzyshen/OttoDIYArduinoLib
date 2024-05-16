@@ -12,8 +12,9 @@
 	//#define  Otto_code			NON_BLOCKING
 	#define  Otto_code			BLOCKING
 	#define  Otto_model			BIPED // 4x 180° Servos
-	#define  Otto_SERVOS			4
+	#define  Otto_SERVOS		4
 	#define  Otto_sound			SOUND_BUZZER
+//	#define  Otto_sound			SOUND_NONE
 	#define  Otto_mouth			LED_MATRIX_8X8_MONO_SPI
 #endif // Otto_config
 
@@ -71,9 +72,10 @@
 		long noteDuration;
 		int silentDuration;
 	};
+    #include "Otto_sounds.h"
+	
 #endif // SOUND_BUZZER
 
-#include "Otto_sounds.h"
 #include "Otto_gestures.h"
 #include "Otto_mouths.h"
 #include "Otto_matrix.h"
@@ -108,7 +110,8 @@ public:
     void _moveServos(int time, int servo_target[]);
     void _moveSingle(int position, int servo_number);
     void oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle = 1.0);
-
+    int Servos_init(int YL, int YR, int RL, int RR, bool load_calibration);
+	
     // HOME = Otto at rest position
     void home();
     bool getRestState();
@@ -135,6 +138,7 @@ public:
     void clearMouth();
 
 #if Otto_sound == SOUND_BUZZER
+    int Sound_init(int Buzzer);
     // Sound functions for SOUND_BUZZER
     void _tone(float frequency, long noteDuration, int silentDuration); // compatibility wrapper
     int Sound_tone(float frequency, long noteDuration, int silentDuration, bool noblock = Otto_code);
@@ -146,13 +150,14 @@ public:
     bool isEmptyToneQueue();
     int clearToneQueue();
 #else // dummy compatibility wrappers
+    int Sound_init(int Buzzer);
     void _tone(float frequency, long noteDuration, int silentDuration); // dummy compatibility wrapper
     void bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration); // dummy compatibility wrapper
     void sing(int songName); // dummy compatibility wrapper
 #endif // SOUND_BUZZER
 
     // Gestures
-    void playGesture(int gesture);
+    void playGesture(int gesture); // compatibility wrapper
     int  Gesture(int gesture, bool noblock = Otto_code);
     void initMATRIX(int DIN, int CS, int CLK, int rotate);
     void matrixIntensity(int intensity);
