@@ -65,17 +65,25 @@ To enhance the core code running OttoDIY robot in order to address its current l
 #### During the development phase, files will be further divided into several smaller files compared to the release file set.
 
 * `Otto_config.h` contains pre-config directives
-* `Otto.h` and `Otto.cpp` contains all the main otto functions
-* `Otto_gestures.h` contains all the otto gestures functions
-* `Otto_mouths.h` contains all the mouth functions
-* `Otto_moves.h` contains all the otto movement functions
-* `Otto_eyes.h` contains all the otto eye functions
-* `Otto_sounds.h` contains all the otto sound functions
-* `Display.h` and `Display.cpp` contains all the oled and led matrix functions
-* `Distance.h` and `Distance.cpp` contains all the distance messurement functions
-* `Servo.h` and `Servo.cpp` contains all the servo functions
+* `Otto_models.h` contains model pre-config directives
+* `Otto_sound.h` contains sound pre-config directives
+* `Otto_mouth.h` contains mouth pre-config directives
+* `Otto_version.h` contains software version directive
+### 
+* `Otto.h` and `Otto.cpp` contain all the main user (API) otto functions
+### 
+* `Otto_gestures.h` and `Otto_gestures.cpp`contain all the otto gestures functions
+* `Otto_mouths.h` and `Otto_mouths.cpp` contain all the mouth functions
+* `Otto_moves.h` and `Otto_moves.cpp` contain all the otto movement functions
+* `Otto_eyes.h` and `Otto_eyes.cpp` contain all the otto eye functions
+* `Otto_sounds.h` and ` Otto_sounds.cpp` contain all the otto sound functions
+### 
+* `Display.h` and `Display.cpp` contain all the oled, led, and ... matrix (output) functions
+* `Distance.h` and `Distance.cpp` contain all the distance messurement (input) functions
+* `LineSensor.h` and `LineSensor.cpp` contain all the line-sensor messurement (input) functions
+* `Servo.h` and `Servo.cpp` contain all the servo (output) functions
+* `Sound.h` and `Sound.cpp` contain all the sound (output) functions
 * `Oscillator.h` and `Oscillator.cpp` is the main algorithm for the servos "smooth" movement
-* `Otto_sound.h` contains sound config directives
 
 ### New Otto API: 
 #### (Biped with arms model, RGB ultrasonic eyes, buzzer sound, and a mono spi matrix mouth)
@@ -122,9 +130,10 @@ Following the configuration declaration, include the Otto.h API. This API utiliz
 ```
   Now, all functions return an (int) value. This return value can be utilized for error handling. Alternatively, for compatibility,it can be ignored.
 ```cpp
-  int Otto.init(const char * name);   // every Otto should have a unique name.
-                                      // Can be used for Wifi, etc.
-  int Otto.Servos_init(LL, LR, FL, FR, AL, AR);   // other hardware inits are called by Otto.init() not directly
+  int Otto.init(const char * name);   // every Otto should have a unique name. Can be used for Wifi, etc.
+
+// other hardware inits are called by Otto.init() not directly
+  int Otto.Servos_init(LL, LR, FL, FR, AL, AR);
   int Otto.Mouth_init(int DIN, int CS, int CLK, int rotate);	
   int Otto.Sound_init(int Buzzer);				
   int Otto.Eyes_init(int EYES_NEO_PIN, int EYES_NEO_START, int EYES_NEO_END);
