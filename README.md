@@ -165,14 +165,14 @@ Many functions in the Otto API now include an optional (bool) noblock parameter,
   int Otto.Mouth_setled(byte X, byte Y, byte value);
   int Otto.Mouth_write(const char * s, byte scrollspeed, bool noblock = BLOCKING);
   int Otto.Mouth(unsigned long int mouth, bool predefined = true);
-  int Otto.Mouth_animation(unsigned long int anim, bool noblock = BLOCKING);
+  int Otto.Mouth_animation(unsigned long int anim, int index);
   int Otto.Mouth_clear();
 
   int Otto.Eyes_intensity(int intensity);
   int Otto.Eyes_setled(byte X, byte Y, byte value);
   int Otto.Eyes_write(const char * s, byte scrollspeed, bool noblock = BLOCKING);
   int Otto.Eyes(unsigned long int eyes, bool predefined = true);
-  int Otto.Eyes_animation(unsigned long int anim, bool noblock = BLOCKING);
+  int Otto.Eyes_animation(unsigned long int anim, int index);
   int Otto.Eyes_clear();
 
   int Otto.Servos_moveServos(int time, int servo_target[], bool noblock = BLOCKING);
