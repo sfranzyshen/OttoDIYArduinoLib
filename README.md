@@ -166,6 +166,7 @@ Many functions in the Otto API now include an optional (bool) noblock parameter,
   int Otto.Mouth_write(const char * s, byte scrollspeed, bool noblock = BLOCKING);
   int Otto.Mouth(unsigned long int mouth, bool predefined = true);
   int Otto.Mouth_animation(unsigned long int anim, int index);
+  int Otto.Mouth_animate(unsigned long int anim, byte speed, bool loop = false, bool bounce = false, bool noblock = BLOCKING);
   int Otto.Mouth_clear();
 
   int Otto.Eyes_intensity(int intensity);
@@ -173,6 +174,7 @@ Many functions in the Otto API now include an optional (bool) noblock parameter,
   int Otto.Eyes_write(const char * s, byte scrollspeed, bool noblock = BLOCKING);
   int Otto.Eyes(unsigned long int eyes, bool predefined = true);
   int Otto.Eyes_animation(unsigned long int anim, int index);
+  int Otto.Eyes_animate(unsigned long int anim, byte speed, bool loop = false, bool bounce = false, bool noblock = BLOCKING);
   int Otto.Eyes_clear();
 
   int Otto.Servos_moveServos(int time, int servo_target[], bool noblock = BLOCKING);
@@ -192,9 +194,6 @@ The following functions are provided for compatibility with the "current" Otto l
   void Otto.init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer); 
   void Otto.setTrims(int TLL, int TLR, int TFL, int TFR);			
   void Otto.saveTrimsOnEEPROM();						
-  void Otto.putMouth(unsigned long int mouth, bool predefined = true);
-  void Otto.putAnimationMouth(unsigned long int anim, int index);
-  void Otto.clearMouth();
   void Otto._moveServos(int time, int  servo_target[]);
   void Otto._moveSingle(int position,int  servo_number);
   void Otto.oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle);
@@ -208,6 +207,9 @@ The following functions are provided for compatibility with the "current" Otto l
   void Otto.matrixIntensity(int intensity);
   void Otto.setLed(byte X, byte Y, byte value);
   void Otto.writeText (const char * s, byte scrollspeed);
+  void Otto.putMouth(unsigned long int mouth, bool predefined = true);
+  void Otto.putAnimationMouth(unsigned long int anim, int index);
+  void Otto.clearMouth();
   void Otto._tone(float noteFrequency, long noteDuration, int silentDuration);
   void Otto.bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration);
   void Otto.sing(int songName);
