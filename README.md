@@ -158,7 +158,7 @@ Many functions in the Otto API now include an optional (bool) noblock parameter,
   int Otto.Sound_tone(float noteFreq, long noteDur, int silentDur, bool noblock = BLOCKING);
   int Otto.Sound_bendTones(float initFreq, float finalFreq, float prop, long noteDur, int silentDur, bool noblock = BLOCKING);
   int Otto.Sound_sing(int songName, bool noblock = BLOCKING);
-  int Otto.Sound_QueueSize();
+  int Otto.Sound_queueSize();
   bool Otto.Sound_isEmptyQueue();
   int Otto.Sound_clearQueue();
 
@@ -171,7 +171,7 @@ Many functions in the Otto API now include an optional (bool) noblock parameter,
   int Otto.Mouth_animation(unsigned long int anim, int index);
   int Otto.Mouth_animate(unsigned long int anim, byte speed, bool loop = false, bool bounce = false, bool noblock = BLOCKING);
   int Otto.Mouth_clear();
-  int Otto.Mouth_QueueSize();
+  int Otto.Mouth_queueSize();
   bool Otto.Mouth_isEmptyQueue();
   int Otto.Mouth_clearQueue();
 
@@ -182,7 +182,7 @@ Many functions in the Otto API now include an optional (bool) noblock parameter,
   int Otto.Eyes_animation(unsigned long int anim, int index);
   int Otto.Eyes_animate(unsigned long int anim, byte speed, bool loop = false, bool bounce = false, bool noblock = BLOCKING);
   int Otto.Eyes_clear();
-  int Otto.Eyes_QueueSize();
+  int Otto.Eyes_queueSize();
   bool Otto.Eyes_isEmptyQueue();
   int Otto.Eyes_clearQueue();
 
