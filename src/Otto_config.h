@@ -8,6 +8,7 @@
 
 #include "Otto_models.h"
 #include "Otto_sound.h"
+#include "Otto_mouth.h"
 #include "Otto_version.h"
 
 template <typename T> void PROGMEM_readAnything(const T *sce, T &dest) {

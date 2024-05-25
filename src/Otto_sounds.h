@@ -5,6 +5,12 @@
 #ifndef Otto_sounds_h
 #define Otto_sounds_h
 
+// Structure to hold tone parameters
+struct ToneParameters {
+	float frequency;
+	long noteDuration;
+	int silentDuration;
+};
 
 // note freqs
 #define  note_0       0    // Rests note
