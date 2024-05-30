@@ -6,37 +6,57 @@
 #define Otto_mouths_h
 
 // Structure to hold mouth command parameters
-struct MouthcommandParameters {
-	int command;
+struct MouthParam {
 	unsigned long int mouth;
+	bool clear = false;
 };
 
 // Structure to hold mouth intensity parameters
-struct MouthintensityParameters {
+struct MouthintensityParam {
 	int intensity;
 };
 
 // Structure to hold mouth setled parameters
-struct MouthsetledParameters {
+struct MouthsetledParam {
 	byte X;
 	byte Y;
 	byte value;
 };
 
 // Structure to hold mouth write parameters
-struct MouthwriteParameters {
+struct MouthwriteParam {
 	const char * string;
 	byte speed
-	bool noblock;
 };
 
 // Structure to hold mouth animate parameters
-struct MouthanimateParameters {
+struct MouthanimateParam {
 	unsigned long int anim;
 	byte speed;
 	bool loop;
 	bool bounce;
-	bool noblock;
+};
+
+// Define a Union for mouth commands
+union MouthQueueCmd {
+    struct MouthParam mouth;				// 1
+    struct MouthintensityParam intensity;	// 2
+    struct MouthsetledParam setled;			// 3
+    struct MouthwriteParam write;			// 4
+    struct MouthanimateParam animate;		// 5
+};
+
+// Define mouth command numbers
+#define MOUTH_MOUTH		1
+#define MOUTH_INTENSITY	2
+#define MOUTH_SETLED	3
+#define MOUTH_WRITE		4
+#define MOUTH_ANIMATE	5
+
+// Define the wrapper structure for mouth messages
+struct MouthQueueMsg {
+    int command; // 1 for mouth, 2 for intensity, ...
+    union MouthQueueCmd cmd;
 };
 
 const unsigned long int Gesturetable[4][10] PROGMEM = {

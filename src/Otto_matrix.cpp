@@ -251,7 +251,8 @@ void Otto_Matrix::sendChar(const byte data, byte pos, byte number, byte scrollsp
         }
         
         // Display character for a brief duration
-        delay(500);
+        //delay(500);
+	    vTaskDelay(max (1U, (500 / portTICK_PERIOD_MS) ));
         
         // Scroll characters to the left
         for (int i = 0; i < ((number * 8) - 1); i++) {
@@ -271,7 +272,8 @@ void Otto_Matrix::sendChar(const byte data, byte pos, byte number, byte scrollsp
                 }
             }
             // Apply scroll speed delay
-            delay(scrollspeed);
+            //delay(scrollspeed);
+			vTaskDelay(max (1U, (scrollspeed / portTICK_PERIOD_MS) ));
         }
         
         // Clear LED matrix after displaying all characters

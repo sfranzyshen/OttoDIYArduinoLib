@@ -695,8 +695,8 @@ void Otto::flapping(float steps, int T, int h, int dir) {
 //    Integer value representing the number of entries in the mouth queue.
 //-------------------------------------------------------
 int Otto::Mouth_queueSize() {
-  if (mouthcommandQueueHandle != NULL) {
-    return uxQueueMessagesWaiting(mouthcommandQueueHandle);
+  if(mouthQueueHandle != NULL) {
+    return uxQueueMessagesWaiting(mouthQueueHandle);
   } else {
       Serial.println(F("Error: Mouth command queue doesn't exist."));
       return -2; // Queue doesn't exist
@@ -725,8 +725,8 @@ bool Otto::Mouth_isEmptyQueue() {
 //-------------------------------------------------------
 // Function to clear all mouths currently in the queue
 int Otto::Mouth_clearQueue() {
-  if (mouthcommandQueueHandle != NULL) {
-    if (xQueueReset(mouthcommandQueueHandle) == pdPASS) {
+  if(mouthQueueHandle != NULL) {
+    if(xQueueReset(mouthQueueHandle) == pdPASS) {
       return 0; // Successfully cleared the queue
     } else {
       Serial.println(F("Error: Failed to clear the mouth command queue!"));
@@ -766,44 +766,25 @@ void Otto::initMATRIX(int DIN, int CS, int CLK, int rotate) {
 //    Integer value representing status 0 = success -# = error.
 //---------------------------------------------------------
 int Otto::Mouth_init(int DIN, int CS, int CLK, int rotate) {
+	// check to see if already initialized 
+	if(ledmatrix != NULL) {
+        Serial.println(F("Error: matrix already initialized"));
+        return -3; // matrix already initialized
+	}
+	
     // Initialize LED matrix display
+	// fixme: do we move this to the mouth task startup or leave it here?
     ledmatrix.init(DIN, CS, CLK, 1, rotate);
 
     // Create the mouth queues
-    mouthcommandQueueHandle = xQueueCreate(5, sizeof(MouthcommandParameters));
+    mouthQueueHandle = xQueueCreate(10, sizeof(struct MouthQueueMsg));
+
     // Check if the queue creation was successful
-    if (mouthcommandQueueHandle == NULL) {
-      Serial.println(F("Error: Failed to create mouth command queue!"));
+    if (mouthQueueHandle == NULL) {
+      Serial.println(F("Error: Failed to create mouth queue!"));
       return -2; // Failed to create queue
     }
 	
-    mouthintensityQueueHandle = xQueueCreate(3, sizeof(MouthintensityParameters));
-    // Check if the queue creation was successful
-    if (mouthintensityQueueHandle == NULL) {
-      Serial.println(F("Error: Failed to create mouth intensity queue!"));
-      return -2; // Failed to create queue
-    }
-	
-    mouthsetledQueueHandle = xQueueCreate(10, sizeof(MouthsetledParameters));
-    // Check if the queue creation was successful
-    if (mouthsetledQueueHandle == NULL) {
-      Serial.println(F("Error: Failed to create mouth setled queue!"));
-      return -2; // Failed to create queue
-    }
-	
-    mouthwriteQueueHandle = xQueueCreate(3, sizeof(MouthwriteParameters));
-    // Check if the queue creation was successful
-    if (mouthwriteQueueHandle == NULL) {
-      Serial.println(F("Error: Failed to create mouth write queue!"));
-      return -2; // Failed to create queue
-    }
-	
-    mouthanimateQueueHandle = xQueueCreate(3, sizeof(MouthanimateParameters));
-    // Check if the queue creation was successful
-    if (mouthanimateQueueHandle == NULL) {
-      Serial.println(F("Error: Failed to create mouth animate queue!"));
-      return -2; // Failed to create queue
-    }
 	
     // Create the mouth task
     xTaskCreate(mouthTaskWrapper, "Mouth Task", 128, this, 1, &mouthTaskHandle);
@@ -813,6 +794,7 @@ int Otto::Mouth_init(int DIN, int CS, int CLK, int rotate) {
         Serial.println(F("Error: Failed to create mouth task!"));
         return -1; // Failed to create task
     }
+
 	return 0; // Success 
 }
 
@@ -836,9 +818,47 @@ void Otto::matrixIntensity(int intensity) {
 // Parameters:
 //    intensity: Intensity level (0 to 15) for the LED matrix
 // Returns:
-//    Integer value representing status 0 = success -# = error.
+//    Integer value of entries in the mouth queue
 //---------------------------------------------------------
 int Otto::Mouth_intensity(int intensity) {
+  struct MouthQueueMsg msg;
+
+  // Check input level for valid range
+  if((intensity < 0) || (intensity > 15)) {
+      Serial.println(F("Error: Intensity out of range (0 to 15)."));
+        return -4; // Intensity out of range			
+  }
+  
+  // Check if the mouth queue exist
+  if(mouthQueueHandle == NULL) {
+      Serial.println(F("Error: Mouth queue doesn't exist."));
+      return -2; // Queue doesn't exist
+  }
+
+  // Check the available space in the mouth queue
+  if(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+	while(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+		delay(1); // delay 1ms
+		count++;
+		if(count > 100) { // max delay 100ms
+			Serial.println(F("Error: No space available in the mouth queue."));
+			return -3; // No space available in the mouth queue			
+		}
+	}
+  }
+
+  // Create a MouthQueueMsg structure for intensity command
+  msg.command = MOUTH_INTENSITY;
+  msg.cmd.intensity.intensity = intensity;
+
+  // Queue up the mouth parameters
+  if(xQueueSendToBack(mouthQueueHandle, &msg, portMAX_DELAY) != pdTRUE) {
+    Serial.println(F("Error: Failed to send to mouth queue."));
+    return -1; // Failed to send to mouth queue
+  }
+  return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
+  
+/*
 	if(ledmatrix == NULL) {
         Serial.println(F("Error: matrix not available"));
         return -1; // matrix not available	
@@ -846,6 +866,7 @@ int Otto::Mouth_intensity(int intensity) {
     // Set intensity of LED matrix display
     ledmatrix.setIntensity(intensity);
 	return 0;
+*/
 }
 
 //---------------------------------------------------------
@@ -872,9 +893,43 @@ void Otto::setLed(byte X, byte Y, byte value) {
 //    Y: The y-coordinate of the LED.
 //    value: The value to set for the LED (0 for OFF, 1 for ON).
 // Returns:
-//    Integer value representing status 0 = success -# = error.
+//    Integer value of entries in the mouth queue
 //---------------------------------------------------------
 int Otto::Mouth_setled(byte X, byte Y, byte value) {
+  struct MouthQueueMsg msg;
+
+  // Check if the mouth queue exist
+  if(mouthQueueHandle == NULL) {
+      Serial.println(F("Error: Mouth queue doesn't exist."));
+      return -2; // Queue doesn't exist
+  }
+
+  // Check the available space in the mouth queue
+  if(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+	while(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+		delay(1); // delay 1ms
+		count++;
+		if(count > 100) { // max delay 100ms
+			Serial.println(F("Error: No space available in the mouth queue."));
+			return -3; // No space available in the mouth queue			
+		}
+	}
+  }
+
+  // Create a MouthQueueMsg structure for setled command
+  msg.command = MOUTH_SETLED;
+  msg.cmd.setled.X = X;
+  msg.cmd.setled.Y = Y;
+  msg.cmd.setled.value = value;
+
+  // Queue up the mouth parameters
+  if(xQueueSendToBack(mouthQueueHandle, &msg, portMAX_DELAY) != pdTRUE) {
+    Serial.println(F("Error: Failed to send to mouth queue."));
+    return -1; // Failed to send to mouth queue
+  }
+  return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
+  
+/*
 	if(ledmatrix == NULL) {
         Serial.println(F("Error: matrix not available"));
         return -1; // matrix not available	
@@ -882,6 +937,19 @@ int Otto::Mouth_setled(byte X, byte Y, byte value) {
     // Set the state of the LED at the specified coordinates
     ledmatrix.setDot(X, Y, value);
 	return 0;
+*/
+}
+//---------------------------------------------------------
+//-- Otto Mouth: Put Animation Mouth frame compatibility wrapper
+//---------------------------------------------------------
+// Description:
+//    This function displays a specific frame of a mouth animation on the LED matrix.
+// Parameters:
+//    aniMouth: The index of the animation sequence.
+//    index: The index of the frame within the animation sequence.
+//---------------------------------------------------------
+void Otto::putAnimationMouth(unsigned long int aniMouth, int index) {
+	Mouth_animation(aniMouth, index);
 }
 
 //---------------------------------------------------------
@@ -892,12 +960,15 @@ int Otto::Mouth_setled(byte X, byte Y, byte value) {
 // Parameters:
 //    aniMouth: The index of the animation sequence.
 //    index: The index of the frame within the animation sequence.
+// Returns:
+//    Integer value of entries in the mouth queue
 //---------------------------------------------------------
-//void Otto::putAnimationMouth(unsigned long int aniMouth, int index) {
 int Otto::Mouth_animation(unsigned long int aniMouth, int index) {
-  //unsigned long int mouth = PROGMEM_getAnything(&Gesturetable[aniMouth][index]);
+  struct MouthQueueMsg msg;
+  msg.command = MOUTH_MOUTH;
+  msg.cmd.mouth.clear = false;
   
-  // Check if the tone queue exist
+  // Check if the mouth queue exist
   if(mouthQueueHandle == NULL) {
       Serial.println(F("Error: Mouth queue doesn't exist."));
       return -2; // Queue doesn't exist
@@ -916,14 +987,28 @@ int Otto::Mouth_animation(unsigned long int aniMouth, int index) {
   }
 
   // Create a MouthParameters structure - Retrieve the anim frame data from PROGMEM
-  MouthParameters mouthParams = {PROGMEM_getAnything(&Gesturetable[aniMouth][index])};
+  msg.cmd.mouth.mouth = {PROGMEM_getAnything(&Gesturetable[aniMouth][index])};
 
   // Queue up the mouth parameters
-  if(xQueueSendToBack(mouthQueueHandle, &mouthParams, portMAX_DELAY) != pdTRUE) {
+  if(xQueueSendToBack(mouthQueueHandle, &msg, portMAX_DELAY) != pdTRUE) {
     Serial.println(F("Error: Failed to send to mouth queue."));
     return -1; // Failed to send to mouth queue
   }
   return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
+
+//ledmatrix.writeFull(PROGMEM_getAnything (&Gesturetable[aniMouth][index]));
+
+}
+
+//---------------------------------------------------------
+//-- Otto Mouth: Put Mouth compatibility wrapper
+//---------------------------------------------------------
+// Parameters:
+//    * mouth: The mouth pattern data
+//    * predefined: Indicates whether the mouth pattern is predefined or custom
+//---------------------------------------------------------
+void Otto::putMouth(unsigned long int mouth, bool predefined) {
+	Mouth(mouth, predefined);
 }
 
 //---------------------------------------------------------
@@ -932,11 +1017,15 @@ int Otto::Mouth_animation(unsigned long int aniMouth, int index) {
 // Parameters:
 //    * mouth: The mouth pattern data
 //    * predefined: Indicates whether the mouth pattern is predefined or custom
+// Returns:
+//    Integer value of entries in the mouth queue
 //---------------------------------------------------------
-//void Otto::putMouth(unsigned long int mouth, bool predefined) {
 int Otto::Mouth(unsigned long int mouth, bool predefined) {
-  MouthParameters mouthParams = NULL;
-  // Check if the tone queue exist
+  struct MouthQueueMsg msg;
+  msg.command = MOUTH_MOUTH;
+  msg.cmd.mouth.clear = false;
+	
+  // Check if the mouth queue exist
   if(mouthQueueHandle == NULL) {
       Serial.println(F("Error: Mouth queue doesn't exist."));
       return -2; // Queue doesn't exist
@@ -957,25 +1046,21 @@ int Otto::Mouth(unsigned long int mouth, bool predefined) {
   // Create a MouthParameters structure
   if (predefined) {
       // If the mouth pattern is predefined, retrieve it from PROGMEM
-      mouthParams = {PROGMEM_getAnything(&Mouthtable[mouth])};
+	  msg.cmd.mouth.mouth = {PROGMEM_getAnything(&Mouthtable[mouth])};
   } else {
       // If the mouth pattern is custom, directly write it
-      mouthParams = {mouth};
+      msg.cmd.mouth.mouth = {mouth};
   }
 	
   // Queue up the mouth parameters
-  if(xQueueSendToBack(mouthQueueHandle, &mouthParams, portMAX_DELAY) != pdTRUE) {
+  if(xQueueSendToBack(mouthQueueHandle, &msg, portMAX_DELAY) != pdTRUE) {
     Serial.println(F("Error: Failed to send to mouth queue."));
     return -1; // Failed to send to mouth queue
   }
   return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
-}
+  
+// ledmatrix.writeFull(PROGMEM_getAnything(&Mouthtable[mouth]));
 
-//---------------------------------------------------------
-//-- Otto Mouth: Animate Mouth
-//---------------------------------------------------------
-int Otto::Mouth_animate(unsigned long int anim, byte speed, bool loop, bool bounce, bool noblock) {
-	// fixme
 }
 
 //---------------------------------------------------------
@@ -988,15 +1073,57 @@ void Otto::clearMouth() {
 //---------------------------------------------------------
 //-- Otto Mouth: Clear Mouth
 // Returns:
-//    Integer value representing status 0 = success -# = error.
+//    Integer value of entries in the mouth queue
 //---------------------------------------------------------
 int Otto::Mouth_clear() {
+  struct MouthQueueMsg msg;
+  msg.command = MOUTH_MOUTH;
+  msg.cmd.mouth.mouth = 123;
+  msg.cmd.mouth.clear = true;
+
+  // Check if the mouth queue exist
+  if(mouthQueueHandle == NULL) {
+      Serial.println(F("Error: Mouth queue doesn't exist."));
+      return -2; // Queue doesn't exist
+  }
+
+  // Check the available space in the mouth queue
+  if(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+	while(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+		delay(1); // delay 1ms
+		count++;
+		if(count > 100) { // max delay 100ms
+			Serial.println(F("Error: No space available in the mouth queue."));
+			return -3; // No space available in the mouth queue			
+		}
+	}
+  }
+
+  // Queue up the mouth parameters
+  if(xQueueSendToBack(mouthQueueHandle, &msg, portMAX_DELAY) != pdTRUE) {
+    Serial.println(F("Error: Failed to send to mouth queue."));
+    return -1; // Failed to send to mouth queue
+  }
+  return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
+  
+/*
 	if(ledmatrix == NULL) {
         Serial.println(F("Error: matrix not available"));
         return -1; // matrix not available	
 	}
     ledmatrix.clearMatrix();
-	return 0;
+*/
+
+}
+//---------------------------------------------------------
+//-- Otto Mouth: Write Text compatibility wrapper
+//---------------------------------------------------------
+// Parameters:
+//    * s: The text to display
+//    * scrollspeed: The scrolling speed
+//---------------------------------------------------------
+void Otto::writeText(const char *s, byte scrollspeed) {
+    Mouth_write(s, scrollspeed, Otto_code);
 }
 
 //---------------------------------------------------------
@@ -1006,7 +1133,39 @@ int Otto::Mouth_clear() {
 //    * s: The text to display
 //    * scrollspeed: The scrolling speed
 //---------------------------------------------------------
-void Otto::writeText(const char *s, byte scrollspeed) {
+int Otto::Mouth_write(const char *s, byte scrollspeed, bool noblock) {
+  struct MouthQueueMsg msg;
+  msg.command = MOUTH_WRITE;
+  msg.cmd.write.string = s;
+  msg.cmd.write.speed = scrollspeed;
+
+  // Check if the mouth queue exist
+  if(mouthQueueHandle == NULL) {
+      Serial.println(F("Error: Mouth queue doesn't exist."));
+      return -2; // Queue doesn't exist
+  }
+
+  // Check the available space in the mouth queue
+  if(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+	while(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+		delay(1); // delay 1ms
+		count++;
+		if(count > 100) { // max delay 100ms
+			Serial.println(F("Error: No space available in the mouth queue."));
+			return -3; // No space available in the mouth queue			
+		}
+	}
+  }
+
+  // Queue up the mouth parameters
+  if(xQueueSendToBack(mouthQueueHandle, &msg, portMAX_DELAY) != pdTRUE) {
+    Serial.println(F("Error: Failed to send to mouth queue."));
+    return -1; // Failed to send to mouth queue
+  }
+  // fixme: handle noblock param to at least wait until queue is empty ...
+  return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
+  
+/*
     int a, b;
 
     // Determine the length of the text (up to 9 characters)
@@ -1028,6 +1187,16 @@ void Otto::writeText(const char *s, byte scrollspeed) {
         }
         s++; // Move to the next character
     }
+*/
+
+}
+
+//---------------------------------------------------------
+//-- Otto Mouth: Animate Mouth
+//---------------------------------------------------------
+int Otto::Mouth_animate(unsigned long int anim, byte speed, bool loop, bool bounce, bool noblock) {
+	// fixme or eliminate me for now ... but do clean up
+	return -1;
 }
 
 // Define c++ wrapper function for c mouthTask
@@ -1055,25 +1224,32 @@ void Otto::mouthTask(void *pvParameters) {
 
 #else // dummy compatibility wrappers for MOUTH_8X8_MONO_SPI
 void Otto::initMATRIX(int DIN, int CS, int CLK, int rotate) {
+	return;
 }
 
 void Otto::matrixIntensity(int intensity) {
+	return;
 }
 
 void Otto::setLed(byte X, byte Y, byte value) {
+	return;
 }
 
 void Otto::writeText(const char* s, byte scrollspeed) {
 	// fixme: delay (block) length of scroll animation ...
+	return;
 }
 
 void Otto::putMouth(unsigned long int mouth, bool predefined = true){
+	return;
 }
 
 void Otto::putAnimationMouth(unsigned long int anim, int index) {
+	return;
 }
 
 void Otto::clearMouth(){
+	return;
 }
 
 #endif // MOUTH_8X8_MONO_SPI
@@ -1377,7 +1553,7 @@ int Otto::Sound_sing(int songName, bool noblock) {
             result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
             if(result < 0) return result;
             for (int i = 880; i < 2000; i = i * 1.04) {
-              result = Sound_tone(note_B5, 5, 10, noblock);
+            result = Sound_tone(note_B5, 5, 10, noblock);
             if(result < 0) return result;
             }
             break;
@@ -1389,7 +1565,7 @@ int Otto::Sound_sing(int songName, bool noblock) {
             result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
             if(result < 0) return result;
             for (int i = 1880; i < 3000; i = i * 1.03) {
-              result = Sound_tone(note_C6, 10, 10, noblock);
+            result = Sound_tone(note_C6, 10, 10, noblock);
             if(result < 0) return result;
             }
             break;

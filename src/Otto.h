@@ -143,10 +143,10 @@ public:
 	int Mouth_init(int DIN, int CS, int CLK, int rotate);
     int Mouth_intensity(int intensity);
     int Mouth_setled(byte X, byte Y, byte value);
-    int Mouth_write(const char * s, byte scrollspeed, bool noblock = BLOCKING);
+    int Mouth_write(const char * s, byte scrollspeed, bool noblock = Otto_code);
     int Mouth(unsigned long int mouth, bool predefined = true);
     int Mouth_animation(unsigned long int anim, int index);
-    int Mouth_animate(unsigned long int anim, byte speed, bool loop = false, bool bounce = false, bool noblock = BLOCKING);
+    int Mouth_animate(unsigned long int anim, byte speed, bool loop = false, bool bounce = false, bool noblock = Otto_code);
     int Mouth_clear();
     int Mouth_queueSize();
     bool Mouth_isEmptyQueue();
@@ -213,15 +213,11 @@ private:
     void _execute(int A[4], int O[4], int T, double phase_diff[4], float steps = 1.0);
 	
 #if Otto_mouth == MOUTH_8X8_MONO_SPI
-    Otto_Matrix ledmatrix;
-    static void mouthTaskWrapper(void *pvParameters);	// Static wrapper function for toneTask	
+    Otto_Matrix ledmatrix = NULL;
+    static void mouthTaskWrapper(void *pvParameters);	// Static wrapper function for mouthTask	
     void mouthTask(void *pvParameters);    				// Function prototypes
-    TaskHandle_t mouthTaskHandle = NULL;    			// Define the task handler for playing tones
-    QueueHandle_t mouthcommandQueueHandle = NULL;   	// Define the command queue handler
-    QueueHandle_t mouthintensityQueueHandle = NULL;   	// Define the intensity queue handler
-    QueueHandle_t mouthsetledQueueHandle = NULL;   	    // Define the setled queue handler
-    QueueHandle_t mouthwriteQueueHandle = NULL;   	    // Define the write queue handler
-    QueueHandle_t mouthanimateQueueHandle = NULL;   	// Define the animate queue handler
+    TaskHandle_t mouthTaskHandle = NULL;    			// Define the task handler for displaying mouths
+    QueueHandle_t mouthQueueHandle = NULL;   			// Define the command queue handler
     unsigned long int getMouthShape(int number);
     unsigned long int getAnimShape(int anim, int index);
 #endif // MOUTH_8X8_MONO_SPI
