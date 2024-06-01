@@ -213,7 +213,7 @@ private:
     void _execute(int A[4], int O[4], int T, double phase_diff[4], float steps = 1.0);
 	
 #if Otto_mouth == MOUTH_8X8_MONO_SPI
-    Otto_Matrix ledmatrix = NULL;
+    Otto_Matrix ledmatrix;
     static void mouthTaskWrapper(void *pvParameters);	// Static wrapper function for mouthTask	
     void mouthTask(void *pvParameters);    				// Function prototypes
     TaskHandle_t mouthTaskHandle = NULL;    			// Define the task handler for displaying mouths

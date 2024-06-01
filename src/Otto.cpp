@@ -718,9 +718,9 @@ bool Otto::Mouth_isEmptyQueue() {
 }
 
 //---------------------------------------------------------
-//-- Otto Mouth: clear all tones currently in the mouth queue.
+//-- Otto : clear all mouths currently in the mouth queue.
 //---------------------------------------------------------
-// Returns:
+// Returns:Mouth
 //    Integer value representing the number of entries in the mouth queue.
 //-------------------------------------------------------
 // Function to clear all mouths currently in the queue
@@ -766,17 +766,24 @@ void Otto::initMATRIX(int DIN, int CS, int CLK, int rotate) {
 //    Integer value representing status 0 = success -# = error.
 //---------------------------------------------------------
 int Otto::Mouth_init(int DIN, int CS, int CLK, int rotate) {
-	// check to see if already initialized 
-	if(ledmatrix != NULL) {
-        Serial.println(F("Error: matrix already initialized"));
-        return -3; // matrix already initialized
-	}
 	
-    // Initialize LED matrix display
-	// fixme: do we move this to the mouth task startup or leave it here?
-    ledmatrix.init(DIN, CS, CLK, 1, rotate);
+	// check to see if matrix already initialized 
+	//if(ledmatrix != NULL) {
+    //    Serial.println(F("Error: matrix already initialized"));
+    //    return -3; // matrix already initialized
+	//}
 
-    // Create the mouth queues
+    // Initialize LED matrix display
+	// fixme: relocate to mouth task startup ... needs global matrix setings ...
+    ledmatrix.init(DIN, CS, CLK, 1, rotate);
+ 
+    // Check if the initialize matrix was successful
+    //if (ledmatrix == NULL) {
+    //  Serial.println(F("Error: Failed to initialize matrix!"));
+    //  return -4; // Failed to initialize LED matrix
+    //}
+	
+    // Create the mouth queue
     mouthQueueHandle = xQueueCreate(10, sizeof(struct MouthQueueMsg));
 
     // Check if the queue creation was successful
@@ -784,7 +791,6 @@ int Otto::Mouth_init(int DIN, int CS, int CLK, int rotate) {
       Serial.println(F("Error: Failed to create mouth queue!"));
       return -2; // Failed to create queue
     }
-	
 	
     // Create the mouth task
     xTaskCreate(mouthTaskWrapper, "Mouth Task", 128, this, 1, &mouthTaskHandle);
@@ -821,7 +827,8 @@ void Otto::matrixIntensity(int intensity) {
 //    Integer value of entries in the mouth queue
 //---------------------------------------------------------
 int Otto::Mouth_intensity(int intensity) {
-  struct MouthQueueMsg msg;
+  int count = 0;
+  MouthQueueMsg msg;
 
   // Check input level for valid range
   if((intensity < 0) || (intensity > 15)) {
@@ -857,16 +864,6 @@ int Otto::Mouth_intensity(int intensity) {
     return -1; // Failed to send to mouth queue
   }
   return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
-  
-/*
-	if(ledmatrix == NULL) {
-        Serial.println(F("Error: matrix not available"));
-        return -1; // matrix not available	
-	}		
-    // Set intensity of LED matrix display
-    ledmatrix.setIntensity(intensity);
-	return 0;
-*/
 }
 
 //---------------------------------------------------------
@@ -896,7 +893,8 @@ void Otto::setLed(byte X, byte Y, byte value) {
 //    Integer value of entries in the mouth queue
 //---------------------------------------------------------
 int Otto::Mouth_setled(byte X, byte Y, byte value) {
-  struct MouthQueueMsg msg;
+  int count = 0;
+  MouthQueueMsg msg;
 
   // Check if the mouth queue exist
   if(mouthQueueHandle == NULL) {
@@ -928,17 +926,8 @@ int Otto::Mouth_setled(byte X, byte Y, byte value) {
     return -1; // Failed to send to mouth queue
   }
   return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
-  
-/*
-	if(ledmatrix == NULL) {
-        Serial.println(F("Error: matrix not available"));
-        return -1; // matrix not available	
-	}	
-    // Set the state of the LED at the specified coordinates
-    ledmatrix.setDot(X, Y, value);
-	return 0;
-*/
 }
+
 //---------------------------------------------------------
 //-- Otto Mouth: Put Animation Mouth frame compatibility wrapper
 //---------------------------------------------------------
@@ -964,7 +953,8 @@ void Otto::putAnimationMouth(unsigned long int aniMouth, int index) {
 //    Integer value of entries in the mouth queue
 //---------------------------------------------------------
 int Otto::Mouth_animation(unsigned long int aniMouth, int index) {
-  struct MouthQueueMsg msg;
+  int count = 0;
+  MouthQueueMsg msg;
   msg.command = MOUTH_MOUTH;
   msg.cmd.mouth.clear = false;
   
@@ -995,9 +985,6 @@ int Otto::Mouth_animation(unsigned long int aniMouth, int index) {
     return -1; // Failed to send to mouth queue
   }
   return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
-
-//ledmatrix.writeFull(PROGMEM_getAnything (&Gesturetable[aniMouth][index]));
-
 }
 
 //---------------------------------------------------------
@@ -1021,7 +1008,8 @@ void Otto::putMouth(unsigned long int mouth, bool predefined) {
 //    Integer value of entries in the mouth queue
 //---------------------------------------------------------
 int Otto::Mouth(unsigned long int mouth, bool predefined) {
-  struct MouthQueueMsg msg;
+  int count = 0;
+  MouthQueueMsg msg;
   msg.command = MOUTH_MOUTH;
   msg.cmd.mouth.clear = false;
 	
@@ -1058,9 +1046,6 @@ int Otto::Mouth(unsigned long int mouth, bool predefined) {
     return -1; // Failed to send to mouth queue
   }
   return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
-  
-// ledmatrix.writeFull(PROGMEM_getAnything(&Mouthtable[mouth]));
-
 }
 
 //---------------------------------------------------------
@@ -1076,7 +1061,8 @@ void Otto::clearMouth() {
 //    Integer value of entries in the mouth queue
 //---------------------------------------------------------
 int Otto::Mouth_clear() {
-  struct MouthQueueMsg msg;
+  int count = 0;
+  MouthQueueMsg msg;
   msg.command = MOUTH_MOUTH;
   msg.cmd.mouth.mouth = 123;
   msg.cmd.mouth.clear = true;
@@ -1105,16 +1091,8 @@ int Otto::Mouth_clear() {
     return -1; // Failed to send to mouth queue
   }
   return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
-  
-/*
-	if(ledmatrix == NULL) {
-        Serial.println(F("Error: matrix not available"));
-        return -1; // matrix not available	
-	}
-    ledmatrix.clearMatrix();
-*/
-
 }
+
 //---------------------------------------------------------
 //-- Otto Mouth: Write Text compatibility wrapper
 //---------------------------------------------------------
@@ -1134,7 +1112,8 @@ void Otto::writeText(const char *s, byte scrollspeed) {
 //    * scrollspeed: The scrolling speed
 //---------------------------------------------------------
 int Otto::Mouth_write(const char *s, byte scrollspeed, bool noblock) {
-  struct MouthQueueMsg msg;
+  int count = 0;
+  MouthQueueMsg msg;
   msg.command = MOUTH_WRITE;
   msg.cmd.write.string = s;
   msg.cmd.write.speed = scrollspeed;
@@ -1164,31 +1143,6 @@ int Otto::Mouth_write(const char *s, byte scrollspeed, bool noblock) {
   }
   // fixme: handle noblock param to at least wait until queue is empty ...
   return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
-  
-/*
-    int a, b;
-
-    // Determine the length of the text (up to 9 characters)
-    for (a = 0; s[a] != '\0'; a++) {
-        b = a + 1;
-        if (b > 9) b = 9; // Limit the maximum length to 9 characters
-    }
-
-    // Display each character
-    for (int charNUMBER = 0; charNUMBER < b; charNUMBER++) {
-        if ((*s < 48) || (*s > 91)) { // Check if the character is not within the alphanumeric range
-            if (*s == 32) { // If it's a space character
-                ledmatrix.sendChar(44, charNUMBER, b, scrollspeed);
-            } else { // If it's a non-alphanumeric character
-                ledmatrix.sendChar(43, charNUMBER, b, scrollspeed);
-            }
-        } else { // If it's an alphanumeric character
-            ledmatrix.sendChar((*s - 48), charNUMBER, b, scrollspeed);
-        }
-        s++; // Move to the next character
-    }
-*/
-
 }
 
 //---------------------------------------------------------
@@ -1205,21 +1159,56 @@ void Otto::mouthTaskWrapper(void *pvParameters) {
   ottoInstance->mouthTask(pvParameters);
 }
 
-// Task to play the mouth
+// Task to play the mouth functions
 void Otto::mouthTask(void *pvParameters) {
-  MouthParameters mouthParams;
+  // contructor for the mouth message queue
+  MouthQueueMsg Queuemsg;
+  
+  // Initialize LED matrix display
+  //ledmatrix.init(DIN, CS, CLK, 1, rotate); //fixme: needs gloabl defines for i2c/spi
+  
+  while(true) {
+    if(xQueueReceive(mouthQueueHandle, &Queuemsg, portMAX_DELAY) == pdTRUE) {
+        if(Queuemsg.command == MOUTH_MOUTH) { // Process StructType mouth
+			if(Queuemsg.cmd.mouth.clear) {
+			    ledmatrix.clearMatrix();
+			} else {
+				ledmatrix.writeFull(Queuemsg.cmd.mouth.mouth);
+			}
+        } else if(Queuemsg.command == MOUTH_INTENSITY) { // Process StructType intensity
+            ledmatrix.setIntensity(Queuemsg.cmd.intensity.intensity); // Set intensity of LED matrix display
+        } else if(Queuemsg.command == MOUTH_SETLED) { // Process StructType setled
+	        ledmatrix.setDot(Queuemsg.cmd.setled.X, Queuemsg.cmd.setled.Y, Queuemsg.cmd.setled.value); // Set value of LED matrix at X/Y
+        } else if(Queuemsg.command == MOUTH_WRITE) { // Process StructType write
+            int a, b;
 
-  while (true) {
-    if (xQueueReceive(mouthQueueHandle, &mouthParams, portMAX_DELAY) == pdTRUE) {
-	/* fixme	
-	  if(mouthParams.frequency != 0) { // ignore empty (rests ) notes
-	    tone(Otto::pinBuzzer, toneParams.frequency, toneParams.noteDuration);
-	    vTaskDelay(max (1U, (toneParams.noteDuration / portTICK_PERIOD_MS) ));
-	  }
-	  vTaskDelay(max (1U, (toneParams.silentDuration / portTICK_PERIOD_MS) ));
+            // Determine the length of the text (up to 12 characters)
+            for(a = 0; Queuemsg.cmd.write.string[a] != '\0'; a++) {
+                b = a + 1;
+                if(b > 12) b = 12; // Limit the maximum length to 12 characters
+            }
+
+            // Display each character
+            for(int charNUMBER = 0; charNUMBER < b; charNUMBER++) {
+                if((*Queuemsg.cmd.write.string < 48) || (*Queuemsg.cmd.write.string > 91)) { // Check if the character is not within the alphanumeric range
+                    if(*Queuemsg.cmd.write.string == 32) { // If it's a space character
+                        ledmatrix.sendChar(44, charNUMBER, b, Queuemsg.cmd.write.speed);
+                    } else { // If it's a non-alphanumeric character
+                        ledmatrix.sendChar(43, charNUMBER, b, Queuemsg.cmd.write.speed);
+                    }
+                } else { // If it's an alphanumeric character
+                    ledmatrix.sendChar((*Queuemsg.cmd.write.string - 48), charNUMBER, b, Queuemsg.cmd.write.speed);
+                }
+                Queuemsg.cmd.write.string++; // Move to the next character
+            }
+			// fixme: should we loop if nothing else is in the mouth queue?
+        } else if (Queuemsg.command == MOUTH_ANIMATE) {
+            // Process StructType animate
+			//fixme: or eliminate me for now ...
+            //printf("Animate: %d\n", msg.cmd.animate.anim);
+        }
     }
-	*/
-  }
+  } // endless loop
 }
 
 #else // dummy compatibility wrappers for MOUTH_8X8_MONO_SPI
@@ -1303,7 +1292,7 @@ int Otto::Sound_queueSize() {
 //    Boolen value representing if the tone queue is empty.
 //-------------------------------------------------------
 bool Otto::Sound_isEmptyQueue() {
-  if(getToneQueueSize() == 0) {
+  if(Sound_queueSize() == 0) {
     return true; // true if queue empty
   } else {
     return false; // false if busy or error (Queue doesn't exist)

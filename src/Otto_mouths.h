@@ -26,7 +26,7 @@ struct MouthsetledParam {
 // Structure to hold mouth write parameters
 struct MouthwriteParam {
 	const char * string;
-	byte speed
+	byte speed;
 };
 
 // Structure to hold mouth animate parameters
@@ -44,6 +44,9 @@ union MouthQueueCmd {
     struct MouthsetledParam setled;			// 3
     struct MouthwriteParam write;			// 4
     struct MouthanimateParam animate;		// 5
+	
+    MouthQueueCmd() {}  // Default constructor
+    ~MouthQueueCmd() {} // Destructor
 };
 
 // Define mouth command numbers
