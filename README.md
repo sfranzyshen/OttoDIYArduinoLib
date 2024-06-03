@@ -24,8 +24,19 @@ To enhance the core code running OttoDIY robot in order to address its current l
   Review and update existing documentation to reflect changes made to the codebase. Ensure comprehensive documentation covering installation, usage, and troubleshooting.
 - [ ] **Testing and Quality Assurance:**
   Develop and execute test cases to ensure the reliability and functionality of the updated code. Implement automated testing where feasible to streamline the testing process. Conduct thorough quality assurance to identify and address any issues before deployment.
-- [ ] **Deployment Plan:**
-  Develop a plan for deploying the updated code to users. Consider methods for migrating existing users to the new version smoothly. Provide support and assistance to users during the transition period.
+- [X] **Deployment Plan:**
+  (* see below) Develop a plan for deploying the updated code to users. Consider methods for migrating existing users to the new version smoothly. Provide support and assistance to users during the transition period.
+
+### **Deployment Plan:**
+Once we reach the 13.1.1 milestone, we will begin parallel development, working simultaneously on three versions of the code.
+
+**13.0.x** - This version of the code is the current "main" branch of the OttoDIYLib repository. It includes only changes to support additional platforms. No new features or core changes will be made to this branch, as it is feature-frozen and maintains 101% compatibility.
+
+**13.1.x** - This version maintains full compatibility with version 13.0.x. It is the current "devel" branch of the OttoDIYLib repository, containing changes to support additional platforms and introducing the new non-blocking coding paradigm. This version will include additions and core changes to add hardware options and unify the separate models (biped, wheels, and ninja) into a single library, maintaining 99.9% compatibility.
+
+**14.1.x** - This version of the code is based on the 13.1.x branch of the OttoDIYLib repository. It supports a non-blocking coding paradigm by default and drops support for 13.x.x compatibility, resulting in 0% compatibility with the 13.x.x versions.
+
+Over time, when 13.1.x becomes mature and well-tested, it will be branched to 13.2.1 and replace 13.0.x as the "main" branch. At the same time, 13.1.x will also be branched to 13.3.1 to start a new development cycle. When 14.1.x matures, it will become 14.2.1 and 14.3.1, but these will remain "devel" branches. At some point in the distant future, we may drop support for version 13 altogether, allowing version 14 to take over as the "main" branch.
 
 ### Constraints and Assumptions:
 * Limited resources (e.g., developers, testers, time).
