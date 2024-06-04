@@ -95,7 +95,7 @@ class Otto_Matrix
     
   public:
     Otto_Matrix();
-    
+    bool initialized;
     void init(byte data, byte load, byte clock, byte num, int rotation);
     void clearMatrix();
     void setCommand(byte command, byte value);

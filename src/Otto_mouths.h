@@ -9,11 +9,13 @@
 struct MouthParam {
 	unsigned long int mouth;
 	bool clear = false;
+	int duration;
 };
 
 // Structure to hold mouth intensity parameters
 struct MouthintensityParam {
 	int intensity;
+	int duration;
 };
 
 // Structure to hold mouth setled parameters
@@ -21,6 +23,7 @@ struct MouthsetledParam {
 	byte X;
 	byte Y;
 	byte value;
+	int duration;
 };
 
 // Structure to hold mouth write parameters
@@ -32,7 +35,7 @@ struct MouthwriteParam {
 // Structure to hold mouth animate parameters
 struct MouthanimateParam {
 	unsigned long int anim;
-	byte speed;
+	int speed;
 	bool loop;
 	bool bounce;
 };

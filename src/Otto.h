@@ -9,8 +9,8 @@
 
 #ifndef Otto_config_h				  // no pre-config ... default to starter kit biped
 	#include "Otto_config.h"
-	//#define  Otto_code			NON_BLOCKING
-	#define  Otto_code			BLOCKING
+	#define  Otto_code			NON_BLOCKING
+	//#define  Otto_code			BLOCKING
 	#define  Otto_model			BIPED // 4x 180° Servos
 	#define  Otto_SERVOS		4
 	#define  Otto_sound			SOUND_BUZZER
@@ -141,13 +141,13 @@ public:
 
     // Mouth & Animations functions for MOUTH_8X8_MONO_SPI
 	int Mouth_init(int DIN, int CS, int CLK, int rotate);
-    int Mouth_intensity(int intensity);
-    int Mouth_setled(byte X, byte Y, byte value);
+    int Mouth_intensity(int intensity, int minimalDuration = FPS30);
+    int Mouth_setled(byte X, byte Y, byte value, int minimalDuration = FPS30);
     int Mouth_write(const char * s, byte scrollspeed, bool noblock = Otto_code);
-    int Mouth(unsigned long int mouth, bool predefined = true);
-    int Mouth_animation(unsigned long int anim, int index);
-    int Mouth_animate(unsigned long int anim, byte speed, bool loop = false, bool bounce = false, bool noblock = Otto_code);
-    int Mouth_clear();
+    int Mouth(unsigned long int mouth, bool predefined = true, int minimalDuration = FPS30);
+    int Mouth_animation(unsigned long int anim, int index, int minimalDuration = FPS30);
+    int Mouth_animate(unsigned long int anim, int speed = FPS30, bool bounce = false, bool loop = true);
+    int Mouth_clear(int minimalDuration = FPS30);
     int Mouth_queueSize();
     bool Mouth_isEmptyQueue();
     int Mouth_clearQueue();

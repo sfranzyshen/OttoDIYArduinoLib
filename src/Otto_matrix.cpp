@@ -8,7 +8,7 @@
 #endif // ARDUINO_ARCH
 #include "Otto_matrix.h"
 
-Otto_Matrix::Otto_Matrix() {}
+Otto_Matrix::Otto_Matrix() : initialized(false) {}
 
 // Initialize MAX7219 LED Matrix
 void Otto_Matrix::init(byte _data, byte _load, byte _clock, byte _num, int _rotation) {
@@ -48,6 +48,9 @@ void Otto_Matrix::init(byte _data, byte _load, byte _clock, byte _num, int _rota
     // Clear display buffer and set intensity
     clearMatrix();
     setIntensity(0x0f);
+
+    // Set the initialized flag to true after successful initialization
+    initialized = true;
 }
 
 // Set LED Matrix Intensity
