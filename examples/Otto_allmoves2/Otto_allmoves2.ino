@@ -34,14 +34,10 @@ void setup(){
     Serial.println(F("Otto Init Succeed"));
   }
 */
-
   
   Otto.initMATRIX( DIN, CS, CLK, Orientation);
-  //Otto.sing(S_connection); //Otto wake up!
-  
   Otto.home();
   delay(50);
-  //Otto.playGesture(OttoHappy);
   Serial.println("Startup done.");
 }
 
@@ -50,36 +46,37 @@ void setup(){
 ///////////////////////////////////////////////////////////////////
 void loop() { 
   Serial.println("Loop ...");
-  //Otto.walk(1,1000,1); //2 steps, "TIME". IF HIGHER THE VALUE THEN SLOWER (from 600 to 1400), 1 FORWARD
-  //Otto.walk(2,1000,-1); //2 steps, T, -1 BACKWARD 
-  //Otto.turn(2,1000,1);//3 steps turning LEFT
-  //Otto._tone(30, 300, 10);
-  //Otto.bendTones (100, 200, 1.04, 10, 10);
- // Otto.home();
- // delay(100);  
- // Otto.turn(2,1000,-1);//3 steps turning RIGHT 
- // Otto.bend (1,500,1); //usually steps =1, T=2000
- // Otto.bend (1,2000,-1);     
- // Otto.shakeLeg (1,1500, 1);
- // Otto.home();
-  //delay(100);
- // Otto.shakeLeg (1,2000,-1);
-  //Otto.moonwalker(3, 1000, 25,1); //LEFT
-  //Otto.moonwalker(3, 1000, 25,-1); //RIGHT  
-  //Otto.crusaito(2, 1000, 20,1);
- // Otto.crusaito(2, 1000, 20,-1);
- // delay(100); 
- // Otto.flapping(2, 1000, 20,1);
- // Otto.flapping(2, 1000, 20,-1);
- // delay(100);        
- // Otto.swing(2, 1000, 20);
- // Otto.tiptoeSwing(2, 1000, 20);
- // Otto.jitter(2, 1000, 20); //(small T)
- // Otto.updown(2, 1500, 20);  // 20 = H "HEIGHT of movement"T 
- // Otto.ascendingTurn(2, 1000, 50);
- // Otto.jump(1,500); // It doesn't really jumpl ;P
-
- /*
+  /*
+  Otto.walk(1,1000,1); //2 steps, "TIME". IF HIGHER THE VALUE THEN SLOWER (from 600 to 1400), 1 FORWARD
+  Otto.walk(2,1000,-1); //2 steps, T, -1 BACKWARD 
+  Otto.turn(2,1000,1);//3 steps turning LEFT
+  Otto._tone(30, 300, 10);
+  Otto.bendTones (100, 200, 1.04, 10, 10);
+  Otto.home();
+  delay(100);  
+  Otto.turn(2,1000,-1);//3 steps turning RIGHT 
+  Otto.bend (1,500,1); //usually steps =1, T=2000
+  Otto.bend (1,2000,-1);     
+  Otto.shakeLeg (1,1500, 1);
+  Otto.home();
+  delay(100);
+  Otto.shakeLeg (1,2000,-1);
+  Otto.moonwalker(3, 1000, 25,1); //LEFT
+  Otto.moonwalker(3, 1000, 25,-1); //RIGHT  
+  Otto.crusaito(2, 1000, 20,1);
+  Otto.crusaito(2, 1000, 20,-1);
+  delay(100); 
+  Otto.flapping(2, 1000, 20,1);
+  Otto.flapping(2, 1000, 20,-1);
+  delay(100);        
+  Otto.swing(2, 1000, 20);
+  Otto.tiptoeSwing(2, 1000, 20);
+  Otto.jitter(2, 1000, 20); //(small T)
+  Otto.updown(2, 1500, 20);  // 20 = H "HEIGHT of movement"T 
+  Otto.ascendingTurn(2, 1000, 50);
+  Otto.jump(1,500); // It doesn't really jumpl ;P
+*/
+  /*
   Otto.home();
   delay(100);
   Serial.println(F("S_connection"));
@@ -138,12 +135,7 @@ void loop() {
   delay(2500);
   Serial.println(F("S_disconnection"));
   Otto.sing(S_disconnection);
- */
- // Otto._tone(150, 120, 1);
- // Otto._tone(0, 0, 1200);
- // Otto._tone(150, 120, 1);
-/*
-  //Otto.bendTones (100, 400, 1.04, 120, 1);
+*/
   Serial.println(F("OttoHappy"));
   Otto.playGesture(OttoHappy);
   delay(2500);  
@@ -186,8 +178,8 @@ void loop() {
   Serial.println(F("home"));
   Otto.home();
   delay(100);  
-*/
 
+/*
   Serial.println(F("writeText"));
   Otto.writeText("SCOTTO", 50);
   delay(5000);
@@ -324,4 +316,5 @@ void loop() {
   Serial.println(F("Mouth_animate littleUuh"));
   Otto.Mouth_animate(littleUuh, FPS30, true, true);
   delay(5000);
+  */
 }

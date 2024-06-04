@@ -13,8 +13,8 @@
 	//#define  Otto_code			BLOCKING
 	#define  Otto_model			BIPED // 4x 180° Servos
 	#define  Otto_SERVOS		4
-	#define  Otto_sound			SOUND_BUZZER
-	//#define  Otto_sound			SOUND_NONE
+	//#define  Otto_sound			SOUND_BUZZER
+	#define  Otto_sound			SOUND_NONE
 	#define  Otto_mouth			MOUTH_8X8_MONO_SPI
 	//#define  Otto_mouth			MOUTH_NONE
 #endif // Otto_config_h
@@ -196,10 +196,10 @@ public:
 
 private:
 #if Otto_sound == SOUND_BUZZER
-    static void toneTaskWrapper(void *pvParameters);	// Static wrapper function for toneTask	
-    void toneTask(void *pvParameters);    		// Function prototypes
-    TaskHandle_t toneTaskHandle = NULL;    		// Define the task handler for playing tones
-    QueueHandle_t toneQueueHandle = NULL;           	// Define the queue handler
+    static void soundTaskWrapper(void *pvParameters);	// Static wrapper function for toneTask	
+    void soundTask(void *pvParameters);    		// Function prototypes
+    TaskHandle_t soundTaskHandle = NULL;    		// Define the task handler for playing tones
+    QueueHandle_t soundQueueHandle = NULL;           	// Define the queue handler
     int pinBuzzer;
 #endif // SOUND_BUZZER
 
