@@ -15,7 +15,7 @@ To enhance the core code running OttoDIY robot in order to address its current l
 
 ### Project Scope:
 - [X] **Code Refactoring:**
-  Evaluate the existing codebase to identify areas for refactoring. Refactor the code to improve its structure, readability, and maintainability. ([release as version 13.0.1](https://github.com/sfranzyshen/OttoDIYArduinoLib/tree/version-13.0.1))
+  Evaluate the existing codebase to identify areas for refactoring. Refactor the code to improve its structure, readability, and maintainability. ([release as version 13.0.1](https://github.com/OttoDIY/OttoDIYLib/tree/version-13.0.1))
 - [ ] **Functionality Enhancement:**
   Identify key functionalities that need improvement or addition. Enhance existing functionalities to make them more robust and responsive. Implement new features to address current limitations and meet user needs.
 - [ ] **Reliability Improvement:**
