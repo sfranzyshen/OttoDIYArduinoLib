@@ -2,7 +2,7 @@
 <a href="https://creativecommons.org/licenses/by-sa/4.0/"><img src="https://certification.oshwa.org/images/by-sa.png" height="23px"></a>[![OSHW Certification Mark](https://raw.githubusercontent.com/OttoDIY/OttoDIYLib/devel/certification-mark-CZ000001.png)](https://certification.oshwa.org/cz000001.html)[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Version](https://img.shields.io/badge/Version-13.1.0-blue)](https://github.com/OttoDIY/OttoDIYLib/tree/devel) [![Built with: Arduino](https://img.shields.io/badge/Built_with-Arduino-blue)](https://www.arduino.cc/reference/en/) [![Built with: FreeRTOS](https://img.shields.io/badge/Built_with-FreeRTOS-green)](https://www.freertos.org/index.html)
 ### Development Branch :star: Star us on GitHub, it helps!
 First join the server <a href="https://discord.gg/CZZytnw"><img src="https://images.squarespace-cdn.com/content/v1/5cd3e3917046805e4d6700e3/1560193788834-KYURUXVSZAIE4XX1ZB2F/ke17ZwdGBToddI8pDm48kK6MRMHcYvpidTm-7i2qDf_lfiSMXz2YNBs8ylwAJx2qLijIv1YpVq4N1RMuCCrb3iJz4vYg48fcPCuGX417dnbl3kVMtgxDPVlhqW83Mmu6GipAUbdvsXjVksOX7D692AoyyEsAbPHhHcQMU6bWQFI/join_discord_button_small.png" width="15%"></a> Then join the discussion <a href="https://discord.com/channels/691410809586450483/1228242677963685918"><img src="https://images.squarespace-cdn.com/content/v1/5cd3e3917046805e4d6700e3/1560193788834-KYURUXVSZAIE4XX1ZB2F/ke17ZwdGBToddI8pDm48kK6MRMHcYvpidTm-7i2qDf_lfiSMXz2YNBs8ylwAJx2qLijIv1YpVq4N1RMuCCrb3iJz4vYg48fcPCuGX417dnbl3kVMtgxDPVlhqW83Mmu6GipAUbdvsXjVksOX7D692AoyyEsAbPHhHcQMU6bWQFI/join_discord_button_small.png" width="15%"></a>
-
+### Warning this code is not ready for use!
 This branch of the repository contains the "development" Arduino library for the [OttoDIY robot](https://www.ottodiy.com/), with support for all [OttoDIY models](https://github.com/OttoDIY/OttoDIYLib/tree/devel#supported-models) and [compatible boards](https://github.com/OttoDIY/OttoDIYLib/tree/devel?tab=readme-ov-file#supported-platforms). This branch is currently not functional. If you are looking for the production software please refer to the [main branch](https://github.com/OttoDIY/OttoDIYLib).
 
 #### Versioning for the project will follow a three-numeral format separated by decimal points, for example, 13.1.0
@@ -24,8 +24,19 @@ To enhance the core code running OttoDIY robot in order to address its current l
   Review and update existing documentation to reflect changes made to the codebase. Ensure comprehensive documentation covering installation, usage, and troubleshooting.
 - [ ] **Testing and Quality Assurance:**
   Develop and execute test cases to ensure the reliability and functionality of the updated code. Implement automated testing where feasible to streamline the testing process. Conduct thorough quality assurance to identify and address any issues before deployment.
-- [ ] **Deployment Plan:**
-  Develop a plan for deploying the updated code to users. Consider methods for migrating existing users to the new version smoothly. Provide support and assistance to users during the transition period.
+- [X] **Deployment Plan:**
+  (* see below) Develop a plan for deploying the updated code to users. Consider methods for migrating existing users to the new version smoothly. Provide support and assistance to users during the transition period.
+
+### **Deployment Plan:**
+Once we reach the 13.1.1 milestone, we will begin parallel development, working simultaneously on three versions of the code.
+
+**13.0.x** - This version of the code is the current "main" branch of the OttoDIYLib repository. It includes only changes to support additional platforms. No new features or core changes will be made to this branch, as it is feature-frozen and maintains 101% compatibility.
+
+**13.1.x** - This version maintains full compatibility with version 13.0.x. It is the current "devel" branch of the OttoDIYLib repository, containing changes to support additional platforms and introducing the new non-blocking coding paradigm. This version will include additions and core changes to add hardware options and unify the separate models (biped, wheels, and ninja) into a single library, maintaining 99.9% compatibility.
+
+**14.1.x** - This version of the code is based on the 13.1.x branch of the OttoDIYLib repository. It supports a non-blocking coding paradigm by default and drops support for 13.x.x compatibility, resulting in 0% compatibility with the 13.x.x versions.
+
+Over time, when 13.1.x becomes mature and well-tested, it will be branched to 13.2.1 and replace 13.0.x as the "main" branch. At the same time, 13.1.x will also be branched to 13.3.1 to start a new development cycle. When 14.1.x matures, it will become 14.2.1 and 14.3.1, but these will remain "devel" branches. At some point in the distant future, we may drop support for version 13 altogether, allowing version 14 to take over as the "main" branch.
 
 ### Constraints and Assumptions:
 * Limited resources (e.g., developers, testers, time).
@@ -64,17 +75,26 @@ To enhance the core code running OttoDIY robot in order to address its current l
 ### Source File Structure
 #### During the development phase, files will be further divided into several smaller files compared to the release file set.
 
-* `Otto.h` and `Otto.cpp` contains all the main otto functions
-* `Otto_gestures.h` contains all the otto gestures functions
-* `Otto_mouths.h` contains all the mouth functions
-* `Otto_moves.h` contains all the otto movement functions
-* `Otto_eyes.h` contains all the otto eye functions
-* `Otto_sounds.h` contains all the otto sound functions
-* `Display.h` and `Display.cpp` contains all the oled and led matrix functions
-* `Distance.h` and `Distance.cpp` contains all the distance messurement functions
-* `Servo.h` and `Servo.cpp` contains all the servo functions
+* `Otto_config.h` contains pre-config directives
+* `Otto_models.h` contains model pre-config directives
+* `Otto_sound.h` contains sound pre-config directives
+* `Otto_mouth.h` contains mouth pre-config directives
+* `Otto_version.h` contains software version directive
+### 
+* `Otto.h` and `Otto.cpp` contain all the main user (API) otto functions
+### 
+* `Otto_gestures.h` and `Otto_gestures.cpp`contain all the otto gestures functions
+* `Otto_mouths.h` and `Otto_mouths.cpp` contain all the mouth functions
+* `Otto_moves.h` and `Otto_moves.cpp` contain all the otto movement functions
+* `Otto_eyes.h` and `Otto_eyes.cpp` contain all the otto eye functions
+* `Otto_sounds.h` and ` Otto_sounds.cpp` contain all the otto sound functions
+### 
+* `Display.h` and `Display.cpp` contain all the oled, led, and ... matrix (output) functions
+* `Distance.h` and `Distance.cpp` contain all the distance messurement (input) functions
+* `LineSensor.h` and `LineSensor.cpp` contain all the line-sensor messurement (input) functions
+* `Servo.h` and `Servo.cpp` contain all the servo (output) functions
+* `Sound.h` and `Sound.cpp` contain all the sound (output) functions
 * `Oscillator.h` and `Oscillator.cpp` is the main algorithm for the servos "smooth" movement
-* `Sound.h` and `Sound.cpp` contains all the code for making sounds
 
 ### New Otto API: 
 #### (Biped with arms model, RGB ultrasonic eyes, buzzer sound, and a mono spi matrix mouth)
@@ -87,12 +107,12 @@ To enhance the core code running OttoDIY robot in order to address its current l
 The "Otto_code" directive establishes the overall coding style for a sketch. This setting can be overridden at the function call level. By default, it operates in BLOCKING mode. However, when set to NON_BLOCKING, all functions will default to non-blocking behavior.
 ```cpp
   #define Otto_model	  	BIPED_ARMS	// 6x 180° Servos
-  #define Otto_sound	  	BUZZER
+  #define Otto_SERVOS	  	6  // total number of servos
+  #define Otto_sound	  	SOUND_BUZZER
   #define Otto_mouth	  	LED_MATRIX_8X8_MONO_SPI
   #define Otto_eyes	  	LED_USONIC_RGB_NEO
 
   // Otto Servos		define Otto's servos (can be blockly generated)
-  #define Otto_SERVOS	  	6  // total number of servos
   #define Otto_LL	  	2  // left leg pin
   #define Otto_LR	  	3  // right leg pin
   #define Otto_FL	  	4  // left foot pin
@@ -121,53 +141,66 @@ Following the configuration declaration, include the Otto.h API. This API utiliz
 ```
   Now, all functions return an (int) value. This return value can be utilized for error handling. Alternatively, for compatibility,it can be ignored.
 ```cpp
-  int Otto.init(const char * name);   // every Otto should have a unique name.
-                                      // Can be used for Wifi, etc.
-  int Otto.Servos_init(LL, LR, FL, FR, AL, AR);   // other hardware inits are called by Otto.init()
+  int Otto.init(const char * name);   // every Otto should have a unique name. Can be used for Wifi, etc.
+
+// other hardware inits are called by Otto.init() not directly
+  int Otto.Servos_init(LL, LR, FL, FR, AL, AR);
   int Otto.Mouth_init(int DIN, int CS, int CLK, int rotate);	
   int Otto.Sound_init(int Buzzer);				
   int Otto.Eyes_init(int EYES_NEO_PIN, int EYES_NEO_START, int EYES_NEO_END);
 ```
-Many functions in the Otto API now include an optional (int) noblock parameter, which defaults to BLOCKING for compatibility. However, the underlying code has been modified to be non-blocking. This modification allows for greater flexibility and can be extended to user-level code. For younger beginner students, understanding blocking, sequentially executed commands is straightforward. However, for older, more experienced students, blocking code can be seen as a limitation. This limitation may exclude the current Otto from being used in the classroom.
+Many functions in the Otto API now include an optional (bool) noblock parameter, which defaults to BLOCKING for compatibility. However, the underlying code has been modified to be non-blocking. This modification allows for greater flexibility and can be extended to user-level code. For younger beginner students, understanding blocking, sequentially executed commands is straightforward. However, for older, more experienced students, blocking code can be seen as a limitation. This limitation may exclude the current Otto from being used in the classroom.
 ```cpp
-  int Otto.home(int noblock = BLOCKING);
-  int Otto.jump(float steps = 1, int T = 2000, int noblock = BLOCKING);
-  int Otto.walk(float steps = 4, int T = 1000, int dir = FORWARD, int noblock = BLOCKING);
-  int Otto.turn(float steps = 4, int T = 2000, int dir = LEFT, int noblock = BLOCKING);
-  int Otto.bend (int steps = 1, int T = 1400, int dir = LEFT, int noblock = BLOCKING);
-  int Otto.shakeLeg (int steps = 1, int T = 2000, int dir = RIGHT, int noblock = BLOCKING);
-  int Otto.updown(float steps = 1, int T = 1000, int h = , int noblock = BLOCKING);
-  int Otto.swing(float steps = 1, int T = 1000, int h = 20, int noblock = BLOCKING);
-  int Otto.tiptoeSwing(float steps = 1, int T = 900, int h = 20, int noblock = BLOCKING);
-  int Otto.jitter(float steps = 1, int T = 500, int h = 20, int noblock = BLOCKING);
-  int Otto.ascendingTurn(float steps = 1, int T = 900, int h = 20, int noblock = BLOCKING);
-  int Otto.moonwalker(float steps = 1, int T = 900, int h = 20, int dir = LEFT, int noblock = BLOCKING);
-  int Otto.crusaito(float steps = 1, int T = 900, int h = 20, int dir = FORWARD, int noblock = BLOCKING);
-  int Otto.flapping(float steps = 1, int T = 1000, int h = 20, int dir = FORWARD, int noblock = BLOCKING);
+  int Otto.home(bool noblock = BLOCKING);
+  int Otto.jump(float steps = 1, int T = 2000, bool noblock = BLOCKING);
+  int Otto.walk(float steps = 4, int T = 1000, int dir = FORWARD, bool noblock = BLOCKING);
+  int Otto.turn(float steps = 4, int T = 2000, int dir = LEFT, bool noblock = BLOCKING);
+  int Otto.bend (int steps = 1, int T = 1400, int dir = LEFT, bool noblock = BLOCKING);
+  int Otto.shakeLeg (int steps = 1, int T = 2000, int dir = RIGHT, bool noblock = BLOCKING);
+  int Otto.updown(float steps = 1, int T = 1000, int h = , bool noblock = BLOCKING);
+  int Otto.swing(float steps = 1, int T = 1000, int h = 20, bool noblock = BLOCKING);
+  int Otto.tiptoeSwing(float steps = 1, int T = 900, int h = 20, bool noblock = BLOCKING);
+  int Otto.jitter(float steps = 1, int T = 500, int h = 20, bool noblock = BLOCKING);
+  int Otto.ascendingTurn(float steps = 1, int T = 900, int h = 20, bool noblock = BLOCKING);
+  int Otto.moonwalker(float steps = 1, int T = 900, int h = 20, int dir = LEFT, bool noblock = BLOCKING);
+  int Otto.crusaito(float steps = 1, int T = 900, int h = 20, int dir = FORWARD, bool noblock = BLOCKING);
+  int Otto.flapping(float steps = 1, int T = 1000, int h = 20, int dir = FORWARD, bool noblock = BLOCKING);
 
-  int Otto.Sound_tone(float noteFreq, long noteDur, int silentDur, int noblock = BLOCKING);
-  int Otto.Sound_bendTones(float initFreq, float finalFreq, float prop, long noteDur, int silentDur, int noblock = BLOCKING);
-  int Otto.Sound_sing(int songName, int noblock = BLOCKING);
+  int Otto.Sound_tone(float noteFreq, long noteDur, int silentDur, bool noblock = BLOCKING);
+  int Otto.Sound_bendTones(float initFreq, float finalFreq, float prop, long noteDur, int silentDur, bool noblock = BLOCKING);
+  int Otto.Sound_sing(int songName, bool noblock = BLOCKING);
+  int Otto.Sound_queueSize();
+  bool Otto.Sound_isEmptyQueue();
+  int Otto.Sound_clearQueue();
 
-  int Otto.Gesture(int gesture, int noblock = BLOCKING);
+  int Otto.Gesture(int gesture, bool noblock = BLOCKING);
 
   int Otto.Mouth_intensity(int intensity);
   int Otto.Mouth_setled(byte X, byte Y, byte value);
-  int Otto.Mouth_write(const char * s, byte scrollspeed, int noblock = BLOCKING);
+  int Otto.Mouth_write(const char * s, byte scrollspeed, bool noblock = BLOCKING);
   int Otto.Mouth(unsigned long int mouth, bool predefined = true);
-  int Otto.Mouth_animation(unsigned long int anim, int noblock = BLOCKING);
+  int Otto.Mouth_animation(unsigned long int anim, int index);
+  int Otto.Mouth_animate(unsigned long int anim, byte speed, bool loop = false, bool bounce = false, bool noblock = BLOCKING);
   int Otto.Mouth_clear();
+  int Otto.Mouth_queueSize();
+  bool Otto.Mouth_isEmptyQueue();
+  int Otto.Mouth_clearQueue();
 
   int Otto.Eyes_intensity(int intensity);
   int Otto.Eyes_setled(byte X, byte Y, byte value);
-  int Otto.Eyes_write(const char * s, byte scrollspeed, int noblock = BLOCKING);
+  int Otto.Eyes_write(const char * s, byte scrollspeed, bool noblock = BLOCKING);
   int Otto.Eyes(unsigned long int eyes, bool predefined = true);
-  int Otto.Eyes_animation(unsigned long int anim, int noblock = BLOCKING);
+  int Otto.Eyes_animation(unsigned long int anim, int index);
+  int Otto.Eyes_animate(unsigned long int anim, byte speed, bool loop = false, bool bounce = false, bool noblock = BLOCKING);
   int Otto.Eyes_clear();
+  int Otto.Eyes_queueSize();
+  bool Otto.Eyes_isEmptyQueue();
+  int Otto.Eyes_clearQueue();
 
-  int Otto.Servos_moveServos(int time, int servo_target[], int noblock = BLOCKING);
-  int Otto.Servos_moveSingle(int position, int servo_number, int noblock = BLOCKING);
-  int Otto.Servos_oscillateServos(int A[6], int O[6], int T, double phase_diff[6], float cycle, int noblock = BLOCKING);
+
+  int Otto.Servos_moveServos(int time, int servo_target[], bool noblock = BLOCKING);
+  int Otto.Servos_moveSingle(int position, int servo_number, bool noblock = BLOCKING);
+  int Otto.Servos_oscillateServos(int A[6], int O[6], int T, double phase_diff[6], float cycle, bool noblock = BLOCKING);
   bool Otto.Servos_getRestState();
   int Otto.Servos_setRestState(bool state);
   int Otto.Servos_attachServos();
@@ -182,9 +215,6 @@ The following functions are provided for compatibility with the "current" Otto l
   void Otto.init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer); 
   void Otto.setTrims(int TLL, int TLR, int TFL, int TFR);			
   void Otto.saveTrimsOnEEPROM();						
-  void Otto.putMouth(unsigned long int mouth, bool predefined = true);
-  void Otto.putAnimationMouth(unsigned long int anim, int index);
-  void Otto.clearMouth();
   void Otto._moveServos(int time, int  servo_target[]);
   void Otto._moveSingle(int position,int  servo_number);
   void Otto.oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle);
@@ -198,6 +228,9 @@ The following functions are provided for compatibility with the "current" Otto l
   void Otto.matrixIntensity(int intensity);
   void Otto.setLed(byte X, byte Y, byte value);
   void Otto.writeText (const char * s, byte scrollspeed);
+  void Otto.putMouth(unsigned long int mouth, bool predefined = true);
+  void Otto.putAnimationMouth(unsigned long int anim, int index);
+  void Otto.clearMouth();
   void Otto._tone(float noteFrequency, long noteDuration, int silentDuration);
   void Otto.bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration);
   void Otto.sing(int songName);
@@ -205,7 +238,7 @@ The following functions are provided for compatibility with the "current" Otto l
 
 ```
 ### New Otto Background API: 
-#### Built with FreeRTOS (coming soon)
+#### Built with FreeRTOS (full details coming soon ... in the meantime ... read the code)
 <img src="https://predictabledesigns.com/wp-content/uploads/2020/06/word-image-19.jpeg)" width="10%">
 
 ### Development Tool-Chain:

@@ -3,9 +3,12 @@
 // MaxMatrix - Copyright 2013 Oscar Kin-Chung Au
 
 #include "Arduino.h"
+#if defined(ARDUINO_ARCH_AVR)
+  #include <Arduino_FreeRTOS.h>
+#endif // ARDUINO_ARCH
 #include "Otto_matrix.h"
 
-Otto_Matrix::Otto_Matrix() {}
+Otto_Matrix::Otto_Matrix() : initialized(false) {}
 
 // Initialize MAX7219 LED Matrix
 void Otto_Matrix::init(byte _data, byte _load, byte _clock, byte _num, int _rotation) {
@@ -45,6 +48,9 @@ void Otto_Matrix::init(byte _data, byte _load, byte _clock, byte _num, int _rota
     // Clear display buffer and set intensity
     clearMatrix();
     setIntensity(0x0f);
+
+    // Set the initialized flag to true after successful initialization
+    initialized = true;
 }
 
 // Set LED Matrix Intensity
@@ -251,7 +257,8 @@ void Otto_Matrix::sendChar(const byte data, byte pos, byte number, byte scrollsp
         }
         
         // Display character for a brief duration
-        delay(500);
+        //delay(500);
+	    vTaskDelay(max (1U, (500 / portTICK_PERIOD_MS) ));
         
         // Scroll characters to the left
         for (int i = 0; i < ((number * 8) - 1); i++) {
@@ -271,7 +278,8 @@ void Otto_Matrix::sendChar(const byte data, byte pos, byte number, byte scrollsp
                 }
             }
             // Apply scroll speed delay
-            delay(scrollspeed);
+            //delay(scrollspeed);
+			vTaskDelay(max (1U, (scrollspeed / portTICK_PERIOD_MS) ));
         }
         
         // Clear LED matrix after displaying all characters

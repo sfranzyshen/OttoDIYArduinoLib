@@ -1,18 +1,31 @@
 // OttoDIY Arduino Library project 2024
 
-// Zowi (c) BQ. Released under a GPL licencse 04 December 2015
+// Zowi (c) BQ. Released under a GPL licencse 2015
 
-#include <Arduino.h>
 #include "Otto.h"
-#include "Oscillator.h"
 
 //---------------------------------------------------------
 //-- Otto Init: Initialize
 //---------------------------------------------------------
 // Description:
-//    This function initializes Otto by setting up servo pins,
-//    attaching servos, loading calibration data if specified,
-//    and configuring the buzzer pin.
+//    This function initializes Otto by setting up freertos task & queues, servo pins,
+//    attaching servos, loading calibration data if specified, and configuring the buzzer pin.
+// Parameters:
+//    name: Name for the Otto
+// Returns:
+//    Integer value representing Otto's init status. 0 = successful -# = error
+//---------------------------------------------------------
+int Otto::init(const char * name) {
+  // fixme
+  return -1;
+}
+
+//---------------------------------------------------------
+//-- Otto Init: Initialize compatibility wrapper
+//---------------------------------------------------------
+// Description:
+//    This function initializes Otto by setting up freertos task & queues, servo pins,
+//    attaching servos, loading calibration data if specified, and configuring the buzzer pin.
 // Parameters:
 //    YL: Pin for left hip servo
 //    YR: Pin for right hip servo
@@ -22,6 +35,13 @@
 //    Buzzer: Pin for the buzzer
 //---------------------------------------------------------
 void Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer) {
+#if Otto_sound == SOUND_BUZZER
+	Sound_init(Buzzer);
+#endif // SOUND_BUZZER	
+    Servos_init(YL, YR, RL, RR, load_calibration);
+}
+
+int Otto::Servos_init(int YL, int YR, int RL, int RR, bool load_calibration) {
     // Set servo pins
     servo_pins[0] = YL;
     servo_pins[1] = YR;
@@ -42,39 +62,33 @@ void Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzze
             servo[i].SetTrim(servo_trim);
         }
     }
-
-    // Set buzzer pin
-    pinBuzzer = Buzzer;
-    pinMode(Buzzer, OUTPUT);
+	return 0; // success
 }
 
 //---------------------------------------------------------
-//-- Otto Display: Initialize Matrix
+//-- Otto Servo: Enable Servo Limit
 //---------------------------------------------------------
-// Description:
-//    This function initializes the LED matrix display.
 // Parameters:
-//    DIN: Data input pin for the LED matrix
-//    CS: Chip select pin for the LED matrix
-//    CLK: Clock pin for the LED matrix
-//    rotate: Rotation value for the LED matrix (0, 1, 2, or 3)
+//    * diff_limit: The difference limit for servo movement
 //---------------------------------------------------------
-void Otto::initMATRIX(int DIN, int CS, int CLK, int rotate) {
-    // Initialize LED matrix display
-    ledmatrix.init(DIN, CS, CLK, 1, rotate);
+void Otto::enableServoLimit(int diff_limit) {
+    for (int i = 0; i < 4; i++) {
+        // Set the difference limit for each servo
+        servo[i].SetLimiter(diff_limit);
+    }
 }
 
 //---------------------------------------------------------
-//-- Otto Display: Set Matrix Intensity
+//-- Otto Servo: Disable Servo Limit
 //---------------------------------------------------------
 // Description:
-//    This function sets the intensity of the LED matrix display.
-// Parameters:
-//    intensity: Intensity level (0 to 15) for the LED matrix
+//    This function disables the servo limits previously set.
 //---------------------------------------------------------
-void Otto::matrixIntensity(int intensity) {
-    // Set intensity of LED matrix display
-    ledmatrix.setIntensity(intensity);
+void Otto::disableServoLimit() {
+    for (int i = 0; i < 4; i++) {
+        // Disable the servo limit for each servo
+        servo[i].DisableLimiter();
+    }
 }
 
 //---------------------------------------------------------
@@ -246,7 +260,7 @@ void Otto::_moveSingle(int position, int servo_number) {
 //    phase_diff: Array of phase differences for each servo
 //    cycle: Number of complete cycles to execute (default is 1)
 //---------------------------------------------------------
-void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle = 1.0) {
+void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle) {
     // Set servo parameters
     for (int i = 0; i < 4; i++) {
         servo[i].SetO(O[i]);
@@ -279,7 +293,7 @@ void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], floa
 //    phase_diff: Array of phase differences for each servo.
 //    steps: Number of complete cycles to execute (default value is 1.0).
 //---------------------------------------------------------
-void Otto::_execute(int A[4], int O[4], int T, double phase_diff[4], float steps = 1.0) {
+void Otto::_execute(int A[4], int O[4], int T, double phase_diff[4], float steps) {
     // Attach servos before executing motion
     attachServos();
     
@@ -672,8 +686,190 @@ void Otto::flapping(float steps, int T, int h, int dir) {
   _execute(A, O, T, phase_diff, steps);
 }
 
+#if Otto_mouth == MOUTH_8X8_MONO_SPI
+
 //---------------------------------------------------------
-//-- Otto Display: Set LED
+//-- Otto Mouth: return the number of entries in the mouth queue
+//---------------------------------------------------------
+// Returns:
+//    Integer value representing the number of entries in the mouth queue.
+//-------------------------------------------------------
+int Otto::Mouth_queueSize() {
+  if(mouthQueueHandle != NULL) {
+    return uxQueueMessagesWaiting(mouthQueueHandle);
+  } else {
+      Serial.println(F("Error: Mouth command queue doesn't exist."));
+      return -2; // Queue doesn't exist
+  }
+}
+
+//---------------------------------------------------------
+//-- Otto Mouth: check if the mouth queue is empty
+//---------------------------------------------------------
+// Returns:
+//    Boolen value representing if the mouth queue is empty.
+//-------------------------------------------------------
+bool Otto::Mouth_isEmptyQueue() {
+  if(Mouth_queueSize() == 0) {
+    return true; // true if queue empty
+  } else {
+    return false; // false if busy or error (Queue doesn't exist)
+  }
+}
+
+//---------------------------------------------------------
+//-- Otto : clear all mouths currently in the mouth queue.
+//---------------------------------------------------------
+// Returns:Mouth
+//    Integer value representing the number of entries in the mouth queue.
+//-------------------------------------------------------
+// Function to clear all mouths currently in the queue
+int Otto::Mouth_clearQueue() {
+  if(mouthQueueHandle != NULL) {
+    if(xQueueReset(mouthQueueHandle) == pdPASS) {
+      return 0; // Successfully cleared the queue
+    } else {
+      Serial.println(F("Error: Failed to clear the mouth command queue!"));
+      return -1; // Failed to clear the queue
+    }
+  }
+  Serial.println(F("Error: Mouth queue doesn't exist."));
+  return -2; // Queue doesn't exist
+}
+
+//---------------------------------------------------------
+//-- Otto Mouth: Initialize Matrix compatibility wrapper
+//---------------------------------------------------------
+// Description:
+//    This function initializes the LED matrix display.
+// Parameters:
+//    DIN: Data input pin for the LED matrix
+//    CS: Chip select pin for the LED matrix
+//    CLK: Clock pin for the LED matrix
+//    rotate: Rotation value for the LED matrix (0, 1, 2, or 3)
+//---------------------------------------------------------
+void Otto::initMATRIX(int DIN, int CS, int CLK, int rotate) {
+	Mouth_init(DIN, CS, CLK, rotate);
+}
+
+//---------------------------------------------------------
+//-- Otto Mouth: Initialize Matrix
+//---------------------------------------------------------
+// Description:
+//    This function initializes the LED matrix display.
+// Parameters:
+//    DIN: Data input pin for the LED matrix
+//    CS: Chip select pin for the LED matrix
+//    CLK: Clock pin for the LED matrix
+//    rotate: Rotation value for the LED matrix (0, 1, 2, or 3)
+// Returns:
+//    Integer value representing status 0 = success -# = error.
+//---------------------------------------------------------
+int Otto::Mouth_init(int DIN, int CS, int CLK, int rotate) {
+	
+	// check to see if matrix already initialized 
+	if(ledmatrix.initialized) {
+        Serial.println(F("Error: matrix already initialized"));
+        return -3; // matrix already initialized
+	}
+
+    // Initialize LED matrix display
+	// fixme: relocate to mouth task startup ... needs global matrix setings ...
+    ledmatrix.init(DIN, CS, CLK, 1, rotate);
+ 
+    // Check if the initialize matrix was successful
+    if(!ledmatrix.initialized) {
+      Serial.println(F("Error: Failed to initialize matrix!"));
+      return -4; // Failed to initialize LED matrix
+    }
+	
+    // Create the mouth queue
+    mouthQueueHandle = xQueueCreate(10, sizeof(struct MouthQueueMsg));
+
+    // Check if the queue creation was successful
+    if (mouthQueueHandle == NULL) {
+      Serial.println(F("Error: Failed to create mouth queue!"));
+      return -2; // Failed to create queue
+    }
+	
+    // Create the mouth task
+    xTaskCreate(mouthTaskWrapper, "Mouth Task", 128, this, 1, &mouthTaskHandle);
+
+    // Check if the task creation was successful
+    if (mouthTaskHandle == NULL) {
+        Serial.println(F("Error: Failed to create mouth task!"));
+        return -1; // Failed to create task
+    }
+
+	return 0; // Success 
+}
+
+//---------------------------------------------------------
+//-- Otto Mouth: Set Matrix Intensity compatibility wrapper
+//---------------------------------------------------------
+// Description:
+//    This function sets the intensity of the LED matrix display.
+// Parameters:
+//    intensity: Intensity level (0 to 15) for the LED matrix
+//---------------------------------------------------------
+void Otto::matrixIntensity(int intensity) {
+	Mouth_intensity(intensity);
+}
+
+//---------------------------------------------------------
+//-- Otto Mouth: Set Matrix Intensity
+//---------------------------------------------------------
+// Description:
+//    This function sets the intensity of the LED matrix display.
+// Parameters:
+//    intensity: Intensity level (0 to 15) for the LED matrix
+//    minimalDuration: the minimal duration to display in ms (defaults to 30 frames per second)
+// Returns:
+//    Integer value of entries in the mouth queue
+//---------------------------------------------------------
+int Otto::Mouth_intensity(int intensity, int minimalDuration) {
+  int count = 0;
+  MouthQueueMsg msg;
+
+  // Check input level for valid range
+  if((intensity < 0) || (intensity > 15)) {
+      Serial.println(F("Error: Intensity out of range (0 to 15)."));
+        return -4; // Intensity out of range			
+  }
+  
+  // Check if the mouth queue exist
+  if(mouthQueueHandle == NULL) {
+      Serial.println(F("Error: Mouth queue doesn't exist."));
+      return -2; // Queue doesn't exist
+  }
+
+  // Check the available space in the mouth queue
+  if(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+	while(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+		delay(1); // delay 1ms
+		count++;
+		if(count > 100) { // max delay 100ms
+			Serial.println(F("Error: No space available in the mouth queue."));
+			return -3; // No space available in the mouth queue			
+		}
+	}
+  }
+
+  // Create a MouthQueueMsg structure for intensity command
+  msg.command = MOUTH_INTENSITY;
+  msg.cmd.intensity.intensity = intensity;
+  msg.cmd.intensity.duration = minimalDuration;
+
+  // Queue up the mouth parameters
+  if(xQueueSendToBack(mouthQueueHandle, &msg, portMAX_DELAY) != pdTRUE) {
+    Serial.println(F("Error: Failed to send to mouth queue."));
+    return -1; // Failed to send to mouth queue
+  }
+  return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
+}
+
+//---------------------------------------------------------
+//-- Otto Mouth: Set LED compatibility wrapper
 //---------------------------------------------------------
 // Description:
 //    This function sets the state of a specific LED on the LED matrix.
@@ -683,12 +879,61 @@ void Otto::flapping(float steps, int T, int h, int dir) {
 //    value: The value to set for the LED (0 for OFF, 1 for ON).
 //---------------------------------------------------------
 void Otto::setLed(byte X, byte Y, byte value) {
-    // Set the state of the LED at the specified coordinates
-    ledmatrix.setDot(X, Y, value);
+	Mouth_setled(X, Y, value);
 }
 
 //---------------------------------------------------------
-//-- Otto Display: Put Animation Mouth
+//-- Otto Mouth: Set LED
+//---------------------------------------------------------
+// Description:
+//    This function sets the state of a specific LED on the LED matrix.
+// Parameters:
+//    X: The x-coordinate of the LED.
+//    Y: The y-coordinate of the LED.
+//    value: The value to set for the LED (0 for OFF, 1 for ON).
+//    minimalDuration: the minimal duration to display in ms (defaults to 30 frames per second)
+// Returns:
+//    Integer value of entries in the mouth queue
+//---------------------------------------------------------
+int Otto::Mouth_setled(byte X, byte Y, byte value, int minimalDuration) {
+  int count = 0;
+  MouthQueueMsg msg;
+
+  // Check if the mouth queue exist
+  if(mouthQueueHandle == NULL) {
+      Serial.println(F("Error: Mouth queue doesn't exist."));
+      return -2; // Queue doesn't exist
+  }
+
+  // Check the available space in the mouth queue
+  if(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+	while(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+		delay(1); // delay 1ms
+		count++;
+		if(count > 100) { // max delay 100ms
+			Serial.println(F("Error: No space available in the mouth queue."));
+			return -3; // No space available in the mouth queue			
+		}
+	}
+  }
+
+  // Create a MouthQueueMsg structure for setled command
+  msg.command = MOUTH_SETLED;
+  msg.cmd.setled.X = X;
+  msg.cmd.setled.Y = Y;
+  msg.cmd.setled.value = value;
+  msg.cmd.setled.duration = minimalDuration;
+  
+  // Queue up the mouth parameters
+  if(xQueueSendToBack(mouthQueueHandle, &msg, portMAX_DELAY) != pdTRUE) {
+    Serial.println(F("Error: Failed to send to mouth queue."));
+    return -1; // Failed to send to mouth queue
+  }
+  return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
+}
+
+//---------------------------------------------------------
+//-- Otto Mouth: Put Animation Mouth frame compatibility wrapper
 //---------------------------------------------------------
 // Description:
 //    This function displays a specific frame of a mouth animation on the LED matrix.
@@ -697,84 +942,560 @@ void Otto::setLed(byte X, byte Y, byte value) {
 //    index: The index of the frame within the animation sequence.
 //---------------------------------------------------------
 void Otto::putAnimationMouth(unsigned long int aniMouth, int index) {
-    // Retrieve the frame data from PROGMEM and display it on the LED matrix
-    ledmatrix.writeFull(PROGMEM_getAnything(&Gesturetable[aniMouth][index]));
+	Mouth_animation(aniMouth, index);
 }
 
 //---------------------------------------------------------
-//-- Otto Display: Put Mouth
+//-- Otto Mouth: Put Animation Mouth frame
+//---------------------------------------------------------
+// Description:
+//    This function displays a specific frame of a mouth animation on the LED matrix.
+// Parameters:
+//    aniMouth: The index of the animation sequence.
+//    index: The index of the frame within the animation sequence.
+//    minimalDuration: the minimal duration to display in ms (defaults to 30 frames per second)
+// Returns:
+//    Integer value of entries in the mouth queue
+//---------------------------------------------------------
+int Otto::Mouth_animation(unsigned long int aniMouth, int index, int minimalDuration) {
+  int count = 0;
+  MouthQueueMsg msg;
+  
+  // Check if the mouth queue exist
+  if(mouthQueueHandle == NULL) {
+      Serial.println(F("Error: Mouth queue doesn't exist."));
+      return -2; // Queue doesn't exist
+  }
+
+  // Check the available space in the mouth queue
+  if(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+	while(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+		delay(1); // delay 1ms
+		count++;
+		if(count > 100) { // max delay 100ms
+			Serial.println(F("Error: No space available in the mouth queue."));
+			return -3; // No space available in the mouth queue			
+		}
+	}
+  }
+
+  // Create a MouthParameters structure - Retrieve the anim frame data from PROGMEM
+  msg.command = MOUTH_MOUTH;
+  msg.cmd.mouth.clear = false;
+  msg.cmd.mouth.mouth = {PROGMEM_getAnything(&Gesturetable[aniMouth][index])};
+  msg.cmd.mouth.duration = minimalDuration;
+
+  // Queue up the mouth parameters
+  if(xQueueSendToBack(mouthQueueHandle, &msg, portMAX_DELAY) != pdTRUE) {
+    Serial.println(F("Error: Failed to send to mouth queue."));
+    return -1; // Failed to send to mouth queue
+  }
+  return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
+}
+
+//---------------------------------------------------------
+//-- Otto Mouth: Put Mouth compatibility wrapper
 //---------------------------------------------------------
 // Parameters:
 //    * mouth: The mouth pattern data
 //    * predefined: Indicates whether the mouth pattern is predefined or custom
 //---------------------------------------------------------
 void Otto::putMouth(unsigned long int mouth, bool predefined) {
-    if (predefined) {
-        // If the mouth pattern is predefined, retrieve it from PROGMEM
-        ledmatrix.writeFull(PROGMEM_getAnything(&Mouthtable[mouth]));
-    } else {
-        // If the mouth pattern is custom, directly write it
-        ledmatrix.writeFull(mouth);
-    }
+	Mouth(mouth, predefined);
 }
 
 //---------------------------------------------------------
-//-- Otto Display: Clear Mouth
+//-- Otto Mouth: Put Mouth
+//---------------------------------------------------------
+// Parameters:
+//    * mouth: The mouth pattern data
+//    * predefined: Indicates whether the mouth pattern is predefined or custom
+//    * minimalDuration: the minimal duration to display in ms (defaults to 30 frames per second)
+// Returns:
+//    Integer value of entries in the mouth queue
+//---------------------------------------------------------
+int Otto::Mouth(unsigned long int mouth, bool predefined, int minimalDuration) {
+  int count = 0;
+  MouthQueueMsg msg;
+  
+  // Check if the mouth queue exist
+  if(mouthQueueHandle == NULL) {
+      Serial.println(F("Error: Mouth queue doesn't exist."));
+      return -2; // Queue doesn't exist
+  }
+
+  // Check the available space in the mouth queue
+  if(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+	while(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+		delay(1); // delay 1ms
+		count++;
+		if(count > 100) { // max delay 100ms
+			Serial.println(F("Error: No space available in the mouth queue."));
+			return -3; // No space available in the mouth queue			
+		}
+	}
+  }
+
+  // Create a MouthParameters structure
+  msg.command = MOUTH_MOUTH;
+  msg.cmd.mouth.clear = false;
+  
+  if (predefined) {
+      // If the mouth pattern is predefined, retrieve it from PROGMEM
+	  msg.cmd.mouth.mouth = {PROGMEM_getAnything(&Mouthtable[mouth])};
+  } else {
+      // If the mouth pattern is custom, directly write it
+      msg.cmd.mouth.mouth = {mouth};
+  }
+
+  msg.cmd.mouth.duration = minimalDuration;
+	
+  // Queue up the mouth parameters
+  if(xQueueSendToBack(mouthQueueHandle, &msg, portMAX_DELAY) != pdTRUE) {
+    Serial.println(F("Error: Failed to send to mouth queue."));
+    return -1; // Failed to send to mouth queue
+  }
+  return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
+}
+
+//---------------------------------------------------------
+//-- Otto Mouth: Clear Mouth compatibility wrapper
 //---------------------------------------------------------
 void Otto::clearMouth() {
-    ledmatrix.clearMatrix();
+    Mouth_clear();
 }
 
 //---------------------------------------------------------
-//-- Otto Display: Write Text
+//-- Otto Mouth: Clear Mouth
+// Parameters:
+//    * minimalDuration: the minimal duration to display in ms (defaults to 30 frames per second)
+// Returns:
+//    Integer value of entries in the mouth queue
+//---------------------------------------------------------
+int Otto::Mouth_clear(int minimalDuration) {
+  int count = 0;
+  MouthQueueMsg msg;
+
+  // Check if the mouth queue exist
+  if(mouthQueueHandle == NULL) {
+      Serial.println(F("Error: Mouth queue doesn't exist."));
+      return -2; // Queue doesn't exist
+  }
+
+  // Check the available space in the mouth queue
+  if(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+	while(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+		delay(1); // delay 1ms
+		count++;
+		if(count > 100) { // max delay 100ms
+			Serial.println(F("Error: No space available in the mouth queue."));
+			return -3; // No space available in the mouth queue			
+		}
+	}
+  }
+  
+  // Create a MouthParameters structure
+  msg.command = MOUTH_MOUTH;
+  msg.cmd.mouth.mouth = 123;
+  msg.cmd.mouth.clear = true;
+  msg.cmd.mouth.duration = minimalDuration;
+
+  // Queue up the mouth parameters
+  if(xQueueSendToBack(mouthQueueHandle, &msg, portMAX_DELAY) != pdTRUE) {
+    Serial.println(F("Error: Failed to send to mouth queue."));
+    return -1; // Failed to send to mouth queue
+  }
+  return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
+}
+
+//---------------------------------------------------------
+//-- Otto Mouth: Write Text compatibility wrapper
 //---------------------------------------------------------
 // Parameters:
 //    * s: The text to display
 //    * scrollspeed: The scrolling speed
 //---------------------------------------------------------
 void Otto::writeText(const char *s, byte scrollspeed) {
-    int a, b;
-
-    // Determine the length of the text (up to 9 characters)
-    for (a = 0; s[a] != '\0'; a++) {
-        b = a + 1;
-        if (b > 9) b = 9; // Limit the maximum length to 9 characters
-    }
-
-    // Display each character
-    for (int charNUMBER = 0; charNUMBER < b; charNUMBER++) {
-        if ((*s < 48) || (*s > 91)) { // Check if the character is not within the alphanumeric range
-            if (*s == 32) { // If it's a space character
-                ledmatrix.sendChar(44, charNUMBER, b, scrollspeed);
-            } else { // If it's a non-alphanumeric character
-                ledmatrix.sendChar(43, charNUMBER, b, scrollspeed);
-            }
-        } else { // If it's an alphanumeric character
-            ledmatrix.sendChar((*s - 48), charNUMBER, b, scrollspeed);
-        }
-        s++; // Move to the next character
-    }
+    Mouth_write(s, scrollspeed);
 }
 
 //---------------------------------------------------------
-//-- Otto Sound: Play Tone
+//-- Otto Mouth: Write Text
+//---------------------------------------------------------
+// Parameters:
+//    * s: The text to display
+//    * scrollspeed: The scrolling speed
+// Return:
+//    * the number of entries in the mouth queue
+//---------------------------------------------------------
+int Otto::Mouth_write(const char *s, byte scrollspeed, bool noblock) {
+  int count = 0;
+  MouthQueueMsg msg;
+  msg.command = MOUTH_WRITE;
+  msg.cmd.write.string = s;
+  msg.cmd.write.speed = scrollspeed;
+
+  // Check if the mouth queue exist
+  if(mouthQueueHandle == NULL) {
+      Serial.println(F("Error: Mouth queue doesn't exist."));
+      return -2; // Queue doesn't exist
+  }
+
+  // Check the available space in the mouth queue
+  if(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+	while(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+		delay(1); // delay 1ms
+		count++;
+		if(count > 100) { // max delay 100ms
+			Serial.println(F("Error: No space available in the mouth queue."));
+			return -3; // No space available in the mouth queue			
+		}
+	}
+  }
+
+  // Queue up the mouth parameters
+  if(xQueueSendToBack(mouthQueueHandle, &msg, portMAX_DELAY) != pdTRUE) {
+    Serial.println(F("Error: Failed to send to mouth queue."));
+    return -1; // Failed to send to mouth queue
+  }
+  // fixme: handle noblock param to at least wait until queue is empty ...
+  return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
+}
+
+//---------------------------------------------------------
+//-- Otto Mouth: Animate Mouth
+//---------------------------------------------------------
+// Parameters:
+//    * anim: The index of the animation sequence
+//    * speed: The playback speed
+//    * bounce: does the animation alternate direction when looping
+//    * loop: does the animation loop when the queue is idle if not stays on last frame
+// Return:
+//    * the number of entries in the mouth queue
+//---------------------------------------------------------
+int Otto::Mouth_animate(unsigned long int anim, int speed, bool bounce, bool loop) {
+  int count = 0;
+  MouthQueueMsg msg;
+
+  // Check if the mouth queue exist
+  if(mouthQueueHandle == NULL) {
+      Serial.println(F("Error: Mouth queue doesn't exist."));
+      return -2; // Queue doesn't exist
+  }
+
+  // Check the available space in the mouth queue
+  if(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+	while(uxQueueSpacesAvailable(mouthQueueHandle) == 0) {
+		delay(1); // delay 1ms
+		count++;
+		if(count > 100) { // max delay 100ms
+			Serial.println(F("Error: No space available in the mouth queue."));
+			return -3; // No space available in the mouth queue			
+		}
+	}
+  }
+
+  msg.command = MOUTH_ANIMATE;
+  msg.cmd.animate.anim = anim;
+  msg.cmd.animate.speed = speed;
+  msg.cmd.animate.bounce = bounce;
+  msg.cmd.animate.loop = loop;
+  
+  // Queue up the mouth parameters
+  if(xQueueSendToBack(mouthQueueHandle, &msg, portMAX_DELAY) != pdTRUE) {
+    Serial.println(F("Error: Failed to send to mouth queue."));
+    return -1; // Failed to send to mouth queue
+  }
+  return uxQueueMessagesWaiting(mouthQueueHandle); // Return the number of entries in the mouth queue
+  
+}
+
+// Define c++ wrapper function for c mouthTask
+void Otto::mouthTaskWrapper(void *pvParameters) {
+  Otto* ottoInstance = static_cast<Otto*>(pvParameters);
+  ottoInstance->mouthTask(pvParameters);
+}
+
+// Task to play the mouth functions
+void Otto::mouthTask(void *pvParameters) {
+  // contructor for the mouth message queue
+  MouthQueueMsg Queuemsg;
+  
+  // Initialize LED matrix display
+  //fixme: needs gloabl defines for mouth i2c/spi
+  //ledmatrix.init(DIN, CS, CLK, 1, rotate);
+  
+  while(true) {
+    if(xQueueReceive(mouthQueueHandle, &Queuemsg, portMAX_DELAY) == pdTRUE) {
+        if(Queuemsg.command == MOUTH_MOUTH) { // Process StructType mouth
+			if(Queuemsg.cmd.mouth.clear) {
+			    ledmatrix.clearMatrix();
+			    vTaskDelay(max (1U, (Queuemsg.cmd.mouth.duration / portTICK_PERIOD_MS) ));
+			} else {
+				ledmatrix.writeFull(Queuemsg.cmd.mouth.mouth);
+			    vTaskDelay(max (1U, (Queuemsg.cmd.mouth.duration / portTICK_PERIOD_MS) ));
+			}
+        } else if(Queuemsg.command == MOUTH_INTENSITY) { // Process StructType intensity
+            ledmatrix.setIntensity(Queuemsg.cmd.intensity.intensity); // Set intensity of LED matrix display
+			vTaskDelay(max (1U, (Queuemsg.cmd.intensity.duration / portTICK_PERIOD_MS) ));
+        } else if(Queuemsg.command == MOUTH_SETLED) { // Process StructType setled
+	        ledmatrix.setDot(Queuemsg.cmd.setled.X, Queuemsg.cmd.setled.Y, Queuemsg.cmd.setled.value); // Set value of LED matrix at X/Y
+			vTaskDelay(max (1U, (Queuemsg.cmd.setled.duration / portTICK_PERIOD_MS) ));
+        } else if(Queuemsg.command == MOUTH_WRITE) { // Process StructType write
+            int a, b;
+            char *originalString = Queuemsg.cmd.write.string;
+            bool continueLoop = true;
+
+            // Determine the length of the text (up to 12 characters)
+            for(a = 0; Queuemsg.cmd.write.string[a] != '\0'; a++) {
+                b = a + 1;
+                if(b > 12) b = 12; // Limit the maximum length to 12 characters
+            }
+
+            // loop scolling letters
+            while(continueLoop) {
+                // Display each character
+                for(int charNUMBER = 0; charNUMBER < b; charNUMBER++) {
+                    if((*Queuemsg.cmd.write.string < 48) || (*Queuemsg.cmd.write.string > 91)) { // Check if the character is not within the alphanumeric range
+                        if(*Queuemsg.cmd.write.string == 32) { // If it's a space character
+                            ledmatrix.sendChar(44, charNUMBER, b, Queuemsg.cmd.write.speed);
+                        } else { // If it's a non-alphanumeric character
+                            ledmatrix.sendChar(43, charNUMBER, b, Queuemsg.cmd.write.speed);
+                        }
+                    } else { // If it's an alphanumeric character
+                        ledmatrix.sendChar((*Queuemsg.cmd.write.string - 48), charNUMBER, b, Queuemsg.cmd.write.speed);
+                    }
+                    Queuemsg.cmd.write.string++; // Move to the next character
+                }
+				// Reset the string back to the beginning
+                Queuemsg.cmd.write.string = originalString;
+				
+				// Check if something else is in the queue to break out of the loop
+                if(uxQueueMessagesWaiting(mouthQueueHandle) > 0) {
+                    continueLoop = false;
+                }
+			}
+        } else if (Queuemsg.command == MOUTH_ANIMATE) { // Process StructType animate
+            bool continueLoop = true;
+
+            // loop animation
+            while(continueLoop) {			
+                for(int index = 0; index < 10; index++) { // zero to nine frames 10 total
+		    		ledmatrix.writeFull(PROGMEM_getAnything(&Gesturetable[Queuemsg.cmd.animate.anim][index]));
+		    	    vTaskDelay(max (1U, (Queuemsg.cmd.animate.speed / portTICK_PERIOD_MS) ));
+		    	}
+		    	if(Queuemsg.cmd.animate.bounce) {
+                    for(int index = 10; index < 0; index--) { // zero to nine frames 10 total
+	    	    		ledmatrix.writeFull(PROGMEM_getAnything(&Gesturetable[Queuemsg.cmd.animate.anim][index]));
+		        	    vTaskDelay(max (1U, (Queuemsg.cmd.animate.speed / portTICK_PERIOD_MS) ));
+			        }
+			    }
+				// Check if something else is in the queue to break out of the loop
+                if(uxQueueMessagesWaiting(mouthQueueHandle) > 0) {
+                    continueLoop = false;
+                }
+                // if loop is false break out of the loop
+                if(Queuemsg.cmd.animate.loop == false) {
+                    continueLoop = false;
+                }				
+			}
+        }
+    }
+  } // endless loop
+}
+
+#else // dummy compatibility wrappers for MOUTH_8X8_MONO_SPI
+void Otto::initMATRIX(int DIN, int CS, int CLK, int rotate) {
+	return;
+}
+
+void Otto::matrixIntensity(int intensity) {
+	return;
+}
+
+void Otto::setLed(byte X, byte Y, byte value) {
+	return;
+}
+
+void Otto::writeText(const char* s, byte scrollspeed) {
+	// fixme: delay (block) length of scroll animation ...
+	return;
+}
+
+void Otto::putMouth(unsigned long int mouth, bool predefined = true){
+	return;
+}
+
+void Otto::putAnimationMouth(unsigned long int anim, int index) {
+	return;
+}
+
+void Otto::clearMouth(){
+	return;
+}
+
+#endif // MOUTH_8X8_MONO_SPI
+
+#if Otto_sound == SOUND_BUZZER
+
+int Otto::Sound_init(int Buzzer) {
+
+    // Create the tone queue
+    toneQueueHandle = xQueueCreate(10, sizeof(ToneParameters));
+
+    // Check if the queue creation was successful
+    if (toneQueueHandle == NULL) {
+      Serial.println(F("Error: Failed to create tone queue!"));
+      return -2; // Failed to create queue
+    }
+    // Create the tone task
+    xTaskCreate(toneTaskWrapper, "Tone Task", 128, this, 1, &toneTaskHandle);
+
+    // Check if the task creation was successful
+    if (toneTaskHandle == NULL) {
+        Serial.println(F("Error: Failed to create tone task!"));
+        return -1; // Failed to create queue
+    }
+	
+    // Set buzzer pin
+    pinBuzzer = Buzzer;
+    pinMode(Buzzer, OUTPUT);
+	return 0; // success
+}
+
+//---------------------------------------------------------
+//-- Otto Sound: return the number of entries in the tone queue
+//---------------------------------------------------------
+// Returns:
+//    Integer value representing the number of entries in the tone queue.
+//-------------------------------------------------------
+int Otto::Sound_queueSize() {
+  if (toneQueueHandle != NULL) {
+    return uxQueueMessagesWaiting(toneQueueHandle);
+  } else {
+      Serial.println(F("Error: Tone queue doesn't exist."));
+      return -2; // Queue doesn't exist
+  }
+}
+
+//---------------------------------------------------------
+//-- Otto Sound: check if the tone queue is empty
+//---------------------------------------------------------
+// Returns:
+//    Boolen value representing if the tone queue is empty.
+//-------------------------------------------------------
+bool Otto::Sound_isEmptyQueue() {
+  if(Sound_queueSize() == 0) {
+    return true; // true if queue empty
+  } else {
+    return false; // false if busy or error (Queue doesn't exist)
+  }
+}
+
+//---------------------------------------------------------
+//-- Otto Sound: clear all tones currently in the tone queue.
+//---------------------------------------------------------
+// Returns:
+//    Integer value representing the number of entries in the tone queue.
+//-------------------------------------------------------
+// Function to clear all tones currently in the queue
+int Otto::Sound_clearQueue() {
+  if (toneQueueHandle != NULL) {
+    if (xQueueReset(toneQueueHandle) == pdPASS) {
+      return 0; // Successfully cleared the queue
+    } else {
+      Serial.println(F("Error: Failed to clear the tone queue!"));
+      return -1; // Failed to clear the queue
+    }
+  }
+  Serial.println(F("Error: Tone queue doesn't exist."));
+  return -2; // Queue doesn't exist
+}
+
+//---------------------------------------------------------
+//-- Otto Sound: Play Tone compatibility wrapper
 //---------------------------------------------------------
 // Parameters:
 //   * noteFrequency: Frequency of the tone to play
 //   * noteDuration: Duration of the tone
 //   * silentDuration: Duration of silence after the tone
-//---------------------------------------------------------
-void Otto::_tone(float noteFrequency, long noteDuration, int silentDuration) {
-    // Ensure silent duration is at least 1 millisecond
-    if (silentDuration == 0) {
-        silentDuration = 1;
-    }
+//-------------------------------------------------------
+void Otto::_tone(float frequency, long noteDuration, int silentDuration) {
+  Sound_tone(frequency, noteDuration, silentDuration, Otto_code);
+}
 
-    // Play the tone for the specified duration
-    tone(Otto::pinBuzzer, noteFrequency, noteDuration);
-    delay(noteDuration);
-    // Add a delay for the specified silent duration
-    delay(silentDuration);
+//---------------------------------------------------------
+//-- Otto Sound: Play Tone and returns the number of entries in the tone queue 
+//---------------------------------------------------------
+// Parameters:
+//   * noteFrequency: Frequency of the tone to play
+//   * noteDuration: Duration of the tone
+//   * silentDuration: Duration of silence after the tone
+//   * noblock: code flow style blocking or non-blocking
+// Returns:
+//    Integer value representing the number of entries in the tone queue or error #.
+//-------------------------------------------------------
+int Otto::Sound_tone(float frequency, long noteDuration, int silentDuration, bool noblock) {
+  int count = 0;
+
+  // Check if the tone queue exist
+  if(toneQueueHandle == NULL) {
+      Serial.println(F("Error: Tone queue doesn't exist."));
+      return -2; // Queue doesn't exist
+  }
+
+  // Check the available space in the tone queue
+  if(uxQueueSpacesAvailable(toneQueueHandle) == 0) {
+	//Serial.println(F("Stall: waiting for available space in the tone queue."));
+	while(uxQueueSpacesAvailable(toneQueueHandle) == 0) {
+		delay(1); // delay 1ms
+		count++;
+		//Serial.print(F("."));
+		if(count > 200) { // max delay 200ms
+			//Serial.println();
+			Serial.println(F("Error: No space available in the tone queue."));
+			return -3; // No space available in the tone queue			
+		}
+	}
+	//Serial.println();
+  }
+
+  // Create a ToneParameters structure
+  ToneParameters toneParams = {frequency, noteDuration, silentDuration};
+
+  // Queue up the tone parameters
+  if(xQueueSendToBack(toneQueueHandle, &toneParams, portMAX_DELAY) != pdTRUE) {
+    Serial.println(F("Error: Failed to send to tone queue."));
+    return -1; // Failed to send to tone queue
+  }
+
+  if(noblock) { // non-blocking code flow
+    //int count = uxQueueMessagesWaiting(toneQueueHandle);
+    //Serial.print("Tone queue size: ");
+    //Serial.println(count);
+    //return count; // Return the number of entries in the tone queue
+    return uxQueueMessagesWaiting(toneQueueHandle); // Return the number of entries in the tone queue
+  } else {  // blocking code flow
+    while(uxQueueMessagesWaiting(toneQueueHandle) != 0) { 
+      // wait for queue to empty
+    }
+    delay(noteDuration + silentDuration); // delay (block) for note duration + silence
+    return 0;
+  }
+}
+
+//---------------------------------------------------------
+//-- Otto Sound: Bend Tones compatibility wrapper
+//---------------------------------------------------------
+// Parameters:
+//   * initFrequency: Initial frequency
+//   * finalFrequency: Final frequency
+//   * prop: Proportion of change in frequency
+//   * noteDuration: Duration of each note
+//   * silentDuration: Duration of silence between notes
+//---------------------------------------------------------
+void Otto::bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration) {
+	Sound_bendTones(initFrequency, finalFrequency, prop, noteDuration, silentDuration, Otto_code);
 }
 
 //---------------------------------------------------------
@@ -787,7 +1508,10 @@ void Otto::_tone(float noteFrequency, long noteDuration, int silentDuration) {
 //   * noteDuration: Duration of each note
 //   * silentDuration: Duration of silence between notes
 //---------------------------------------------------------
-void Otto::bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration) {
+int Otto::Sound_bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration, bool noblock) {
+	int result;
+	//int total = 0;
+	
     // Ensure silent duration is at least 1 millisecond
     if (silentDuration == 0) {
         silentDuration = 1;
@@ -797,14 +1521,52 @@ void Otto::bendTones(float initFrequency, float finalFrequency, float prop, long
     if (initFrequency < finalFrequency) {
         // Ascending frequency
         for (int i = initFrequency; i < finalFrequency; i *= prop) {
-            _tone(i, noteDuration, silentDuration);
+			//total = total + (noteDuration + silentDuration);
+            result = Sound_tone(i, noteDuration, silentDuration, noblock);
+	        if(result < 0) return result;
         }
     } else {
         // Descending frequency
         for (int i = initFrequency; i > finalFrequency; i /= prop) {
-            _tone(i, noteDuration, silentDuration);
+			//total = total + (noteDuration + silentDuration);
+            result = Sound_tone(i, noteDuration, silentDuration, noblock);
+	        if(result < 0) return result;
         }
     }
+    //Serial.print(F("bendTones: total ms bendtone queue = "));
+    //Serial.println(total);
+    return 0; // sucess
+}
+
+// Define c++ wrapper function for c toneTask
+void Otto::toneTaskWrapper(void *pvParameters) {
+  Otto* ottoInstance = static_cast<Otto*>(pvParameters);
+  ottoInstance->toneTask(pvParameters);
+}
+
+// Task to play the tone
+void Otto::toneTask(void *pvParameters) {
+  ToneParameters toneParams;
+
+  while (true) {
+    if (xQueueReceive(toneQueueHandle, &toneParams, portMAX_DELAY) == pdTRUE) {
+	  if(toneParams.frequency != 0) { // ignore empty (rests ) notes
+	    tone(Otto::pinBuzzer, toneParams.frequency, toneParams.noteDuration);
+	    vTaskDelay(max (1U, (toneParams.noteDuration / portTICK_PERIOD_MS) ));
+	  }
+	  vTaskDelay(max (1U, (toneParams.silentDuration / portTICK_PERIOD_MS) ));
+    }
+  }
+}
+
+//---------------------------------------------------------
+//-- Otto Sound: Sing compatibility wrapper
+//---------------------------------------------------------
+// Parameters:
+//   * songName: The name of the song to sing (defined constants)
+//---------------------------------------------------------
+void Otto::sing(int songName) {
+	Sound_sing(songName, Otto_code);
 }
 
 //---------------------------------------------------------
@@ -812,124 +1574,273 @@ void Otto::bendTones(float initFrequency, float finalFrequency, float prop, long
 //---------------------------------------------------------
 // Parameters:
 //   * songName: The name of the song to sing (defined constants)
+//   * noblock: code flow style blocking or non-blocking
+// Returns:
+//    Integer value representing success (0) or error #.
 //---------------------------------------------------------
-void Otto::sing(int songName) {
+int Otto::Sound_sing(int songName, bool noblock) {
+    int result = 0;
     switch (songName) {
-        case S_connection:
-            _tone(note_E5, 50, 30);
-            _tone(note_E6, 55, 25);
-            _tone(note_A6, 60, 10);
+        case S_connection:	// 230ms
+            result = Sound_tone(note_E5, 50, 30, noblock);
+            if(result < 0) return result;
+            result = Sound_tone(note_E6, 55, 25, noblock);
+            if(result < 0) return result;
+            result = result = Sound_tone(note_A6, 60, 10, noblock);
+            if(result < 0) return result;
             break;
-        case S_disconnection:
-            _tone(note_E5, 50, 30);
-            _tone(note_A6, 55, 25);
-            _tone(note_E6, 50, 10);
+        case S_disconnection:	// 220ms
+            result = Sound_tone(note_E5, 50, 30, noblock);
+            if(result < 0) return result;
+            result = Sound_tone(note_A6, 55, 25, noblock);
+            if(result < 0) return result;
+            result = Sound_tone(note_E6, 50, 10, noblock);
+            if(result < 0) return result;
             break;
-        case S_buttonPushed:
-            bendTones(note_E6, note_G6, 1.03, 20, 2);
-            delay(30);
-            bendTones(note_E6, note_D7, 1.04, 10, 2);
+        case S_buttonPushed:	// 312ms
+            result = Sound_bendTones(note_E6, note_G6, 1.03, 20, 2, noblock);
+            if(result < 0) return result;
+            result = Sound_tone(note_0, 0, 30); // rests  note 
+            if(result < 0) return result;
+            result = Sound_bendTones(note_E6, note_D7, 1.04, 10, 2, noblock);
+            if(result < 0) return result;
             break;
-        case S_mode1:
-            bendTones(note_E6, note_A6, 1.02, 30, 10);
+        case S_mode1:	// 600ms
+            result = Sound_bendTones(note_E6, note_A6, 1.02, 30, 10, noblock);
+            if(result < 0) return result;
             break;
-        case S_mode2:
-            bendTones(note_G6, note_D7, 1.03, 30, 10);
+        case S_mode2:	// 560ms
+            result = Sound_bendTones(note_G6, note_D7, 1.03, 30, 10, noblock);
+            if(result < 0) return result;
             break;
-        case S_mode3:
-            _tone(note_E6, 50, 100);
-            _tone(note_G6, 50, 80);
-            _tone(note_D7, 300, 0);
+        case S_mode3:	// 580ms
+            result = Sound_tone(note_E6, 50, 100, noblock);
+            if(result < 0) return result;
+            result = Sound_tone(note_G6, 50, 80, noblock);
+            if(result < 0) return result;
+            result = Sound_tone(note_D7, 300, 0, noblock);
+            if(result < 0) return result;
             break;
-        case S_surprise:
-            bendTones(800, 2150, 1.02, 10, 1);
-            bendTones(2149, 800, 1.03, 7, 1);
+        case S_surprise:	// 825ms
+            result = Sound_bendTones(800, 2150, 1.02, 10, 1, noblock);
+            if(result < 0) return result;
+            result = Sound_bendTones(2149, 800, 1.03, 7, 1, noblock);
+            if(result < 0) return result;
             break;
-        case S_OhOoh:
-            bendTones(880, 2000, 1.04, 8, 3);
-            delay(200);
+        case S_OhOoh:	// 242ms
+            result = Sound_bendTones(880, 2000, 1.04, 8, 3, noblock);
+            if(result < 0) return result;
+            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
+            if(result < 0) return result;
+            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
+            if(result < 0) return result;
             for (int i = 880; i < 2000; i = i * 1.04) {
-                _tone(note_B5, 5, 10);
+            result = Sound_tone(note_B5, 5, 10, noblock);
+            if(result < 0) return result;
             }
             break;
-        case S_OhOoh2:
-            bendTones(1880, 3000, 1.03, 8, 3);
-            delay(200);
+        case S_OhOoh2:	// 176ms
+            result = Sound_bendTones(1880, 3000, 1.03, 8, 3, noblock);
+            if(result < 0) return result;
+            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
+            if(result < 0) return result;
+            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
+            if(result < 0) return result;
             for (int i = 1880; i < 3000; i = i * 1.03) {
-                _tone(note_C6, 10, 10);
+            result = Sound_tone(note_C6, 10, 10, noblock);
+            if(result < 0) return result;
             }
             break;
-        case S_cuddly:
-            bendTones(700, 900, 1.03, 16, 4);
-            bendTones(899, 650, 1.01, 18, 7);
+        case S_cuddly:	// 955ms
+            result = Sound_bendTones(700, 900, 1.03, 16, 4, noblock);
+            if(result < 0) return result;
+            result = Sound_bendTones(899, 650, 1.01, 18, 7, noblock);
+            if(result < 0) return result;
             break;
-        case S_sleeping:
-            bendTones(100, 500, 1.04, 10, 10);
-            delay(500);
-            bendTones(400, 100, 1.04, 10, 1);
+        case S_sleeping:	// 1243ms
+            result = Sound_bendTones(100, 500, 1.04, 10, 10, noblock);
+            if(result < 0) return result;
+            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
+            if(result < 0) return result;
+            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
+            if(result < 0) return result;
+            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
+            if(result < 0) return result;
+            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
+            if(result < 0) return result;
+            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
+            if(result < 0) return result;
+            result = Sound_bendTones(400, 100, 1.04, 10, 1, noblock);
+            if(result < 0) return result;
             break;
-        case S_happy:
-            bendTones(1500, 2500, 1.05, 20, 8);
-            bendTones(2499, 1500, 1.05, 25, 8);
+        case S_happy:	// 671ms
+            result = Sound_bendTones(1500, 2500, 1.05, 20, 8, noblock);
+            if(result < 0) return result;
+            result = Sound_bendTones(2499, 1500, 1.05, 25, 8, noblock);
+            if(result < 0) return result;
             break;
-        case S_superHappy:
-            bendTones(2000, 6000, 1.05, 8, 3);
-            delay(50);
-            bendTones(5999, 2000, 1.05, 13, 2);
+        case S_superHappy:	// 598ms
+            result = Sound_bendTones(2000, 6000, 1.05, 8, 3, noblock);
+            if(result < 0) return result;
+            result = Sound_tone(note_0, 0, 50); // rests  note 
+            if(result < 0) return result;
+            result = Sound_bendTones(5999, 2000, 1.05, 13, 2, noblock);
+            if(result < 0) return result;
             break;
-        case S_happy_short:
-            bendTones(1500, 2000, 1.05, 15, 8);
-            delay(100);
-            bendTones(1900, 2500, 1.05, 10, 8);
+        case S_happy_short:	// 246ms
+            result = Sound_bendTones(1500, 2000, 1.05, 15, 8, noblock);
+            if(result < 0) return result;
+            result = Sound_tone(note_0, 0, 100); // rests  note 
+            if(result < 0) return result;
+            result = Sound_bendTones(1900, 2500, 1.05, 10, 8, noblock);
+            if(result < 0) return result;
             break;
-        case S_sad:
-            bendTones(880, 669, 1.02, 20, 200);
+        case S_sad:	// 3080ms
+            result = Sound_bendTones(880, 669, 1.02, 20, 200, noblock);
+            if(result < 0) return result;
             break;
-        case S_confused:
-            bendTones(1000, 1700, 1.03, 8, 2);
-            bendTones(1699, 500, 1.04, 8, 3);
-            bendTones(1000, 1700, 1.05, 9, 10);
+        case S_confused:	// 740ms
+            result = Sound_bendTones(1000, 1700, 1.03, 8, 2, noblock);
+            if(result < 0) return result;
+            result = Sound_bendTones(1699, 500, 1.04, 8, 3, noblock);
+            if(result < 0) return result;
+            result = Sound_bendTones(1000, 1700, 1.05, 9, 10, noblock);
+            if(result < 0) return result;
             break;
-        case S_fart1:
-            bendTones(1600, 3000, 1.02, 2, 15);
+        case S_fart1:	// 561ms
+            result = Sound_bendTones(1600, 3000, 1.02, 2, 15, noblock);
+            if(result < 0) return result;
             break;
-        case S_fart2:
-            bendTones(2000, 6000, 1.02, 2, 20);
+        case S_fart2:	// 1232ms
+            result = Sound_bendTones(2000, 6000, 1.02, 2, 20, noblock);
+            if(result < 0) return result;
             break;
-        case S_fart3:
-            bendTones(1600, 4000, 1.02, 2, 20);
-            bendTones(4000, 3000, 1.02, 2, 20);
+        case S_fart3:	// 1364ms
+            result = Sound_bendTones(1600, 4000, 1.02, 2, 20, noblock);
+            if(result < 0) return result;
+            result = Sound_bendTones(4000, 3000, 1.02, 2, 20, noblock);
+            if(result < 0) return result;
             break;
     }
+    return 0; // return sucess
+}
+#else // SOUND_BUZZER dummy compatibility wrappers
+
+//---------------------------------------------------------
+//-- Otto Sound: Play Tone dummy compatibility wrapper
+//---------------------------------------------------------
+// Parameters:
+//   * noteFrequency: Frequency of the tone to play
+//   * noteDuration: Duration of the tone
+//   * silentDuration: Duration of silence after the tone
+//-------------------------------------------------------
+void Otto::_tone(float frequency, long noteDuration, int silentDuration) {
+	if(!Otto_code) delay(noteDuration + silentDuration); // block for length of note to stay compatable
 }
 
 //---------------------------------------------------------
-//-- Otto Gesture: Play Gesture
+//-- Otto Sound: Bend Tones dummy compatibility wrapper
+//---------------------------------------------------------
+// Parameters:
+//   * initFrequency: Initial frequency
+//   * finalFrequency: Final frequency
+//   * prop: Proportion of change in frequency
+//   * noteDuration: Duration of each note
+//   * silentDuration: Duration of silence between notes
+//---------------------------------------------------------
+void Otto::bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration) {
+	if(!Otto_code) {
+
+		if (silentDuration == 0) {
+			silentDuration = 1;
+		}
+
+		// Bend the tones based on the frequency change proportion
+		if (initFrequency < finalFrequency) {
+			// Ascending frequency
+			for (int i = initFrequency; i < finalFrequency; i *= prop) {
+				delay(noteDuration + silentDuration); // block for length of note to stay compatable
+			}
+		} else {
+			// Descending frequency
+			for (int i = initFrequency; i > finalFrequency; i /= prop) {
+				delay(noteDuration + silentDuration); // block for length of note to stay compatable
+			}
+		}
+	}
+}
+
+//---------------------------------------------------------
+//-- Otto Sound: Sing dummy compatibility wrapper
+//---------------------------------------------------------
+// Parameters:
+//   * songName: The name of the song to sing (defined constants)
+//---------------------------------------------------------
+void Otto::sing(int songName) {
+	if(!Otto_code) {
+		int song[19] = {230, 220, 312, 600, 560, 580, 825, 242, 176, 955, 1243, 671, 598, 246, 3080, 740, 561, 1232, 1364};
+		delay(song[songName]); // block for length of song to stay compatable
+	}
+	return;
+}
+
+#endif // SOUND_BUZZER
+
+//---------------------------------------------------------
+//-- Otto Gesture: Play Gesture compatibility wrapper
 //---------------------------------------------------------
 // Parameters:
 //   * gesture: The name of the gesture to play (defined constants)
 //---------------------------------------------------------
 void Otto::playGesture(int gesture) {
+	Gesture(gesture, Otto_code);
+}
+	
+//---------------------------------------------------------
+//-- Otto Gesture: Play Gesture
+//---------------------------------------------------------
+// Parameters:
+//   * gesture: The name of the gesture to play (defined constants)
+// Returns:
+//    Integer value representing success (0) or error #.
+//---------------------------------------------------------
+int Otto::Gesture(int gesture, bool noblock) {
   int gesturePOSITION[4];
+  int result = 0;
   
   switch(gesture) {
     case OttoHappy: 
-      _tone(note_E5, 50, 30);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_tone(note_E5, 50, 30, noblock);
+      //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(smile);
-      sing(S_happy_short);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_happy_short, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       swing(1, 800, 20); 
-      sing(S_happy_short);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_happy_short, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       home();
       putMouth(happyOpen);
       break;
 
     case OttoSuperHappy:
       putMouth(happyOpen);
-      sing(S_happy);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_happy, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(happyClosed);
       tiptoeSwing(1, 500, 20);
       putMouth(happyOpen);
-      sing(S_superHappy);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_superHappy, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(happyClosed);
       tiptoeSwing(1, 500, 20); 
       home();  
@@ -943,19 +1854,34 @@ void Otto::playGesture(int gesture) {
       gesturePOSITION[2] = 20;
       gesturePOSITION[3] = 160;
       _moveServos(700, gesturePOSITION);     
-      bendTones(880, 830, 1.02, 20, 200);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_bendTones(880, 830, 1.02, 20, 200, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(sadClosed);
-      bendTones(830, 790, 1.02, 20, 200);  
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_bendTones(830, 790, 1.02, 20, 200, noblock);  
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(sadOpen);
-      bendTones(790, 740, 1.02, 20, 200);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_bendTones(790, 740, 1.02, 20, 200, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(sadClosed);
-      bendTones(740, 700, 1.02, 20, 200);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_bendTones(740, 700, 1.02, 20, 200, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(sadOpen);
-      bendTones(700, 669, 1.02, 20, 200);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_bendTones(700, 669, 1.02, 20, 200, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(sad);
-      delay(500);
+      delay(500); // fixme no delays
       home();
-      delay(300);
+      delay(300); // fixme no delays
       putMouth(happyOpen);
       break;
 
@@ -967,20 +1893,38 @@ void Otto::playGesture(int gesture) {
       _moveServos(700, gesturePOSITION);     
       for(int i = 0; i < 4; i++) {
         putAnimationMouth(dreamMouth, 0);
-        bendTones(100, 200, 1.04, 10, 10);
+#if Otto_sound == SOUND_BUZZER
+        result = Sound_bendTones(100, 200, 1.04, 10, 10, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
         putAnimationMouth(dreamMouth, 1);
-        bendTones(200, 300, 1.04, 10, 10);  
+#if Otto_sound == SOUND_BUZZER
+        result = Sound_bendTones(200, 300, 1.04, 10, 10, noblock);  
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
         putAnimationMouth(dreamMouth, 2);
-        bendTones(300, 500, 1.04, 10, 10);   
-        delay(500);
+#if Otto_sound == SOUND_BUZZER
+        result = Sound_bendTones(300, 500, 1.04, 10, 10, noblock);   
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
+        delay(500); // fixme no delays
         putAnimationMouth(dreamMouth, 1);
-        bendTones(400, 250, 1.04, 10, 1); 
+#if Otto_sound == SOUND_BUZZER
+        result = Sound_bendTones(400, 250, 1.04, 10, 1, noblock); 
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
         putAnimationMouth(dreamMouth, 0);
-        bendTones(250, 100, 1.04, 10, 1); 
-        delay(500);
+#if Otto_sound == SOUND_BUZZER
+        result = Sound_bendTones(250, 100, 1.04, 10, 1, noblock); 
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
+        delay(500); // fixme no delays
       } 
       putMouth(lineMouth);
-      sing(S_cuddly);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_cuddly, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       home();  
       putMouth(happyOpen);
       break;
@@ -991,33 +1935,42 @@ void Otto::playGesture(int gesture) {
       gesturePOSITION[2] = 145;
       gesturePOSITION[3] = 122;
       _moveServos(500, gesturePOSITION);
-      delay(300);     
+      delay(300); // fixme no delays
       putMouth(lineMouth);
-      sing(S_fart1);  
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_fart1, noblock);  
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(tongueOut);
-      delay(250);
+      delay(250); // fixme no delays
       gesturePOSITION[0] = 90;
       gesturePOSITION[1] = 90;
       gesturePOSITION[2] = 80;
       gesturePOSITION[3] = 122;
       _moveServos(500, gesturePOSITION);
-      delay(300);
+      delay(300); // fixme no delays
       putMouth(lineMouth);
-      sing(S_fart2); 
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_fart2, noblock); 
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(tongueOut);
-      delay(250);
+      delay(250); // fixme no delays
       gesturePOSITION[0] = 90;
       gesturePOSITION[1] = 90;
       gesturePOSITION[2] = 145;
       gesturePOSITION[3] = 80;
       _moveServos(500, gesturePOSITION);
-      delay(300);
+      delay(300); // fixme no delays
       putMouth(lineMouth);
-      sing(S_fart3);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_fart3, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(tongueOut);    
-      delay(300);
+      delay(300); // fixme no delays
       home(); 
-      delay(500); 
+      delay(500); // fixme no delays
       putMouth(happyOpen);
       break;
 
@@ -1028,18 +1981,27 @@ void Otto::playGesture(int gesture) {
       gesturePOSITION[3] = 90;
       _moveServos(300, gesturePOSITION); 
       putMouth(confused);
-      sing(S_confused);
-      delay(500);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_confused, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
+      delay(500); // fixme no delays
       home();  
       putMouth(happyOpen);
       break;
 
     case OttoLove:
       putMouth(heart);
-      sing(S_cuddly);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_cuddly, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       crusaito(2, 1500, 15, 1);
       home(); 
-      sing(S_happy_short);  
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_happy_short, noblock);  
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(happyOpen);
       break;
 
@@ -1050,34 +2012,52 @@ void Otto::playGesture(int gesture) {
       gesturePOSITION[3] = 110;
       _moveServos(300, gesturePOSITION); 
       putMouth(angry);
-      _tone(note_A5, 100, 30);
-      bendTones(note_A5, note_D6, 1.02, 7, 4);
-      bendTones(note_D6, note_G6, 1.02, 10, 1);
-      bendTones(note_G6, note_A5, 1.02, 10, 1);
-      delay(15);
-      bendTones(note_A5, note_E5, 1.02, 20, 4);
-      delay(400);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_tone(note_A5, 100, 30, noblock);
+	  //if(result < 0) return result;
+      result = Sound_bendTones(note_A5, note_D6, 1.02, 7, 4, noblock);
+ 	  //if(result < 0) return result;
+      result = Sound_bendTones(note_D6, note_G6, 1.02, 10, 1, noblock);
+	  //if(result < 0) return result;
+      result = Sound_bendTones(note_G6, note_A5, 1.02, 10, 1, noblock);
+	  //if(result < 0) return result;
+      result = Sound_tone(note_0, 0, 15, noblock); // rests note 15ms replace delay 
+	  //if(result < 0) return result;
+      result = Sound_bendTones(note_A5, note_E5, 1.02, 20, 4, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
+      delay(400); // fixme no delays
       gesturePOSITION[0] = 110;
       gesturePOSITION[1] = 110;
       gesturePOSITION[2] = 90;
       gesturePOSITION[3] = 90;
       _moveServos(200, gesturePOSITION); 
-      bendTones(note_A5, note_D6, 1.02, 20, 4);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_bendTones(note_A5, note_D6, 1.02, 20, 4, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       gesturePOSITION[0] = 70;
       gesturePOSITION[1] = 70;
       gesturePOSITION[2] = 90;
       gesturePOSITION[3] = 90;
       _moveServos(200, gesturePOSITION); 
-      bendTones(note_A5, note_E5, 1.02, 20, 4);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_bendTones(note_A5, note_E5, 1.02, 20, 4, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       home();  
       putMouth(happyOpen);
       break;
 
     case OttoFretful: 
       putMouth(angry);
-      bendTones(note_A5, note_D6, 1.02, 20, 4);
-      bendTones(note_A5, note_E5, 1.02, 20, 4);
-      delay(300);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_bendTones(note_A5, note_D6, 1.02, 20, 4, noblock);
+	  //if(result < 0) return result;
+      result = Sound_bendTones(note_A5, note_E5, 1.02, 20, 4, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
+      delay(300); // fixme no delays
       putMouth(lineMouth);
       for(int i = 0; i < 4; i++) {
         gesturePOSITION[0] = 90;
@@ -1088,57 +2068,82 @@ void Otto::playGesture(int gesture) {
         home();
       }
       putMouth(angry);
-      delay(500);
+      delay(500); // fixme no delays
       home();  
       putMouth(happyOpen);
       break;
 
     case OttoMagic:
       for(int i = 0; i < 4; i++) { 
+#if Otto_sound == SOUND_BUZZER
         int noteM = 400; 
+#endif // SOUND_BUZZER	  
         for(int index = 0; index < 6; index++) {
           putAnimationMouth(adivinawi, index);
-          bendTones(noteM, noteM + 100, 1.04, 10, 10);    // 400 -> 1000 
+#if Otto_sound == SOUND_BUZZER
+          result = Sound_bendTones(noteM, noteM + 100, 1.04, 10, 10, noblock); // 400 -> 1000
+	      //if(result < 0) return result;
           noteM += 100;
+#endif // SOUND_BUZZER	  
         }
         clearMouth();
-        bendTones(noteM - 100, noteM + 100, 1.04, 10, 10);  // 900 -> 1100
+#if Otto_sound == SOUND_BUZZER
+        result = Sound_bendTones(noteM - 100, noteM + 100, 1.04, 10, 10, noblock); // 900 -> 1100
+	    //if(result < 0) return result;
+#endif // SOUND_BUZZER	  
         for(int index = 0; index < 6; index++) {
           putAnimationMouth(adivinawi, index);
-          bendTones(noteM, noteM + 100, 1.04, 10, 10);    // 1000 -> 400 
+#if Otto_sound == SOUND_BUZZER
+          result = Sound_bendTones(noteM, noteM + 100, 1.04, 10, 10, noblock); // 1000 -> 400
+	      //if(result < 0) return result; 
           noteM -= 100;
+#endif // SOUND_BUZZER	  
         }
       } 
-      delay(300);
+      delay(300); // fixme no delays
       putMouth(happyOpen);
       break;
 
     case OttoWave:
       for(int i = 0; i < 2; i++) { 
+#if Otto_sound == SOUND_BUZZER
         int noteW = 500; 
+#endif // SOUND_BUZZER	  
         for(int index = 0; index < 10; index++) {
           putAnimationMouth(wave, index);
-          bendTones(noteW, noteW + 100, 1.02, 10, 10); 
+#if Otto_sound == SOUND_BUZZER
+          result = Sound_bendTones(noteW, noteW + 100, 1.02, 10, 10, noblock);
+	      //if(result < 0) return result;
           noteW += 101;
+#endif // SOUND_BUZZER	  
         }
         for(int index = 0; index < 10; index++) {
           putAnimationMouth(wave, index);
-          bendTones(noteW, noteW + 100, 1.02, 10, 10); 
+#if Otto_sound == SOUND_BUZZER
+          result = Sound_bendTones(noteW, noteW + 100, 1.02, 10, 10, noblock);
+	      //if(result < 0) return result;
           noteW += 101;
+#endif // SOUND_BUZZER	  
         }
         for(int index = 0; index < 10; index++) {
           putAnimationMouth(wave, index);
-          bendTones(noteW, noteW - 100, 1.02, 10, 10); 
+#if Otto_sound == SOUND_BUZZER
+          result = Sound_bendTones(noteW, noteW - 100, 1.02, 10, 10, noblock);
+	      //if(result < 0) return result; 
           noteW -= 101;
+#endif // SOUND_BUZZER	  
         }
         for(int index = 0; index < 10; index++) {
           putAnimationMouth(wave, index);
-          bendTones(noteW, noteW - 100, 1.02, 10, 10); 
+#if Otto_sound == SOUND_BUZZER
+          result = Sound_bendTones(noteW, noteW - 100, 1.02, 10, 10, noblock);
+	      //if(result < 0) return result;
           noteW -= 101;
+#endif // SOUND_BUZZER	  
         }
       }    
       clearMouth();
-      delay(100);
+      delay(100); // fixme no delays
       putMouth(happyOpen);
       break;
 
@@ -1147,17 +2152,26 @@ void Otto::playGesture(int gesture) {
       for (int i = 0; i < 60; ++i) {
         int pos[] = {90, 90, 90 + i, 90 - i};  
         _moveServos(10, pos);
-        _tone(1600 + i * 20, 15, 1);
+#if Otto_sound == SOUND_BUZZER
+        result = Sound_tone(1600 + i * 20, 15, 1, noblock);
+        //if(result < 0) return result;
+#endif // SOUND_BUZZER	  
       }
       putMouth(bigSurprise);
       for (int i = 0; i < 60; ++i) {
         int pos[] = {90, 90, 150 - i, 30 + i};  
         _moveServos(10, pos);
-        _tone(2800 + i * 20, 15, 1);
+#if Otto_sound == SOUND_BUZZER
+        result = Sound_tone(2800 + i * 20, 15, 1, noblock);
+        //if(result < 0) return result;
+#endif // SOUND_BUZZER	  
       }
       putMouth(happyOpen);
       tiptoeSwing(1, 500, 20);
-      sing(S_superHappy);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_sing(S_superHappy, noblock);
+	  //if(result < 0) return result;
+#endif // SOUND_BUZZER
       putMouth(happyClosed);
       tiptoeSwing(1, 500, 20); 
       home();
@@ -1172,21 +2186,30 @@ void Otto::playGesture(int gesture) {
       gesturePOSITION[2] = 70;
       gesturePOSITION[3] = 35;
       _moveServos(300, gesturePOSITION);
-      _tone(900, 200, 1);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_tone(900, 200, 1, noblock);
+      //if(result < 0) return result;
+#endif // SOUND_BUZZER	  
       putMouth(sadClosed);
       gesturePOSITION[0] = 90;
       gesturePOSITION[1] = 90;
       gesturePOSITION[2] = 55;
       gesturePOSITION[3] = 35;
       _moveServos(300, gesturePOSITION);
-      _tone(600, 200, 1);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_tone(600, 200, 1, noblock);
+      //if(result < 0) return result;
+#endif // SOUND_BUZZER	  
       putMouth(confused);
       gesturePOSITION[0] = 90;
       gesturePOSITION[1] = 90;
       gesturePOSITION[2] = 42;
       gesturePOSITION[3] = 35;
       _moveServos(300, gesturePOSITION);
-      _tone(300, 200, 1);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_tone(300, 200, 1, noblock);
+      //if(result < 0) return result;
+#endif // SOUND_BUZZER	  
       gesturePOSITION[0] = 90;
       gesturePOSITION[1] = 90;
       gesturePOSITION[2] = 34;
@@ -1194,37 +2217,16 @@ void Otto::playGesture(int gesture) {
       _moveServos(300, gesturePOSITION);
       putMouth(xMouth);
       detachServos();
-      _tone(150, 2200, 1);
-      delay(600);
+#if Otto_sound == SOUND_BUZZER
+      result = Sound_tone(150, 2200, 1, noblock);
+      //if(result < 0) return result;
+#endif // SOUND_BUZZER	  
+      delay(600); // fixme no delays
       clearMouth();
       putMouth(happyOpen);
       home();
       break;
   }
+  return 0; // success
 }
 
-//---------------------------------------------------------
-//-- Otto Servo: Enable Servo Limit
-//---------------------------------------------------------
-// Parameters:
-//    * diff_limit: The difference limit for servo movement
-//---------------------------------------------------------
-void Otto::enableServoLimit(int diff_limit) {
-    for (int i = 0; i < 4; i++) {
-        // Set the difference limit for each servo
-        servo[i].SetLimiter(diff_limit);
-    }
-}
-
-//---------------------------------------------------------
-//-- Otto Servo: Disable Servo Limit
-//---------------------------------------------------------
-// Description:
-//    This function disables the servo limits previously set.
-//---------------------------------------------------------
-void Otto::disableServoLimit() {
-    for (int i = 0; i < 4; i++) {
-        // Disable the servo limit for each servo
-        servo[i].DisableLimiter();
-    }
-}
