@@ -13,10 +13,10 @@
 	//#define  Otto_code			BLOCKING
 	#define  Otto_model			BIPED // 4x 180° Servos
 	#define  Otto_SERVOS		4
-	//#define  Otto_sound			SOUND_BUZZER
-	#define  Otto_sound			SOUND_NONE
-	#define  Otto_mouth			MOUTH_8X8_MONO_SPI
-	//#define  Otto_mouth			MOUTH_NONE
+	#define  Otto_sound			SOUND_BUZZER
+	//#define  Otto_sound			SOUND_NONE
+	//#define  Otto_mouth			MOUTH_8X8_MONO_SPI
+	#define  Otto_mouth			MOUTH_NONE
 #endif // Otto_config_h
 
 #ifndef Otto_model

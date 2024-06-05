@@ -8,9 +8,10 @@
 
 #define FPS30 33	// 30 frames per second = 33 ms per frame (approximately)
 
-#include "Otto_models.h"
+#include "Otto_model.h"
 #include "Otto_sound.h"
 #include "Otto_mouth.h"
+#include "Otto_gesture.h"
 #include "Otto_version.h"
 
 template <typename T> void PROGMEM_readAnything(const T *sce, T &dest) {

@@ -1671,13 +1671,11 @@ int Otto::Sound_sing(int songName, bool noblock) {
         case S_OhOoh:	// 242ms
             result = Sound_bendTones(880, 2000, 1.04, 8, 3, noblock);
             if(result < 0) return result;
-            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
-            if(result < 0) return result;
-            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
+            result = Sound_tone(note_0, 0, 200, noblock); // rests  note 
             if(result < 0) return result;
 			
             for (int i = 880; i < 2000; i = i * 1.04) {
-                result = Sound_tone(note_B5, 5, 10, BLOCKING);
+                result = Sound_tone(note_B5, 5, 10, BLOCKING); // fixme: too many tone calls
                 if(result < 0) return result;
             }
 			
@@ -1685,13 +1683,11 @@ int Otto::Sound_sing(int songName, bool noblock) {
         case S_OhOoh2:	// 176ms
             result = Sound_bendTones(1880, 3000, 1.03, 8, 3, noblock);
             if(result < 0) return result;
-            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
-            if(result < 0) return result;
-            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
+            result = Sound_tone(note_0, 0, 200, noblock); // rests  note 
             if(result < 0) return result;
 			
             for (int i = 1880; i < 3000; i = i * 1.03) {
-                result = Sound_tone(note_C6, 10, 10, BLOCKING);
+                result = Sound_tone(note_C6, 10, 10, BLOCKING); // fixme: too many tone calls
                 if(result < 0) return result;
             }
 			
@@ -1705,15 +1701,7 @@ int Otto::Sound_sing(int songName, bool noblock) {
         case S_sleeping:	// 1243ms
             result = Sound_bendTones(100, 500, 1.04, 10, 10, noblock);
             if(result < 0) return result;
-            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
-            if(result < 0) return result;
-            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
-            if(result < 0) return result;
-            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
-            if(result < 0) return result;
-            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
-            if(result < 0) return result;
-            result = Sound_tone(note_0, 0, 100, noblock); // rests  note 
+            result = Sound_tone(note_0, 0, 500, noblock); // rests  note 
             if(result < 0) return result;
             result = Sound_bendTones(400, 100, 1.04, 10, 1, noblock);
             if(result < 0) return result;
