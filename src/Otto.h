@@ -10,13 +10,10 @@
 #ifndef Otto_config_h				  // no pre-config ... default to starter kit biped
 	#include "Otto_config.h"
 	#define  Otto_code			NON_BLOCKING
-	//#define  Otto_code			BLOCKING
 	#define  Otto_model			BIPED // 4x 180° Servos
 	#define  Otto_SERVOS		4
 	#define  Otto_sound			SOUND_BUZZER
-	//#define  Otto_sound			SOUND_NONE
-	//#define  Otto_mouth			MOUTH_8X8_MONO_SPI
-	#define  Otto_mouth			MOUTH_NONE
+	#define  Otto_mouth			MOUTH_8X8_MONO_SPI
 #endif // Otto_config_h
 
 #ifndef Otto_model
@@ -58,10 +55,15 @@
 	#undef delay		     // undefine freertos's delay() wrapper 
 	#include <queue.h>
     #include <Servo.h>               // Servo Library
+	#define Mouth_Stack 128
+	#define Sound_Stack 128
 #elif defined(ARDUINO_ARCH_ESP8266)  // https://github.com/alexCajas/esp8266RTOSArduCore/
     #include <ESP32Servo.h>          // Esp-idf Servo Library *untested
 #elif defined(ARDUINO_ARCH_ESP32)
     #include <ESP32Servo.h>          // Esp-idf Servo Library
+	#define max(a, b) ((a) > (b) ? (a) : (b))
+	#define Mouth_Stack 1024
+	#define Sound_Stack 1024
 #elif defined(ARDUINO_ARCH_RP2040)   // https://github.com/earlephilhower/arduino-pico
     #include <FreeRTOS.h>            // add the FreeRTOS functions
     #include <Servo.h>               // Servo Library
