@@ -47,7 +47,7 @@ void Otto_Matrix::init(byte _data, byte _load, byte _clock, byte _num, int _rota
 
     // Clear display buffer and set intensity
     clearMatrix();
-    setIntensity(0x0f);
+    setIntensity(0x0f); // 0 - 15
 }
 
 // Set LED Matrix Intensity
