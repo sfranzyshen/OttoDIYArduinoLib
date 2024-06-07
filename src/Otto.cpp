@@ -793,7 +793,7 @@ int Otto::Mouth_init(int DIN, int CS, int CLK, int rotate) {
     }
 	
     // Create the mouth task
-    xTaskCreate(mouthTaskWrapper, "Mouth Task", 128, this, 1, &mouthTaskHandle);
+    xTaskCreate(mouthTaskWrapper, "Mouth Task", Mouth_Stack, this, 1, &mouthTaskHandle);
 
     // Check if the task creation was successful
     if (mouthTaskHandle == NULL) {
@@ -1349,7 +1349,7 @@ int Otto::Sound_init(int Buzzer) {
       return -2; // Failed to create queue
     }
     // Create the tone task
-    xTaskCreate(toneTaskWrapper, "Tone Task", 128, this, 1, &toneTaskHandle);
+    xTaskCreate(toneTaskWrapper, "Tone Task", Sound_Stack, this, 1, &toneTaskHandle);
 
     // Check if the task creation was successful
     if (toneTaskHandle == NULL) {
