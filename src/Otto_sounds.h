@@ -6,10 +6,38 @@
 #define Otto_sounds_h
 
 // Structure to hold tone parameters
-struct ToneParameters {
+struct SoundtoneParam {
 	float frequency;
 	long noteDuration;
 	int silentDuration;
+};
+
+// Structure to hold bendtones parameters
+struct SoundbendtonesParam {
+    float initFrequency;
+	float finalFrequency;
+	float prop;
+	long noteDuration;
+	int silentDuration;
+};
+
+// Define a Union for sound commands
+union SoundQueueCmd {
+    struct SoundtoneParam tone;				// 1
+    struct SoundbendtonesParam bendtones;	// 2
+	
+    SoundQueueCmd() {}  // Default constructor
+    ~SoundQueueCmd() {} // Destructor
+};
+
+// Define sound command numbers
+#define SOUND_TONE		1
+#define SOUND_BENDTONES	2
+
+// Define the wrapper structure for sound messages
+struct SoundQueueMsg {
+    int command; // 1 for mouth, 2 for intensity, ...
+    union SoundQueueCmd cmd;
 };
 
 // note freqs
