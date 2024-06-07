@@ -1250,7 +1250,7 @@ void Otto::mouthTask(void *pvParameters) {
 			vTaskDelay(max (1U, (Queuemsg.cmd.setled.duration / portTICK_PERIOD_MS) ));
         } else if(Queuemsg.command == MOUTH_WRITE) { // Process StructType write
             int a, b;
-            char *originalString = Queuemsg.cmd.write.string;
+            const char *originalString = Queuemsg.cmd.write.string;
             bool continueLoop = true;
 
             // Determine the length of the text (up to 12 characters)
