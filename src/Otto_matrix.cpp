@@ -3,9 +3,6 @@
 // MaxMatrix - Copyright 2013 Oscar Kin-Chung Au
 
 #include "Arduino.h"
-#if defined(ARDUINO_ARCH_AVR)
-  #include <Arduino_FreeRTOS.h>
-#endif // ARDUINO_ARCH
 #include "Otto_matrix.h"
 
 Otto_Matrix::Otto_Matrix() : initialized(false) {}

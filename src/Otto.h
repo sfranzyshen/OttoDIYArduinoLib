@@ -66,6 +66,10 @@
 	#define Sound_Stack 1024
 #elif defined(ARDUINO_ARCH_RP2040)   // https://github.com/earlephilhower/arduino-pico
     #include <FreeRTOS.h>            // add the FreeRTOS functions
+    #include <task.h>
+	#include <queue.h>
+	#define Mouth_Stack 1024
+	#define Sound_Stack 1024
     #include <Servo.h>               // Servo Library
 #endif // ARDUINO_ARCH
 

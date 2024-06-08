@@ -7,6 +7,13 @@
 
 #include "Arduino.h"
 
+#if defined(ARDUINO_ARCH_AVR)
+  #include <Arduino_FreeRTOS.h>
+#elif defined(ARDUINO_ARCH_RP2040)
+  #include <FreeRTOS.h>            // add the FreeRTOS functions
+  #include <task.h>
+#endif // ARDUINO_ARCH
+
 typedef struct {
     uint8_t Character[1];
     uint8_t data[6];

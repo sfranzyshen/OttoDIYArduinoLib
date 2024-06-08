@@ -1349,7 +1349,7 @@ int Otto::Sound_init(int Buzzer) {
       return -2; // Failed to create queue
     }
     // Create the tone task
-    xTaskCreate(toneTaskWrapper, "Tone Task", Sound_Stack, this, 1, &toneTaskHandle);
+    xTaskCreate(soundTaskWrapper, "Sound Task", Sound_Stack, this, 1, &soundTaskHandle);
 
     // Check if the task creation was successful
     if (toneTaskHandle == NULL) {
